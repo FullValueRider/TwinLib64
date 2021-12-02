@@ -1,0 +1,68 @@
+Class mpToLong
+
+	Attribute VB_Name = "mpToLong"
+    Attribute VB_GlobalNameSpace = False
+    Attribute VB_Creatable = False
+    Attribute VB_PredeclaredId = True
+    Attribute VB_Exposed = True
+    '@PredeclaredId
+    '@Exposed
+    Option Explicit
+    
+    Implements IMapper
+    Public Sub New()
+        
+    End Sub
+    
+    Public Function Deb() As mpToLong
+        
+        With New mpToLong
+        
+            Set Deb = .ReadyToUseInstance
+            
+        End With
+        
+    End Function
+    
+    Friend Function ReadyToUseInstance() As mpToLong
+        
+        Set ReadyToUseInstance = Me
+        
+    End Function
+    
+    Private Function IMapper_ExecMapper(ByVal ipHostItem As Variant, Optional ByRef ipArgsArray As Variant) As Variant
+        IMapper_ExecMapper = ExecMapper(ipHostItem, ipArgsArray)
+    End Function
+    
+    '@Description("iparg(0) should be used")
+    Public Function ExecMapper(ByVal ipHostItem As Variant, Optional ByRef ipArgsArray As Variant) As Variant
+        
+        'A paramArray cannot be forwarded as a paramarray, but the above syntax 
+        ' is required to comply with interface signature matching
+        ' thus we test ens extract the first item or set to s dummy array
+        Dim myArgs As Variant
+       If VBA.IsMissing(ipArgsArray) Then
+        
+            myArgs = Array(Empty)
+            
+       ElseIf VBA.IsEmpty(ipArgsArray) Then
+            
+            myArgs = Array(Empty)
+            
+        Else
+            
+            myArgs = ipArgsArray
+        End If
+        
+       
+        
+        On Error Resume Next
+        Dim myResult As Long = CLng(ipHostItem)
+        Dim myErrorNo As Long = Err.Number
+        On Error GoTo 0
+        
+        ExecMapper = IIf(myErrorNo = 0, myResult, myArgs(0))
+        
+    End Function
+
+End Class
