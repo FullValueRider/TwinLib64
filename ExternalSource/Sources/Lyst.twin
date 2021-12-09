@@ -179,42 +179,52 @@ Class Lyst
     '     Status = s.RangeStatus
     ' End Function
 
-    ' '@Description("Returns the first item in the list.  Remove the item from the list")
-    ' Public Function Dequeue() As Variant
+    '@Description("Returns the first item in the list.  Remove the item from the list")
+    Public Function Dequeue() As Variant
         
-    '     Dequeue = Empty
-    '     If s.Host.count = 0 Then Exit Function
-    '     If VBA.IsObject(s.Host.item(0)) Then
+        Dequeue = Empty
+        If s.Host.count = 0 Then Exit Function
+        If VBA.IsObject(s.Host.item(0)) Then
             
-    '         Set Dequeue = s.Host.item(0)
+            Set Dequeue = s.Host.item(0)
         
             
-    '     Else
+        Else
             
-    '         Dequeue = s.Host.item(0)
+            Dequeue = s.Host.item(0)
             
-    '     End If
+        End If
         
-    '     s.Host.removeat 0
+        s.Host.removeat 0
         
-    ' End Function
+    End Function
 
+    '@Description("Returns values taken sequentially from position 0 of the Lyst. If count 1 then an array of one item returned")
+    Public Function Dequeue(ByVal ipCount As Long = 1) As Variant
+        
+        Dequeue = Empty
+        If s.Host.count < 1 Then Exit Function
 
-    ' Public Function Enqueue(ParamArray ipargs() As Variant) As Lyst
+        Dequeue = s.Host.getrange(0, ipCount).toarray
+        s.Host.removerange 0, ipCount
         
-    '     Set Enqueue = Me
-    '     Dim myResult As Result
-    '     Set myResult = Result.Deb
+    End Function
+
+    Public Function Enqueue(ParamArray ipargs() As Variant) As Lyst
         
-    '     If Arrays.HasNoItems(ipargs) Then Exit Function
+        Set Enqueue = Me
+        Dim myResult As Result
+        Set myResult = Result.Deb
+        
+        If Arrays.HasNoItems(ipargs) Then Exit Function
             
-    '     If VBA.UBound(ipargs) = 0 Then
+        If VBA.UBound(ipargs) = 0 Then
     
-    '         If ParamArrayParsing.OneItem(ipargs, myResult).NotOkay Then Exit Function
+            If ParamArrayParsing.OneItem(ipargs, myResult).NotOkay Then Exit Function
                 
+            End If
             
-            
-    ' End Function
+    End Function
 
     '@DefaultMember
     '@Description("Allows read and write of an item value")
