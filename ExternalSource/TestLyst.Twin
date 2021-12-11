@@ -37,7 +37,7 @@ Module TestLyst
 
     Public Sub LystTests()
 
-            Debug.Print "Testing ", CurrentComponentName vbTab, vbTab, vbTab, vbTab ;
+            Debug.Print "Testing ", CurrentComponentName vbTab, vbTab ;
             myPlace = CurrentSourceFile & CurrentComponentName
             Test01_NewLystIsObject
             Test02_NewLystIsLystObject
@@ -548,13 +548,13 @@ Module TestLyst
             
             'Arrange:
             Dim myExpected  As Variant
-            myExpected = Array(20, 30, 40, 50)
+            myExpected = Array(30, 40, 50)
         
             
             Dim myLyst As Lyst
             Set myLyst = Lyst.Deb.Add(10, 20, 30, 40, 50)
             
-            Dim myResult(0 To 3) As Variant
+            Dim myResult(0 To 2) As Variant
             
             'Act:
             myLyst.CopyTo myResult, 2
@@ -576,7 +576,7 @@ Module TestLyst
             
             'Arrange:
             Dim myExpected  As Variant
-            myExpected = Array(10, 20, 30)
+            myExpected = Array(20, 30, 40)
         
             '@Ignore IntegerDataType
             Dim myLyst As Lyst
@@ -692,7 +692,7 @@ Module TestLyst
             
             'Arrange:
             Dim myExpected  As Variant
-            myExpected = Array(10, 70, 20, 30, 40, 50)
+            myExpected = Array(10, 20, 70, 30, 40, 50)
         
             '@Ignore IntegerDataType
             Dim myLyst As Lyst
@@ -731,7 +731,7 @@ Module TestLyst
             Dim myResult As Lyst
             
             'Act:
-            Set myResult = myLyst.InsertRange(3, Array(15, 16, 17, 18, 19))
+            Set myResult = myLyst.InsertRange(2, Array(15, 16, 17, 18, 19))
         
             'Assert:
             Assert.Exact.SequenceEquals myExpected, myResult.ToArray, CurrentProcedureName

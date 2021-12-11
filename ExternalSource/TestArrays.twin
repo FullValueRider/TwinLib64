@@ -671,7 +671,7 @@ Module TestArrays
             
             'Arrange:
             Dim myExpected As Long
-            myExpected = 0
+            myExpected = -1
             
             Dim myArray() As Long
             Dim myResult As Long
@@ -790,8 +790,8 @@ Module TestArrays
             
             'Assert:
             Assert.Strict.AreEqual myExpectedStatus, myResultState, "Status"
-            Assert.Strict.AreEqual myExpectedFirstIndex, myResult.Item(ieFirstIndex), "FirstIndex"
-            Assert.Strict.AreEqual myExpectedLastIndex, myResult.Item(ieLastIndex), "LastIndex"
+            Assert.Strict.AreEqual myExpectedFirstIndex, myResult.Item(IsFirstIndex), "FirstIndex"
+            Assert.Strict.AreEqual myExpectedLastIndex, myResult.Item(IsLastIndex), "LastIndex"
             
     TestExit:
             Exit Sub

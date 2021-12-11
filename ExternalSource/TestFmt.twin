@@ -286,8 +286,8 @@ Module TestFmt
             On Error GoTo TestFail
 
             'Arrange:
-            myExpected = "Should have single quotes 'Hello World'"
-            myTest = "Should have single quotes {sq}{0}{sq}"
+            myExpected = "Should have double quotes 'Hello World'"
+            myTest = "Should have double quotes {sq}{0}{sq}"
 
             'Act
             myResult = Fmt.Txt(myTest, "Hello World")
@@ -311,14 +311,14 @@ Module TestFmt
             On Error GoTo TestFail
 
             'Arrange:
-            myExpected = "Should have single smart quotes" & Char.twLSmartSQuote & "Hello World" & Char.twRSmartSQuote()
+            myExpected = "Should have single smart quotes �Hello World�"
             myTest = "Should have single smart quotes {so}{0}{sc}"
 
             'Act
             myResult = Fmt.Txt(myTest, "Hello World")
 
             'Assert:
-            Assert.Exact.AreEqual VBA.Right$(myExpected, 1), VBA.Right$(myResult, 1)  ', CurrentProcedureName
+            Assert.Exact.AreEqual myExpected, myResult  ', CurrentProcedureName
 
             'TestExit:
             Exit Sub
@@ -336,14 +336,14 @@ Module TestFmt
             On Error GoTo TestFail
 
             'Arrange:
-            myExpected = "Should have double smart quotes" & Char.twLSMartDQuote & "Hello World" & Char.twRSmartDQuote
-            myTest = "Should have doublesmart quotes {do}{0}{dc}"
+            myExpected = "Should have double quotes �Hello World�"
+            myTest = "Should have double quotes {do}{0}{dc}"
 
             'Act
             myResult = Fmt.Txt(myTest, "Hello World")
 
             'Assert:
-            Assert.Exact.AreEqual VBA.Right$(myExpected, 1), Right$(myResult, 1)  ', CurrentProcedureName
+            Assert.Exact.AreEqual myExpected, myResult  ', CurrentProcedureName
 
             'TestExit:
             Exit Sub

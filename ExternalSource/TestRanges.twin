@@ -245,7 +245,7 @@ Public Sub T010_TryStartRunForPrimitive()
     myExpectedStatus = False
     
     Dim myExpectedMessage As enumMessages.Id
-    myExpectedMessage = Enums.Message.AsEnum(Id.IsNotIterable)
+    myExpectedMessage = enums.Message.AsEnum(Id.IsNotIterable)
     
     Dim myResult As Result
     Dim myResultStatus As Boolean
@@ -344,7 +344,7 @@ Public Sub T011d_TryStartRunForString11CharsRank2_False()
     myExpectedStatus = False
     
     Dim myExpectedMessage As Variant
-    myExpectedMessage = Enums.Message.AsEnum(Id.ObjectDoesNotSupportRanks)
+    myExpectedMessage = enums.Message.AsEnum(Id.ObjectDoesNotSupportRanks)
     
     Dim myResult As Result
     Dim myResultStatus As Boolean
@@ -418,7 +418,7 @@ Public Sub T011g_TryStartRunForString11CharsStartMoreThanCount_False()
     myExpectedStatus = False
     
     Dim myExpectedMessage As Variant
-    myExpectedMessage = Enums.Message.AsEnum(Id.StartIndexExceedsItemCount)
+    myExpectedMessage = enums.Message.AsEnum(Id.StartIndexExceedsItemCount)
     
     Dim myResult As Result
     Dim myResultStatus As Boolean
@@ -444,7 +444,7 @@ Public Sub T011h_TryStartRunForString11CharsAbsMinusStartMoreThanCount_False()
     myExpectedStatus = False
     
     Dim myExpectedMessage As Variant
-    myExpectedMessage = Enums.Message.AsEnum(Id.StartIndexExceedsItemCount)
+    myExpectedMessage = enums.Message.AsEnum(Id.StartIndexExceedsItemCount)
     
     Dim myResult As Result
     Dim myResultStatus As Boolean
@@ -470,7 +470,7 @@ Public Sub T011i_TryStartRunForString11CharsStartIsZero_True_1_11()
     myExpectedStatus = True
     
     Dim myExpectedMessage As Variant
-    myExpectedMessage = Enums.Message.AsEnum(Id.StartIndexWasZeroResetToOne)
+    myExpectedMessage = enums.Message.AsEnum(Id.StartIndexWasZeroResetToOne)
     
     
     Dim myExpectedItems As Variant
@@ -1009,7 +1009,7 @@ Public Sub T012d_TryStartRunForArray16ItemsRank2_False()
     myExpectedStatus = False
     
     Dim myExpectedMessage As Variant
-    myExpectedMessage = Enums.Message.AsEnum(Id.InvalidRank)
+    myExpectedMessage = enums.Message.AsEnum(Id.InvalidRank)
     
     Dim myItem() As Variant
     ReDim myItem(-5 To 10)
@@ -1094,7 +1094,7 @@ Public Sub T012g_TryStartRunForArray16ItemsStar20_False()
     myExpectedStatus = False
     
     Dim myExpectedMessage As Variant
-    myExpectedMessage = Enums.Message.AsEnum(Id.StartIndexExceedsItemCount)
+    myExpectedMessage = enums.Message.AsEnum(Id.StartIndexExceedsItemCount)
     
     Dim myItem() As Variant
     ReDim myItem(-5 To 10)
@@ -1126,7 +1126,7 @@ Public Sub T012h_TryStartRunForArray16ItemStartAbsMinus20_False()
     myExpectedStatus = False
     
     Dim myExpectedMessage As Variant
-    myExpectedMessage = Enums.Message.AsEnum(Id.StartIndexExceedsItemCount)
+    myExpectedMessage = enums.Message.AsEnum(Id.StartIndexExceedsItemCount)
     
     Dim myItem() As Variant
     ReDim myItem(-5 To 10)
@@ -1155,7 +1155,7 @@ Public Sub T012i_TryStartRunForArray16IttemsStartIsZero_True_Minus5_16()
     myExpectedStatus = True
     
     Dim myExpectedMessage As Variant
-    myExpectedMessage = Enums.Message.AsEnum(Id.StartIndexWasZeroResetToOne)
+    myExpectedMessage = enums.Message.AsEnum(Id.StartIndexWasZeroResetToOne)
     
     Dim myItem() As Variant
     ReDim myItem(-5 To 10)
@@ -1737,7 +1737,7 @@ Public Sub T013d_TryStartRunForCollection16ItemsRank2_False()
     myExpectedStatus = False
     
     Dim myExpectedMessage As Variant
-    myExpectedMessage = Enums.Message.AsEnum(Id.ObjectDoesNotSupportRanks)
+    myExpectedMessage = enums.Message.AsEnum(Id.ObjectDoesNotSupportRanks)
     
     Dim myItem As Collection
     Set myItem = Types.Iterable.ToCollection(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
@@ -1824,7 +1824,7 @@ Public Sub T013g_TryStartRunForCollection16ItemsStar20_False()
     myExpectedStatus = False
     
     Dim myExpectedMessage As Variant
-    myExpectedMessage = Enums.Message.AsEnum(Id.StartIndexExceedsItemCount)
+    myExpectedMessage = enums.Message.AsEnum(Id.StartIndexExceedsItemCount)
     
     Dim myItem As Collection
     Set myItem = Types.Iterable.ToCollection(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
@@ -1856,7 +1856,7 @@ Public Sub T013h_TryStartRunForCollection16ItemStartAbsMinus20_False()
     myExpectedStatus = False
     
     Dim myExpectedMessage As Variant
-    myExpectedMessage = Enums.Message.AsEnum(Id.StartIndexExceedsItemCount)
+    myExpectedMessage = enums.Message.AsEnum(Id.StartIndexExceedsItemCount)
     
     Dim myItem As Collection
     Set myItem = Types.Iterable.ToCollection(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
@@ -1885,7 +1885,7 @@ Public Sub T013i_TryStartRunForCollection16IttemsStartIsZero_True_1_16()
     myExpectedStatus = True
     
     Dim myExpectedMessage As Variant
-    myExpectedMessage = Enums.Message.AsEnum(Id.StartIndexWasZeroResetToOne)
+    myExpectedMessage = enums.Message.AsEnum(Id.StartIndexWasZeroResetToOne)
     
     Dim myItem As Collection
     Set myItem = Types.Iterable.ToCollection(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
@@ -2466,7 +2466,7 @@ Public Sub T014d_TryStartRunForLyst16ItemsRank2_False()
     myExpectedStatus = False
     
     Dim myExpectedMessage As Variant
-    myExpectedMessage = Enums.Message.AsEnum(Id.ObjectDoesNotSupportRanks)
+    myExpectedMessage = enums.Message.AsEnum(Id.ObjectDoesNotSupportRanks)
     
     Dim myItem As Lyst
     Set myItem = Types.Iterable.ToLyst(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
@@ -2553,7 +2553,7 @@ Public Sub T014g_TryStartRunForLyst16ItemsStart20_False()
     myExpectedStatus = False
     
     Dim myExpectedMessage As Variant
-    myExpectedMessage = Enums.Message.AsEnum(Id.StartIndexExceedsItemCount)
+    myExpectedMessage = enums.Message.AsEnum(Id.StartIndexExceedsItemCount)
     
     Dim myItem As Lyst
     Set myItem = Types.Iterable.ToLyst(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
@@ -2585,7 +2585,7 @@ Public Sub T014h_TryStartRunForLyst16ItemStartMinus20_False()
     myExpectedStatus = False
     
     Dim myExpectedMessage As Variant
-    myExpectedMessage = Enums.Message.AsEnum(Id.StartIndexExceedsItemCount)
+    myExpectedMessage = enums.Message.AsEnum(Id.StartIndexExceedsItemCount)
     
     Dim myItem As Lyst
     Set myItem = Types.Iterable.ToLyst(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
@@ -2614,7 +2614,7 @@ Public Sub T014i_TryStartRunForLyst16IttemsStartIsZero_True_0_16()
     myExpectedStatus = True
     
     Dim myExpectedMessage As Variant
-    myExpectedMessage = Enums.Message.AsEnum(Id.StartIndexWasZeroResetToOne)
+    myExpectedMessage = enums.Message.AsEnum(Id.StartIndexWasZeroResetToOne)
     
     Dim myItem As Lyst
     Set myItem = Types.Iterable.ToLyst(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
