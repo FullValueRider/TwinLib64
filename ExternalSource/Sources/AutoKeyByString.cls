@@ -33,58 +33,70 @@ Attribute VB_Exposed = True
 Option Explicit
 
 Implements IAutoKey
+Private Type ReadOnly
+  
+  DefaultFirstUseKey                        As String
+  DefaultAllowedCharListForKey              As ROC
+  
+End Type
 
+Private r                                   As ReadOnly
 Private Type Properties
 
-    FirstKey                                As Variant
+    FirstUseKey                             As Variant
     CurrentKey                              As Variant
-    '    FirstUse                                As Boolean
-    KeyAllowedChars                         As Lyst
+    FirstUse                                As Boolean
+    KeyAllowedChars                         As ROC
     KeyAsChars                              As Lyst
-    FirstKeyType                            As String
+    FirstUseKeyType                         As String
+    Result                                  As Result
 End Type
 
 Private p                                   As Properties
 
-'Private Sub Class_Initialise()
-'
-'    ' If Me Is AutoKeyByString Then
-'
-'    '     Debug.Print "Me is PredeclaredId"
-'
-'    ' Else
-'
-'    '     Debug.Print "Other instance"
-'
-'    ' End If
-'
-'End Sub
+Private Sub Class_Initialise()
+
+   r.DefaultFirstUseKey = "0000"
+   Set r.DefaultAllowedCharListForKey = Strs.AlphaNumList
+
+End Sub
 
 Public Function Deb _
-       ( _
-       Optional ByVal ipFirstKey As String = AutoKeyAid.DefaultInitialStringKey, _
-       Optional ByVal ipKeyCharList As String = AutoKeyAid.DefaultAllowedCharListForStringKey _
-       ) As AutoKeyByString
+( _
+    Optional ByVal ipFirstUseKey As String, _
+    Optional ByVal ipKeyCharList As String _
+) As AutoKeyByString
 
     With New AutoKeyByString
         
-        Set Deb = .ReadyToUseInstance(ipFirstKey, ipKeyCharList) ' Why is ipKeyCharsequence a null string
+        Set Deb = .ReadyToUseInstance(ipFirstUseKey, ipKeyCharList) ' Why is ipKeyCharsequence a null string
             
     End With
         
 End Function
 
 Public Function ReadyToUseInstance _
-       ( _
-       ByVal ipFirstKey As String, _
-       ByVal ipKeyCharList As String _
-       ) As AutoKeyByString
-
-    p.FirstKey = IIf(VBA.Len(ipFirstKey) = 0, AutoKeyAid.DefaultInitialStringKey, ipFirstKey)
-    Set p.KeyAllowedChars = Strs.ToCharLyst(IIf(VBA.Len(ipKeyCharList) = 0, AutoKeyAid.DefaultAllowedCharListForStringKey, ipKeyCharList))
-        
+( _
+    ByVal ipFirstUseKey As String, _
+    ByVal ipKeyCharList As String _
+) As AutoKeyByString
+    r.DefaultFirstUseKey = "0000"
+    p.FirstUseKey = IIf(VBA.Len(ipFirstUseKey) = 0, r.DefaultFirstUseKey, ipFirstUseKey)
+    If VBA.Len(ipKeyCharList) = 0 Then
+   
+      Set p.KeyAllowedChars = r.DefaultAllowedCharListForKey
+      
+      
+    Else
+      
+      Set p.KeyAllowedChars = ROC.Deb(ipKeyCharList)
+      
+      
+    End If
+  
+    Set p.Result = Result.Deb
     p.CurrentKey = Empty
-    p.FirstKeyType = TypeName(p.FirstKey)
+    p.FirstUseKeyType = TypeName(p.FirstUseKey)
 
     Set ReadyToUseInstance = Me
         
@@ -95,12 +107,12 @@ End Function
 ' Interface
 '
 '========1=========2=========3=========4=========5=========6=========7=========8=========9=========A=========B=========C
-Private Property Get IAutoKey_FirstKey() As Variant
-    IAutoKey_FirstKey = FirstKey
+Private Property Get IAutoKey_FirstUseKey() As Variant
+    IAutoKey_FirstUseKey = FirstUseKey
 End Property
 
-Private Property Let IAutoKey_FirstKey(ByVal ipValue As Variant)
-    FirstKey = ipValue
+Private Property Let IAutoKey_FirstUseKey(ByVal ipValue As Variant)
+    FirstUseKey = ipValue
 End Property
 
 Private Property Get IAutoKey_CurrentKey() As Variant
@@ -111,8 +123,8 @@ Private Property Let IAutoKey_CurrentKey(ByVal ipValue As Variant)
     CurrentKey = ipValue
 End Property
 
-Public Property Get IAutoKey_FirstKeyType() As String
-    IAutoKey_FirstKeyType = p.FirstKeyType
+Public Property Get IAutoKey_FirstUseKeyType() As String
+    IAutoKey_FirstUseKeyType = p.FirstUseKeyType
 End Property
 
 Private Function IAutoKey_Clone() As IAutoKey
@@ -124,25 +136,28 @@ Private Function IAutoKey_GetNextKey() As Variant
 End Function
 
 Private Function IAutoKey_Name() As String
-    IAutoKey_Name = Name
+    IAutoKey_Name = TypeName(Me)
 End Function
 
 Private Function IAutoKey_GetKeySequence(ByVal ipCount As Long) As Lyst
     Set IAutoKey_GetKeySequence = GetKeySequence(ipCount)
 End Function
 
+Private Function IAutoKey_Res() As Result
+  Set IAutoKey_Res = Res
+End Function
 '========1=========2=========3=========4=========5=========6=========7=========8=========9=========A=========B=========C
 '
 ' class public members
 '
 '========1=========2=========3=========4=========5=========6=========7=========8=========9=========A=========B=========C
 
-Public Property Get FirstKey() As Variant
-    FirstKey = p.FirstKey
+Public Property Get FirstUseKey() As Variant
+    FirstUseKey = p.FirstUseKey
 End Property
 
-Public Property Let FirstKey(ByVal ipValue As Variant)
-    p.FirstKey = ipValue
+Public Property Let FirstUseKey(ByVal ipValue As Variant)
+    p.FirstUseKey = ipValue
 End Property
 
 Public Property Get CurrentKey() As Variant
@@ -153,16 +168,16 @@ Public Property Let CurrentKey(ByVal ipValue As Variant)
     p.CurrentKey = ipValue
 End Property
 
-Public Property Get KeyCharList() As Variant
-    KeyCharList = p.KeyAllowedChars.ToString(vbNullString)
+Public Property Get KeyCharList() As ROC
+    Set KeyCharList = p.KeyAllowedChars
 End Property
 
-Public Property Let KeyCharList(ByVal ipValue As Variant)
-    KeyCharList = ipValue
+Public Property Let KeyCharList(ByVal ipValue As ROC)
+    Set p.KeyAllowedChars = ipValue
 End Property
 
-Public Property Get FirstKeyType() As String
-    FirstKeyType = p.FirstKeyType
+Public Property Get FirstUseKeyType() As String
+    FirstUseKeyType = p.FirstUseKeyType
 End Property
 
 'Public Property Get FirstUse() As Boolean
@@ -179,10 +194,10 @@ Public Function Clone() As AutoKeyByString
     ' this will already exist in the Host ordered Dictionary
 
     Dim myAutoKey As AutoKeyByString
-    Set myAutoKey = Me.Deb(p.FirstKey, Join(p.KeyAllowedChars.ToArray, vbNullString))
+    Set myAutoKey = Me.Deb(p.FirstUseKey, p.KeyAllowedChars.ToString)
     'myAutoKey.CurrentKey = p.CurrentKey
     'myAutoKey.FirstUse = p.FirstUse
-    myAutoKey.FirstKey = p.FirstKey
+    myAutoKey.FirstUseKey = p.FirstUseKey
         
     Set Clone = myAutoKey
         
@@ -192,11 +207,11 @@ Public Property Get GetNextKey() As Variant
 
     If VBA.IsEmpty(p.CurrentKey) Then
         
-        p.CurrentKey = p.FirstKey
+        p.CurrentKey = p.FirstUseKey
             
     Else
         
-        p.CurrentKey = Inc(p.CurrentKey)
+        p.CurrentKey = Strs.Inc(p.CurrentKey, p.KeyAllowedChars)
             
     End If
         
@@ -225,99 +240,6 @@ Public Function GetKeySequence(ByVal ipCount As Long) As Lyst
         
 End Function
 
-'========1=========2=========3=========4=========5=========6=========7=========8=========9=========A=========B=========C
-'
-' class private members
-'
-'========1=========2=========3=========4=========5=========6=========7=========8=========9=========A=========B=========C
-' the harder option. strings are treated as numbers. The sequence
-' of numbers allowed for each character is defined by
-' AutoKeyCharSequence, which should be one character per string. If
-' a character  is encountered that is not in myAutoKeyStrings then key characters
-' will be inserted to the rightt of the unknown character to allow the known
-' part of the string to increment. in numeric terms /9 would go to
-' /10 where the 1 has been inserted to allow incrementing.
-'
-' The string containing the characters to be used in incrementing
-' the key is read left to right as it appears on screen. The key
-' string is read in the opposite direction ( right to left ) so
-' that it increments in the same pattern as a number when the
-' number is displayed on screen.
-'
-' Example of incrementing where '/' is not in the list of
-' characters that can be used in a Key '0000' -> '0001' '000x' ->
-' '000y' '000/' -> '000/1' i.e. an implied 0 after the /
-' '000/0' ->'000/1' '000z' -> '0010' '/zzzz' ->'/10000'
-'========1=========2=========3=========4=========5=========6=========7=========8=========9=========A=========B=========C
-
-Private Function Inc(ByVal ipKey As String) As String
-            
-    Dim myKeyAsCharList As Lyst
-    Set myKeyAsCharList = Strs.ToCharLyst(ipKey)
-            
-    ' Dim myKeyAsCharsLastIndex As Long
-    ' myKeyAsCharsLastIndex = p.AllowedKeyChars.LastIndex
-            
-    ' The key is read last index to first index so start we need the index of
-    ' the last character of myKeyAsChars
-    Dim myKeyAsCharsCurrentIndex As Long
-    myKeyAsCharsCurrentIndex = myKeyAsCharList.LastIndex
-            
-    ' A flag to indicate that the current character in myKeyChars as been
-    ' rolled over from the last char in the allowed char sequence to the
-    ' first char in the allowed char sequence
-    Dim myCarryFlag As Boolean
-    'myCarryFlag = False
-            
-    ' normalise for the case of the last character of the key
-    ' not being included in the sequence of chars allowed for
-    ' a key i.e. for the default key char sequence the key
-    ' 'aaa/' becomes 'aaa/0'. This simplifies code later as we
-    ' now don't need to check for the last char of the key
-    ' not being in the allowed key chars.
-    If p.KeyAllowedChars.LacksItem(myKeyAsCharList.Last) Then myKeyAsCharList.Add p.KeyAllowedChars.First
-
-    Do
-        myCarryFlag = False
-
-        If myKeyAsCharsCurrentIndex < 0 Then
-                
-            myKeyAsCharList.InsertAt 0, p.KeyAllowedChars.Item(1)
-            Exit Do
-                    
-        End If
-                
-        Dim myCurChar As String
-        myCurChar = myKeyAsCharList.Item(myKeyAsCharsCurrentIndex)
-        If p.KeyAllowedChars.LacksItem(myCurChar) Then
-            
-            myKeyAsCharList.InsertAt myKeyAsCharsCurrentIndex + 1, p.KeyAllowedChars.Item(1)
-            Exit Do
-                    
-                
-        ElseIf myKeyAsCharList.Item(myKeyAsCharsCurrentIndex) = p.KeyAllowedChars.Last Then
-                
-            myKeyAsCharList.Item(myKeyAsCharsCurrentIndex) = p.KeyAllowedChars.Item(0)
-            myCarryFlag = True
-            myKeyAsCharsCurrentIndex = myKeyAsCharsCurrentIndex - 1
-                    
-                    
-        Else
-                
-            Dim myNextAllowedKeyCharIndex As String
-            myNextAllowedKeyCharIndex = p.KeyAllowedChars.IndexOf(myKeyAsCharList.Item(myKeyAsCharsCurrentIndex)) + 1
-                    
-            myKeyAsCharList.Item(myKeyAsCharsCurrentIndex) = p.KeyAllowedChars.Item(myNextAllowedKeyCharIndex)
-            Exit Do
-                    
-                    
-        End If
-                    
-                
-    Loop While myCarryFlag
-
-    Inc = VBA.Join(myKeyAsCharList.ToArray, vbNullString)
-            
+Public Function Res() As Result
+  Set Res = p.Result
 End Function
-
-

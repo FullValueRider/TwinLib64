@@ -147,7 +147,7 @@ Module TestTypes
         Test104_MinMaxFromQueue
         Test105_MinMaxFromStack
 
-        Test106_SumFromArray
+        Test106_SumFromArray'@TestMethod("")
         Test107_SumFromArrayList
         Test108_SumFromCollection
         Test109_SumFromQueue
@@ -160,7 +160,7 @@ Module TestTypes
 
     #Region "HoldsItem"
 
-        '@TestMethod("HoldsItem") ]
+        '@TestMethod("HoldsItem") 
         Private Sub Test01_HasItemsEmptyArrayOfIntegerIsFalse()
             On Error GoTo TestFail
             
@@ -408,15 +408,15 @@ Module TestTypes
             '@Ignore IntegerDataType
             Dim myIterable() As Integer
             
-            Dim myResultStatus As Boolean
+            
             Dim myResult As Result
             
             'Act:
             '@Ignore ImplicitDefaultMemberAccess
-            myResultStatus = Types.Iterable.TryExtent(myIterable, myResult)
+            Set myResult = Types.Iterable.TryExtent(myIterable)
         
             'Assert.Strict:
-            Assert.Strict.AreEqual myExpectedStatus, myResultStatus, CurrentProcedureName & ":Status"
+            Assert.Strict.AreEqual myExpectedStatus, myResult.Status, CurrentProcedureName & ":Status"
             
 
     TestExit:
@@ -444,13 +444,13 @@ Module TestTypes
             Dim myIterable(10 To 15) As Integer
             
             Dim myResult As Result
-            Dim myResultStatus As Boolean
+            
             
             'Act:
-            myResultStatus = Types.Iterable.TryExtent(myIterable, myResult)
+            Set myResult = Types.Iterable.TryExtent(myIterable)
         
             'Assert.Strict:
-            Assert.Strict.AreEqual myExpectedStatus, myResultStatus, CurrentProcedureName & ":Status"
+            Assert.Strict.AreEqual myExpectedStatus, myResult.Status, CurrentProcedureName & ":Status"
             Assert.Strict.SequenceEquals myExpectedItems, myResult.Items.ToArray, CurrentProcedureName & ":Items"
             
     TestExit:
@@ -474,12 +474,12 @@ Module TestTypes
             Set myIterable = New ArrayList
             
             Dim myResult As Result
-            Dim myResultStatus As Boolean
+            
             'Act:
-            myResultStatus = Types.Iterable.TryExtent(myIterable, myResult)
+            Set myResult = Types.Iterable.TryExtent(myIterable)
         
             'Assert.Strict:
-            Assert.Strict.AreEqual myExpectedStatus, myResultStatus, CurrentProcedureName & ":Status"
+            Assert.Strict.AreEqual myExpectedStatus, myResult.Status, CurrentProcedureName & ":Status"
         
 
     TestExit:
@@ -510,14 +510,14 @@ Module TestTypes
             myIterable.Add 40
             
             Dim myResult As Result
-            Dim myResultStatus As Boolean
+            
             
             'Act:
             
-            myResultStatus = Types.Iterable.TryExtent(myIterable, myResult)
+            Set myResult = Types.Iterable.TryExtent(myIterable)
         
             'Assert:
-            Assert.Strict.AreEqual myExpectedStatus, myResultStatus, CurrentProcedureName & ":Status"
+            Assert.Strict.AreEqual myExpectedStatus, myResult.Status, CurrentProcedureName & ":Status"
             Assert.Strict.SequenceEquals myExpecteditems, myResult.Items.ToArray, CurrentProcedureName & ":Value"
             
     TestExit:
@@ -540,14 +540,14 @@ Module TestTypes
             Dim myIterable As Collection
             Set myIterable = New Collection
             
-            Dim myResultStatus As Boolean
+            
             Dim myResult As Result
             
             'Act:
-            myResultStatus = Types.Iterable.TryExtent(myIterable, myResult)
+            Set myResult = Types.Iterable.TryExtent(myIterable)
         
             'Assert:
-            Assert.Strict.AreEqual myExpectedStatus, myResultStatus, CurrentProcedureName & ":Status"
+            Assert.Strict.AreEqual myExpectedStatus, myResult.Status, CurrentProcedureName & ":Status"
             
             
     TestExit:
@@ -578,14 +578,14 @@ Module TestTypes
             myIterable.Add 40
             
             Dim myResult As Result
-            Dim myResultStatus As Boolean
+            
             
             'Act:
             
-            myResultStatus = Types.Iterable.TryExtent(myIterable, myResult).Status
+            Set myResult = Types.Iterable.TryExtent(myIterable)
         
             'Assert.Strict:
-            Assert.Strict.AreEqual myExpectedStatus, myResultStatus ' , myPlace & CurrentProcedureName & ":Status"
+            Assert.Strict.AreEqual myExpectedStatus, myResult.Status ' , myPlace & CurrentProcedureName & ":Status"
             Assert.Strict.SequenceEquals myExpectedItems, myResult.Items.ToArray, CurrentProcedureName & ":FirstIndex"
         
             
@@ -608,13 +608,13 @@ Module TestTypes
             Dim myIterable As Queue
             Set myIterable = New Queue
             
-            Dim myResultStatus As Boolean
+            
             Dim myResult As Result
             'Act:
-            myResultStatus = Types.Iterable.TryExtent(myIterable, myResult)
+            Set myResult = Types.Iterable.TryExtent(myIterable)
         
             'Assert.Strict:
-            Assert.Strict.AreEqual myExpectedStatus, myResultStatus ' , myPlace & CurrentProcedureName & ":Status"
+            Assert.Strict.AreEqual myExpectedStatus, myResult.Status ' , myPlace & CurrentProcedureName & ":Status"
             
     TestExit:
             Exit Sub
@@ -644,10 +644,10 @@ Module TestTypes
             myIterable.EnQueue 40
             
             Dim myResult As Result
-            Dim myResultStatus As Boolean
+            
             
             'Act:
-            myResultStatus = Types.Iterable.TryExtent(myIterable, myResult)
+            Set myResult = Types.Iterable.TryExtent(myIterable)
         
             'Assert.Strict:
             Assert.Strict.AreEqual myExpectedStatus, myResult.Status, CurrentProcedureName & ":Status"
@@ -674,14 +674,14 @@ Module TestTypes
             Dim myIterable As Stack
             Set myIterable = New Stack
             
-            Dim myResultStatus As Boolean
+            
             Dim myResult As Result
             'Act:
             '@Ignore ImplicitDefaultMemberAccess
-            myResultStatus = Types.Iterable.TryExtent(myIterable, myResult)
+            Set myResult = Types.Iterable.TryExtent(myIterable)
         
             'Assert.Strict:
-            Assert.Strict.AreEqual myExpectedStatus, myResultStatus, CurrentProcedureName & ":Status"
+            Assert.Strict.AreEqual myExpectedStatus, myResult.Status, CurrentProcedureName & ":Status"
         
     TestExit:
 
@@ -710,14 +710,14 @@ Module TestTypes
             myIterable.Push 40
             
             Dim myResult As Result
-            Dim myResultStatus As Boolean
+            
             
             'Act:
             '@Ignore ImplicitDefaultMemberAccess
-            myResultStatus = Types.Iterable.TryExtent(myIterable, myResult)
+            Set myResult = Types.Iterable.TryExtent(myIterable)
         
             'Assert.Strict:
-            Assert.Strict.AreEqual myExpectedStatus, myResultStatus  ' ' , myPlace & CurrentProcedureName & ":Status"
+            Assert.Strict.AreEqual myExpectedStatus, myResult.Status  ' ' , myPlace & CurrentProcedureName & ":Status"
             Assert.Strict.SequenceEquals myExpectedItems, myResult.Items.ToArray, CurrentProcedureName & ":Value"
             
     TestExit:

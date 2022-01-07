@@ -12,26 +12,26 @@ Option Explicit
 '@PredeclaredId
 '@Exposed
 
+'Public Const IsFirstRank As long = 1
 '12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789
 '========1=========2=========3=========4=========5=========6=========7=========8=========9=========A=========B=========C
 ' Code line limit should be 120 characters.
 ' Comment line limit should be 80 characters
 '========1=========2=========3=========4=========5=========6=========7=========8=========9=========A=========B=========C
     
-Public Enum ArrayAdmin
+' Public Enum ArrayAdmin
     
-    NotCountable = 0
-    FirstRank = 1
+'     FirstRank = 1
         
-End Enum
+' End Enum
 
-Private Type ReadOnly
+' Private Type ReadOnly
         
-    Location As String
+'     Location As String
 
-End Type
+' End Type
 
-Private r                                     As ReadOnly
+' Private r                                     As ReadOnly
 
 
 Public Enum ArrayDirections
@@ -50,22 +50,20 @@ End Enum
 
 Private Sub Class_Initialize()
         
-    If VBA.Len(r.Location) = 0 Then
+    ' If VBA.Len(r.Location) = 0 Then
             
-        r.Location = "VBALib.Arrays."
+    '     r.Location = "VBALib.Arrays."
             
             
-    End If
+    ' End If
         
-    Guard Enums.Message.AsEnum(Id.InvalidNew), Not (Me Is Arrays), r.Location & "Class_Initialise"
+   ' if BailOut.When( enums.Message.AsEnum(Msg.InvalidNew), Not (Me Is Arrays), r.Location & "Class_Initialise"
         
 End Sub
 
-' Public Sub Class_Initialize()
-' End Sub
 
-'Public Function FirstRank() As Long: FirstRank = 1: End Function
-'Public Function ArrayListFirstIndex() As Long: ArrayListFirstIndex = 0: End Function
+
+
     'ToDo: Move perimiter and associated functions to its own Area class
     ' ToDO use Lbound and Ubound to get min and max values
     '@Description("Returns an array of valid coordinates based on the provided x,y coordinate and the available area.")
@@ -133,335 +131,409 @@ Public Function GetMoveCoordinates(ByVal ipType As ArrayDirections) As Scripting
 
 End Function
 
-' Public Function IsEmptyForwardedParamArray(ByRef ipForwardedParamarray As Variant) As Boolean
-'     IsEmptyForwardedParamArray = (LBound(ipForwardedParamarray) = 0) And (UBound(ipForwardedParamarray) = -1)
-' End Function
-
-' Public Function IsSameSize _
-' ( _
-'     ByVal ipTestArray As Variant, _
-'     ByVal ipRefArray As Variant, _
-'     Optional ByVal ipTestRank_One As Variant, _
-'     Optional ByVal ipRefRank_One As Variant _
-' ) As Boolean
+Public Function HasNoBounds(ByRef ipArray As Variant, Optional ByVal ipRank As Long = Constant.ArrayFirstRank) As Boolean
+    
+    HasNoBounds = True
+    If ipRank < 0 Then Exit Function
+     
+    On Error Resume Next
+    Dim myTest As Boolean
+    myTest = UBound(ipArray, ipRank) < LBound(ipArray, ipRank)
+    If Err.Number <> 0 Then
         
-'     IsSameSize = False
-'     ipTestRank_One = If(VBA.IsMissing(ipTestRank_One), 1, ipTestRank_One)
-'     ipRefRank_One = If(VBA.IsMissing(ipTestRank_One), 1, ipRefRank_One)
+        On Error GoTo 0
+        Exit Function
         
-'     If (ipTestRank_One = 0) And (ipRefRank_One = 0) Then
-            
-'         IsSameSize = pvIsArraySameSize(ipTestArray, ipRefArray)
-            
-            
-'     Else
-            
-'         IsSameSize = pvIsRankSameSize(ipTestArray, ipRefArray, ipTestRank_One, ipRefRank_One)
-            
-            
-'     End If
+    End If
+    
+    On Error GoTo 0
+    
+    HasNoBounds = myTest
+    
+End Function
 
-' End Function
+Public Function RankHasNoItems(ByVal ipArray As Variant, Optional ByVal ipRank As Long = Constant.ArrayFirstRank) As Boolean
+    RankHasNoItems = Count(ipArray, ipRank) < 1
+End Function
 
+Public Function RankHasItems(ByVal ipArray As Variant, Optional ByVal ipRank As Long = Constant.ArrayFirstRank) As Boolean
+    RankHasItems = Not RankHasNoItems(ipArray, ipRank)
+End Function
 
-Public Function pvIsRankSameSize _
-       ( _
-       ByVal ipTestArray As Variant, _
-       ByVal ipRefArray As Variant, _
-       Optional ByVal ipTestRank_One As Variant, _
-       Optional ByVal ipRefRank_One As Variant _
-       ) As Boolean
+Public Function IsRankSameSize _
+( _
+    ByVal ipTestArray As Variant, _
+    ByVal ipRefArray As Variant, _
+    Optional ByVal ipTestRank As Long = 1, _
+    Optional ByVal ipRefRank As Long = 1 _
+) As Result
         
-    pvIsRankSameSize = False
-    ipTestRank_One = IIf(VBA.IsMissing(ipTestRank_One), 1, ipTestRank_One)
-    ipRefRank_One = IIf(VBA.IsMissing(ipTestRank_One), 1, ipRefRank_One)
-    If LacksRank(ipTestArray, ipTestRank_One) Then Exit Function
-    If LacksRank(ipRefArray, ipRefRank_One) Then Exit Function
+    Globals.Res.Init (Msg.Okay)
+    If BailOut.When(ipTestRank < 1, Msg.RankLessThanArrayFirstRank) Then Exit Function
+    If BailOut.When(ipRefRank < 1, Msg.RankLessThanArrayFirstRank) Then Exit Function
+    
+    If BailOut.When(Arrays.HasNoRanks(ipTestArray, ipTestRank), Msg.HasNoRanks) Then Exit Function
+    If BailOut.When(Arrays.HasNoRanks(ipRefArray, ipRefRank), Msg.HasNoRanks) Then Exit Function
         
-    pvIsRankSameSize = (UBound(ipTestArray) - LBound(ipTestArray)) = (UBound(ipRefArray) = LBound(ipRefArray))
+    Globals.Res.Item(ResultItemsEnums.SameSize(ssTestItem)) = Count(ipTestArray, ipTestRank)
+    Globals.Res.Item(ResultItemsEnums.SameSize(ssRefItem)) = Count(ipRefArray, ipRefRank)
+    
+    If Globals.Res.Item(ResultItemsEnums.SameSize(ssTestItem)) = Globals.Res.Item(ResultItemsEnums.SameSize(ssRefItem)) Then
+        
+        Set IsRankSameSize = Globals.Res.Init(Msg.Okay)
+        
+    Else
+        
+        Set IsRankSameSize = Globals.Res.SetNotOkay(enums.Message.AsEnum(Msg.NotSameSize))
+        
+    End If
         
 End Function
 
-Public Function pvIsArraySameSize _
-       ( _
-       ByVal ipTestArray As Variant, _
-       ByVal ipRefArray As Variant _
-       ) As Boolean
-
-    pvIsArraySameSize = False
+Public Function IsSameSize _
+( _
+ByVal ipTestArray As Variant, _
+ByVal ipRefArray As Variant _
+) As Result
         
-    Dim myTestRanks As Long
-    myTestRanks = Ranks(ipTestArray)
-    If myTestRanks = 0 Then Exit Function
-                
-    Dim myRefRanks As Long
-    myRefRanks = Ranks(ipRefArray)
-    If myRefRanks = 0 Then Exit Function
-            
-    If myRefRanks <> myTestRanks Then Exit Function
-            
-    Dim mySize As Long
-    mySize = MinLong
+    If BailOut.When(HasNoRanks(ipTestArray, ipRefArray), Msg.HasNoRanks) Then Exit Function
+    If BailOut.When(Ranks(ipTestArray) <> Ranks(ipRefArray), Msg.notequal) Then Exit Function
+    
+    Dim myRefCount As Long
+    myRefCount = CountAll(ipRefArray)
+    
+    Dim myTestCount As Long
+    myTestCount = CountAll(ipTestArray)
+    
+    If BailOut.When(myRefCount <> myTestCount, Msg.notequal) Then Exit Function
+    
+    Globals.Res.SetOkay.SetItems myTestCount, myRefCount
         
-    Dim myRank As Long
-    For myRank = FirstRank To myRefRanks
-        
-        Dim myRefSize As Long
-        myRefSize = Count(ipRefArray, myRank)
-            
-        If myRefSize = Sys.NotOkay Then Exit Function
-        If myRefRanks = MinLong Then myRefRanks = myRefSize
-        If mySize <> myRefSize Then Exit Function
-                
-        Dim myTestSize As Long
-        myTestSize = Count(ipTestArray(myRank))
-        If mySize <> myTestSize Then Exit Function
-                
-                
-    Next
-        
-    pvIsArraySameSize = True
+    Set IsSameSize = Globals.Res
         
 End Function
 
-'@Description("Returns the number of dimensions of an array.  A return value of -1 means the input could not be treated as an array")
-Public Function Ranks(ByVal iparray As Variant) As Long
-Attribute Ranks.VB_Description = "Returns the number of dimensions of an array.  A return value of -1 means the input could not be treated as an array"
+'@Description("Returns the number of dimensions of an array. Return values >1:No of Ranks, 0: no Ranks. -1: Not an array")
+Public Function Ranks(ByVal ipArray As Variant) As Long
+Attribute Ranks.VB_Description = "Returns the number of dimensions of an array. Return values >1:No of Ranks, 0: no Ranks. -1: Not an array"
         
-    Ranks = 0
+    Ranks = -1
+    ' Can't use is not array here due to cicular references
     ' Can't call HasNoItems as this will introlduce circular dependencies.
-    'If LacksItems(iparray) Then Exit Function
-        
+    If BailOut.When(Not VBA.IsArray(ipArray), Msg.ItemDoesNotSupportRanks) Then Exit Function
+    
     'Visual Basic for Applications arrays can have up to 60000 dimensions; this allows for that
-    Dim myDims As Long
-    For myDims = 1 To 60000
+    Dim myRank As Long
+    For myRank = 1 To 60000
         
         '@Ignore VariableNotUsed
         Dim myUBound As Long
         On Error Resume Next
-        myUBound = UBound(iparray, myDims)
+        myUBound = UBound(ipArray, myRank)
         If Err.Number <> 0 Then
                 
             On Error GoTo 0
-            Ranks = myDims - 1
+            Ranks = myRank - 1
             Exit Function
                 
                 
         End If
             
     Next
-        
+    
+    Globals.Res.Init(Msg.NotOkay).SetItems (myRank)
     On Error GoTo 0
         
 End Function
 
-'@Description("Returns True is an array has the requested dimension")
-Public Function HasRank(ByVal iparray As Variant, Optional ByVal ipRank As Long = 1) As Boolean
-Attribute HasRank.VB_Description = "Returns True is an array has the requested dimension"
-        
-    HasRank = False
-    'If LacksItems(iparray) Then Exit Function
-    If ipRank < 1 Then Exit Function
-    If ipRank > Ranks(iparray) Then Exit Function
-    HasRank = True
-        
+
+Public Function HasRank(ByRef ipArray As Variant, Optional ByVal ipRank As Long = Constant.ArrayFirstRank) As Boolean
+
+    HasRank = Globals.Res.SetNotOkay.Status
+    If BailOut.When(Arrays.IsNotValid(ipArray), Msg.ArrayLacksRank) Then Exit Function
+    If BailOut.When(ipRank < 1, Msg.RankLessThanArrayFirstRank) Then Exit Function
+    If BailOut.When(ipRank > Ranks(ipArray), Msg.ArrayLacksRank) Then Exit Function
+    
+    Globals.Res.SetOkay
+    Globals.Res.SetItems (True)
+    HasRank = Globals.Res.Status
+    
 End Function
 
-Public Function LacksRank(ByVal iparray As Variant, Optional ByVal ipRank As Long = 1) As Boolean
-    LacksRank = Not HasRank(iparray, ipRank)
+Public Function LacksRank(ByRef ipArray As Variant, Optional ByVal ipRank As Long = Constant.ArrayFirstRank) As Boolean
+    LacksRank = Not HasRank(ipArray, ipRank)
 End Function
 
-Public Function IsSingleItem(ByVal iparray As Variant) As Boolean
-    IsSingleItem = (UBound(iparray) - LBound(iparray) + 1) = 1
+
+Public Function HasRanks(ParamArray ipArgArray() As Variant) As Boolean
+    HasRanks = HasRanksByIterable(ipArgArray)
 End Function
 
-Public Function IsNotSingleItem(ByVal iparray As Variant) As Boolean
-    IsNotSingleItem = Not IsSingleItem(iparray)
+Friend Function HasNoRanks(ParamArray ipArgArray() As Variant) As Boolean
+    HasNoRanks = Not HasRanksByIterable(ipArgArray)
 End Function
 
-Public Function IsListArray(ParamArray ipArgs() As Variant) As Boolean
-    IsListArray = HasRanks(CVar(ipArgs), cmpEQ.Deb(1))
-End Function
-
-Public Function IsNotListArray(ParamArray ipArgs() As Variant) As Boolean
-    IsNotListArray = Not HasRanks(CVar(ipArgs), cmpEQ.Deb(1))
-End Function
-
-Public Function IsTableArray(ParamArray ipArgs() As Variant) As Boolean
-    IsTableArray = HasRanks(CVar(ipArgs), cmpEQ.Deb(2))
-End Function
-
-Public Function IsNotTableArray(ParamArray ipArgs() As Variant) As Boolean
-    IsNotTableArray = Not HasRanks(CVar(ipArgs), cmpEQ.Deb(2))
-End Function
-
-Public Function IsMDArray(ParamArray ipArgs() As Variant) As Boolean
-    IsMDArray = HasRanks(ipArgs, cmpMT.Deb(2))
-End Function
-
-Public Function IsNotMDArray(ParamArray ipArgs() As Variant) As Boolean
-    IsNotMDArray = Not IsMDArray(ipArgs, cmpMT.Deb(2))
-End Function
-
-Friend Function HasRanks(ByVal ipArgs As Variant, ByVal ipComparer As IComparer) As Boolean
-
-    HasRanks = False
-    If HasNoItems(ipArgs) Then Exit Function
+Friend Function HasRanksByIterable(ByVal ipArgArray As Variant) As Boolean
+    
+    HasRanksByIterable = False
 
     Dim myArg As Variant
-    For Each myArg In ipArgs
+    For Each myArg In ipArgArray
 
-        Dim myRanks As Long
-        myRanks = Ranks(myArg)
-        If Not ipComparer.ExecCmp(myRanks) Then Exit Function
-
+       If Ranks(myArg) < 1 Then Exit Function
+        
     Next
 
-    HasRanks = True
+    HasRanksByIterable = True
 
 End Function
 
-Friend Function LacksRanks(ByVal ipArgs As Variant, ByVal ipComparer As IComparer) As Boolean
-    LacksRanks = Not HasRanks(ipArgs, ipComparer)
-End Function
-
-'@Description("Returns -1 for an unitialised array/not array otherwise the number of items in the rank of the array")
-Public Function Count(ByRef iparray As Variant, Optional ByVal ipRank As ArrayAdmin = ArrayAdmin.FirstRank) As Long
-Attribute Count.VB_Description = "Returns -1 for an unitialised array/not array otherwise the number of items in the rank of the array"
+'@Description("Returns the number of items in an Array Rank or -1 the rank didn't exist/item not an array. Global result enabled")
+Public Function Count(ByRef ipArray As Variant, Optional ByVal ipRank As Long = Constant.ArrayFirstRank) As Long
+Attribute Count.VB_Description = "Returns the number of items in an Array Rank or -1 the rank didn't exist/item not an array. Global result enabled"
         
-   
-    If HasNoItems(iparray, ipRank) Then
-            
-        Count = ArrayAdmin.NotCountable
+    Count = -1
+    If BailOut.When(Types.IsNotArray(ipArray), Msg.IsNotArray) Then Exit Function
+    If BailOut.When(Arrays.IsNotValid(ipArray), Msg.ArrayHasNoItems) Then Exit Function
+    If BailOut.When(Ranks(ipArray) < 1, Msg.RankLessThanArrayFirstRank) Then Exit Function
+    If BailOut.When(Arrays.LacksRank(ipArray, ipRank), Msg.ArrayLacksRank) Then Exit Function
         
-    Else
-        
-        Count = UBound(iparray, ipRank) - LBound(iparray, ipRank) + 1
-            
-    End If
+    Dim myCount As Long
+    myCount = UBound(ipArray, ipRank) - LBound(ipArray, ipRank) + 1
+    Globals.Res.SetOkay.SetItems (myCount)
+    Count = myCount
             
 End Function
 
 '@Description("Returns -1 for an unitialised array/not array otherwise the total number of items in the array")
-Public Function CountAll(ByRef iparray As Variant) As Long
+Public Function CountAll(ByRef ipArray As Variant) As Long
 Attribute CountAll.VB_Description = "Returns -1 for an unitialised array/not array otherwise the total number of items in the array"
-
-    CountAll = ArrayAdmin.NotCountable
         
-    If HasNoItems(iparray) Then Exit Function
-        
-    Dim myRank As Long
+    Globals.Res.SetNotOkay
+    CountAll = -1
+    
     Dim myRanks As Long
-    myRanks = Ranks(iparray)
-    Dim myCount As Long
-    myCount = 1
+    myRanks = Ranks(ipArray)
+    
+    Dim mySum As Long
+    mySum = 0
+    
+    Dim myRank As Long
     For myRank = 1 To myRanks
             
-        myCount = myCount * Count(iparray, myRank)
+        If Count(ipArray, myRank) < 0 Then
+            Exit Function
+        End If
             
             
     Next
-            
-    CountAll = myCount
+    
+    Globals.Res.SetOkay.SetItems (mySum)
+    CountAll = mySum
             
 End Function
 
-Public Function HasItems(ByVal ipArray As Variant, Optional ByVal ipRank As ArrayAdmin = ArrayAdmin.FirstRank) As Boolean
-    
-    ' First test for having no ranks
-    HasItems = False
-    On Error Resume Next
-    Dim myUbound As Long
-    myUbound = UBound(ipArray)
-    If Err.Number <> 0 Then
-        On Error GoTo 0
-        Exit Function
-    End If
-    
-    'Does ipRank exist
-    If ipRank < 1 Or ipRank > Ranks(ipArray) Then Exit Function
+
+
+Public Function HasOneItem(ByVal ipArray As Variant) As Boolean
+    HasOneItem = (UBound(ipArray) - LBound(ipArray) + 1) = 1
+End Function
+
+'Public Function HasOneItem(ByVal ipArray As Variant, Optional ByVal ipRank As Long = constant.ArrayFirstRank) As Boolean
         
-    ' Is it  variant containing an an uninitialised array    
-    If UBound(ipArray, ipRank) < LBound(ipArray, ipRank) Then Exit Function
+    '      HasOneItem = Count(ipArray, ipRank) = 1
+        
+    '  End Function
+
+Public Function IsNotSingleItem(ByVal ipArray As Variant) As Boolean
+    IsNotSingleItem = Not HasOneItem(ipArray)
+End Function
+
+
+Public Function IsListArray(ParamArray ipArgArray() As Variant) As Boolean
+    IsListArray = IsListArrayByIterable(ipArgArray)
+End Function
+
+Public Function IsNotListArray(ParamArray ipArgArray() As Variant) As Boolean
+    IsNotListArray = Not IsListArrayByIterable(ipArgArray)
+End Function
+
+Public Function IsListArrayByIterable(ByVal ipFPA As Variant) As Boolean
     
-    HasItems = True
+    IsListArrayByIterable = Globals.Res.SetNotOkay.Status
+    
+    If Arrays.IsNotValid(ipFPA) Then Exit Function
+    Dim myitem As Variant
+    For Each myitem In ipFPA
+        
+        If BailOut.When(Types.IsNotArray(myitem), Msg.IsNotArray) Then Exit Function
+        If BailOut.When(Arrays.Ranks(myitem) <> 1, Msg.IsNotListArray) Then Exit Function
+        
+    Next
+    
+    IsListArrayByIterable = Globals.Res.SetOkay.Status
     
 End Function
 
-'
 
-' Public Function HasNoItems(ByVal iparray As Variant) As Boolean
-'     HasNoItems = Not TryExtent(iparray, ipRank_one:=Arrays.FirstRank)
+Public Function IsTableArray(ParamArray ipArgArray() As Variant) As Boolean
+    IsTableArray = IsTableArrayByIterable(ipArgArray)
+End Function
+
+Public Function IsNotTableArray(ParamArray ipArgArray() As Variant) As Boolean
+    IsNotTableArray = Not IsTableArrayByIterable(ipArgArray)
+End Function
+
+Public Function IsTableArrayByIterable(ByVal ipFPA As Variant) As Boolean
+    
+    IsTableArrayByIterable = Globals.Res.SetNotOkay.Status
+    
+    If Arrays.IsNotValid(ipFPA) Then Exit Function
+    Dim myitem As Variant
+    For Each myitem In ipFPA
+        
+        If BailOut.When(Types.IsNotArray(myitem), Msg.IsNotArray) Then Exit Function
+        If BailOut.When(Arrays.Ranks(myitem) <> 2, Msg.IsNotTableArray) Then Exit Function
+        
+    Next
+    
+    IsTableArrayByIterable = Globals.Res.SetOkay.Status
+    
+End Function
+
+Public Function IsMDArray(ParamArray ipArgArray() As Variant) As Boolean
+    IsMDArray = IsMDArrayByIterable(ipArgArray)
+End Function
+
+Public Function IsNotMDArray(ParamArray ipArgArray() As Variant) As Boolean
+    IsNotMDArray = Not IsMDArrayByIterable(ipArgArray)
+End Function
+
+
+Public Function IsMDArrayByIterable(ByVal ipFPA As Variant) As Boolean
+    
+    IsMDArrayByIterable = Globals.Res.SetNotOkay.Status
+    
+    If Arrays.IsNotValid(ipFPA) Then Exit Function
+    Dim myitem As Variant
+    For Each myitem In ipFPA
+        
+        If BailOut.When(Types.IsNotArray(myitem), Msg.IsNotArray) Then Exit Function
+        If BailOut.When(Arrays.Ranks(myitem) < 3, Msg.IsNotTableArray) Then Exit Function
+        
+    Next
+    
+    IsMDArrayByIterable = Globals.Res.SetOkay.Status
+    
+End Function
+
+'@Description("Returns true if dimension 1 of an array has Ubound>=Lbound. Allows syntax parity with IterableObjects")
+Public Function HasItems(ParamArray ipArgArray() As Variant) As Boolean
+Attribute HasItems.VB_Description = "Returns true if dimension 1 of an array has Ubound>=Lbound. Allows syntax parity with IterableObjects"
+   HasItems = HasItemsByIterable(ipArgArray)
+End Function
+
+Public Function HasNoItems(ParamArray ipArgsArray() As Variant) As Boolean
+    HasNoItems = Not HasItemsByIterable(ipArgsArray)
+End Function
+
+' ' this function exists to get out of an awkiwardness for Lyst.Add method
+' Public Function HasNoItemsByIterable(ByVal ipArgsArray As Variant) As Boolean
+'     HasNoItemsByIterable = Not HasItemsByIterable(ipArgsArray)
 ' End Function
-    
-Public Function HasNoItems(ByVal ipArray As Variant, Optional ByVal ipRank As ArrayAdmin = ArrayAdmin.FirstRank) As Boolean
-    HasNoItems = Not HasItems(ipArray, ipRank:=ipRank)
-End Function
 
-Public Function HasOneItem(ByVal ipArray As Variant, Optional ByVal ipRank As ArrayAdmin = ArrayAdmin.FirstRank) As Boolean
-        
-    HasOneItem = Count(ipArray, ipRank) = 1
-End Function
-
-Public Function TryExtent(ByRef ipArray As Variant, Optional ByRef iopResult As Result, Optional ByVal ipRank As ArrayAdmin = ArrayAdmin.FirstRank) As Result
-        
-    If iopResult Is Nothing Then Set iopResult = Result.Deb
-    Set TryExtent = iopResult
-        
-    If LacksRank(ipArray, ipRank) Then
+Friend Function HasItemsByIterable(ByVal ipArgsArray As Variant) As Boolean
     
-        iopResult.SetNotOkay
-        iopResult.MessageEnum = Enums.Message.AsEnum(Id.InvalidRank)
-        Exit Function
+    HasItemsByIterable = Globals.Res.SetNotOkay.Status
+    
+    Dim myitem As Variant
+    For Each myitem In ipArgsArray
         
+        On Error Resume Next
+        Dim myUBound As Long
+        myUBound = UBound(myitem)
+        If Err.Number <> 0 Then
             
-    End If
+            On Error GoTo 0
+            Exit Function
+            
+        End If
         
-    Dim myErrorNo As Long
+        If myUBound < LBound(myitem) Then Exit Function
+        
+    Next
+    
+    On Error GoTo 0
+    
+    HasItemsByIterable = Globals.Res.SetOkay.SetItems(True).Status
+
+End Function
+    
+'@description("Returns true if a single array is a valid array")
+Public Function IsValid(ByRef ipArray As Variant) As Boolean
+Attribute IsValid.VB_Description = "Returns true if a single array is a valid array"
+    
+    IsValid = False
     On Error Resume Next
     Dim myUBound As Long
-    myUBound = UBound(ipArray, ipRank)
-    myErrorNo = Err.Number
+    myUBound = UBound(ipArray)
+    If Err.Number <> 0 Then
         
-    Err.Clear
-    On Error GoTo 0
+        On Error GoTo 0
+        Exit Function
         
-    If myErrorNo <> 0 Then
+    End If
     
-        iopResult.SetNotOkay (Enums.Message.AsEnum(Id.ArrayNotInitialised))
+    If myUBound < LBound(ipArray) Then Exit Function
+    
+    IsValid = True
+End Function
+
+Public Function IsNotValid(ByVal ipArray As Variant) As Boolean
+    IsNotValid = Not IsValid(ipArray)
+End Function
+'
+
+Public Function TryExtent(ByRef ipArray As Variant, Optional ByVal ipRank As Long = Constant.ArrayFirstRank) As Result
+        
+    Set TryExtent = Globals.Res.SetNotOkay
+    If BailOut.When(Arrays.IsNotValid(ipArray), Msg.HasNoItems) Then Exit Function
+    If BailOut.When(Ranks(ipArray) < Constant.ArrayFirstRank, Msg.RankLessThanArrayFirstRank) Then Exit Function
+    If BailOut.When(Arrays.LacksRank(ipArray, ipRank), Msg.ArrayLacksRank) Then Exit Function
+    'If BailOut.When(Arrays.HasNoItems(ipArray), Msg.ArrayHasNoItems) Then Exit Function ' also detects empty variant
+   
+    'An uninitialised variant array has Ubound of -1 and Lbound of 0
+    Dim myUBound As Long
+    myUBound = UBound(ipArray, ipRank)
+    
+    Dim myLbound As Long
+    myLbound = LBound(ipArray, ipRank)
+    
+    If myUBound < myLbound Then
+            
+        Globals.Res.SetNotOkay enums.Message.AsEnum(Msg.ArrayHasNoItems)
         Exit Function
             
             
-     End If
-        
-    'An uninitialised variant array has Ubound of -1 and Lbound of 0
-    Dim myLbound As Long
-    myLbound = LBound(ipArray, ipRank)
-    If myUBound < myLbound Then
-            
-         iopResult.SetNotOkay Empty, Empty, Empty, Empty, Empty
-         iopResult.MessageEnum = Enums.Message.AsEnum(Id.ArrayNotInitialised)
-         Exit Function
-            
-            
     End If
-            
-    iopResult.SetOkay myLbound, myUBound, myUBound - myLbound + 1
-        
+       
+    Set TryExtent = Globals.Res.SetOkay.SetItems(myLbound, myUBound, myUBound - myLbound + 1)
+    
 End Function
+
 
 '@Description("Returns a Lyst of Lyst where the inner lyst is a lyst the selected rank(row or column) items")
 Public Function ToLystOfRanksAsLyst _
-       ( _
-       ByVal ipTablearray As Variant, _
-       Optional ByVal ipAction As TableToLystAction = TableToLystAction.RankIsRowFirstItemActionIsNoAction _
-       ) As Lyst
+( _
+    ByVal ipTablearray As Variant, _
+    Optional ByVal ipAction As TableToLystAction = TableToLystAction.RankIsRowFirstItemActionIsNoAction _
+) As Lyst
 Attribute ToLystOfRanksAsLyst.VB_Description = "Returns a Lyst of Lyst where the inner lyst is a lyst the selected rank(row or column) items"
 
-    Guard NotTableArray, Me.IsNotTableArray(ipTablearray), r.Location & "ToLystOfRankLysts"
-    Guard NotEnumerationMember, Enums.TableToLystActions.LacksMember(ipAction), r.Location & "TryToLystOfLysts"
+    If BailOut.When(IsNotTableArray(ipTablearray), Msg.IsNotTableArray) Then Exit Function
+    If BailOut.When(enums.TableToLystActions.LacksMember(ipAction), Msg.msgLacksMember) Then Exit Function
     Dim myAction As ITableToLystAction
-    Set myAction = Enums.TableToLystActions.Action(ipAction)
+    Set myAction = enums.TableToLystActions.Action(ipAction)
     Set ToLystOfRanksAsLyst = myAction.ExecAction(ipTablearray)
         
 End Function
@@ -469,7 +541,7 @@ End Function
 '@Description("transposes rows and colums of a 2d array")
 Public Function Transpose(ByVal ipTablearray As Variant) As Variant
 Attribute Transpose.VB_Description = "transposes rows and colums of a 2d array"
-    
+    'ToDo: update to be able to cope with a jagged array.
     ' 'Check for a jaggedarray
     ' If Ranks(ipTablearray) = 1 And Ranks(ipTablearray(LBound(ipTablearray))) = 1 Then
             

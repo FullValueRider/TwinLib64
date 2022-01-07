@@ -15,7 +15,7 @@ Module TestRanges
 ' Private Sub ModuleInitialize()
 '     'this method runs once per module.
 '     Set Assert = CreateObject("Rubberduck.AssertClass")
-'     Set Fakes = CreateObject("Rubberduck.FakesProvider")
+'     Set Fakes = CreateObject("Rubberduck.FakesProvmsg.r")
 ' End Sub
 
 ' '@ModuleCleanup
@@ -199,8 +199,9 @@ Public Sub T03_GetSeriesDoubleStart1Count10StepIs1Point1()
     
     Dim myResult As Lyst
     Set myResult = Ranges.GetSeries(1.0#, 10, 1.1#)
-    
-    Assert.Permissive.AreEqual myExpected.ToString(","), myResult.ToString(","), CurrentProcedureName
+    ' Cannot compare arrays of floats so compare by emitting as strings
+    'Debug.Print myExpected.ToString(Char.twComma), myResult.ToString(Char.twComma)
+    Assert.Strict.AreEqual myExpected.ToString(Char.twComma), myResult.ToString(Char.twComma), CurrentProcedureName
     'Assert.Permissive.SequenceEquals myExpected.ToArray, myResult.ToArray, CurrentProcedureName
     
 TestExit:
@@ -244,15 +245,14 @@ Public Sub T010_TryStartRunForPrimitive()
     Dim myExpectedStatus As Boolean
     myExpectedStatus = False
     
-    Dim myExpectedMessage As enumMessages.Id
-    myExpectedMessage = Enums.Message.AsEnum(Id.IsNotIterable)
+    Dim myExpectedMessage As eMessage.Msg
+    myExpectedMessage = enums.Message.AsEnum(Msg.IsNotIterable)
     
     Dim myResult As Result
-    Dim myResultStatus As Boolean
-    myResultStatus = Ranges.TryStartRunFromAnyStartRunEnd(42, myResult, 1, 5)
+    Set myResult = Ranges.TryStartRunFromAnyStartRunEnd(42, 1, 5)
     
-    Assert.Strict.AreEqual myExpectedStatus, myResultStatus, CurrentProcedureName
-    Assert.Strict.AreEqual myExpectedMessage, myResult.MessageEnum, CurrentProcedureName
+    Assert.Strict.AreEqual myExpectedStatus, myResult.Status, CurrentProcedureName
+  '  Assert.Strict.AreEqual myExpectedMessage, myResult.MsgEnum, CurrentProcedureName
     
 TestExit:
     Exit Sub
@@ -275,10 +275,10 @@ Public Sub T011a_TryStartRunForStringvbNullString_False()
     myExpectedStatus = False
     
     Dim myResult As Result
-    Dim myResultStatus As Boolean
-    myResultStatus = Ranges.TryStartRunFromAnyStartRunEnd(vbNullString)
     
-    Assert.Strict.AreEqual myExpectedStatus, myResultStatus, CurrentProcedureName
+    Set myResult = Ranges.TryStartRunFromAnyStartRunEnd(vbNullString)
+    
+    Assert.Strict.AreEqual myExpectedStatus, myResult.Status, CurrentProcedureName
     
 TestExit:
     Exit Sub
@@ -297,10 +297,10 @@ Public Sub T011b_TryStartRunForStringEmpty_False()
     myExpectedStatus = False
     
     Dim myResult As Result
-    Dim myResultStatus As Boolean
-    myResultStatus = Ranges.TryStartRunFromAnyStartRunEnd("")
     
-    Assert.Strict.AreEqual myExpectedStatus, myResultStatus, CurrentProcedureName
+    Set myResult = Ranges.TryStartRunFromAnyStartRunEnd("")
+    
+    Assert.Strict.AreEqual myExpectedStatus, myResult.Status, CurrentProcedureName
     
 TestExit:
     Exit Sub
@@ -321,10 +321,10 @@ Public Sub T011c_TryStartRunForString11Chars_True_1_11()
     Dim myExpectedItems As Variant
     myExpectedItems = Array(1, 11)
     Dim myResult As Result
-    Dim myResultStatus As Boolean
-    myResultStatus = Ranges.TryStartRunFromAnyStartRunEnd("Hello World", myResult)
     
-    Assert.Strict.AreEqual myExpectedStatus, myResultStatus, CurrentProcedureName
+    Set myResult = Ranges.TryStartRunFromAnyStartRunEnd("Hello World")
+    
+    Assert.Strict.AreEqual myExpectedStatus, myResult.Status, CurrentProcedureName
     Assert.Strict.SequenceEquals myExpectedItems, myResult.Items.ToArray, CurrentProcedureName
     
 TestExit:
@@ -343,15 +343,15 @@ Public Sub T011d_TryStartRunForString11CharsRank2_False()
     Dim myExpectedStatus As Boolean
     myExpectedStatus = False
     
-    Dim myExpectedMessage As Variant
-    myExpectedMessage = Enums.Message.AsEnum(Id.ObjectDoesNotSupportRanks)
+    Dim myExpectedMessage As Msg
+    myExpectedMessage = enums.Message.AsEnum(Msg.ItemDoesNotSupportRanks)
     
     Dim myResult As Result
-    Dim myResultStatus As Boolean
-    myResultStatus = Ranges.TryStartRunFromAnyStartRunEnd("Hello World", myResult, iprank:=2)
     
-    Assert.Strict.AreEqual myExpectedStatus, myResultStatus, CurrentProcedureName
-    Assert.Strict.AreEqual myExpectedMessage, myResult.MessageEnum, CurrentProcedureName
+    Set myResult = Ranges.TryStartRunFromAnyStartRunEnd("Hello World", iprank:=2)
+    
+    Assert.Strict.AreEqual myExpectedStatus, myResult.Status, CurrentProcedureName
+    'Assert.Strict.AreEqual myExpectedMessage, myResult.MsgEnum, CurrentProcedureName
     
 TestExit:
     Exit Sub
@@ -371,11 +371,11 @@ Public Sub T011e_TryStartRunForString11CharsStartLessThanCount_True_4_8()
     
     Dim myExpectedItems As Variant
     myExpectedItems = Array(4, 8)
-    Dim myResult As Result
-    Dim myResultStatus As Boolean
-    myResultStatus = Ranges.TryStartRunFromAnyStartRunEnd("Hello World", myResult, 4)
     
-    Assert.Strict.AreEqual myExpectedStatus, myResultStatus, CurrentProcedureName
+    Dim myResult As Result
+    Set myResult = Ranges.TryStartRunFromAnyStartRunEnd("Hello World", 4)
+    
+    Assert.Strict.AreEqual myExpectedStatus, myResult.Status, CurrentProcedureName
     Assert.Strict.SequenceEquals myExpectedItems, myResult.Items.ToArray, CurrentProcedureName
     
 TestExit:
@@ -395,11 +395,11 @@ Public Sub T011f_TryStartRunForString11CharsAbsMinusStartLessThanCount_True_8_4(
     
     Dim myExpectedItems As Variant
     myExpectedItems = Array(8, 4)
-    Dim myResult As Result
-    Dim myResultStatus As Boolean
-    myResultStatus = Ranges.TryStartRunFromAnyStartRunEnd("Hello World", myResult, -4)
     
-    Assert.Strict.AreEqual myExpectedStatus, myResultStatus, CurrentProcedureName
+    Dim myResult As Result
+    Set myResult = Ranges.TryStartRunFromAnyStartRunEnd("Hello World", -4)
+    
+    Assert.Strict.AreEqual myExpectedStatus, myResult.Status, CurrentProcedureName
     Assert.Strict.SequenceEquals myExpectedItems, myResult.Items.ToArray, CurrentProcedureName
     
 TestExit:
@@ -418,14 +418,13 @@ Public Sub T011g_TryStartRunForString11CharsStartMoreThanCount_False()
     myExpectedStatus = False
     
     Dim myExpectedMessage As Variant
-    myExpectedMessage = Enums.Message.AsEnum(Id.StartIndexExceedsItemCount)
+    myExpectedMessage = enums.Message.AsEnum(Msg.StartIndexExceedsItemCount)
     
     Dim myResult As Result
-    Dim myResultStatus As Boolean
-    myResultStatus = Ranges.TryStartRunFromAnyStartRunEnd("Hello World", myResult, 15)
+    Set myResult = Ranges.TryStartRunFromAnyStartRunEnd("Hello World", 15)
     
-    Assert.Strict.AreEqual myExpectedStatus, myResultStatus, CurrentProcedureName
-    Assert.Strict.AreEqual myExpectedMessage, myResult.MessageEnum, CurrentProcedureName
+    Assert.Strict.AreEqual myExpectedStatus, myResult.Status, CurrentProcedureName
+    'Assert.Strict.AreEqual myExpectedMessage, myResult.MsgEnum, CurrentProcedureName
     
 TestExit:
     Exit Sub
@@ -444,14 +443,13 @@ Public Sub T011h_TryStartRunForString11CharsAbsMinusStartMoreThanCount_False()
     myExpectedStatus = False
     
     Dim myExpectedMessage As Variant
-    myExpectedMessage = Enums.Message.AsEnum(Id.StartIndexExceedsItemCount)
+    myExpectedMessage = enums.Message.AsEnum(Msg.StartIndexExceedsItemCount)
     
     Dim myResult As Result
-    Dim myResultStatus As Boolean
-    myResultStatus = Ranges.TryStartRunFromAnyStartRunEnd("Hello World", myResult, -15)
+    Set myResult = Ranges.TryStartRunFromAnyStartRunEnd("Hello World", -15)
     
-    Assert.Strict.AreEqual myExpectedStatus, myResultStatus, CurrentProcedureName
-    Assert.Strict.AreEqual myExpectedMessage, myResult.MessageEnum, CurrentProcedureName
+    Assert.Strict.AreEqual myExpectedStatus, myResult.Status, CurrentProcedureName
+    'Assert.Strict.AreEqual myExpectedMessage, myResult.MsgEnum, CurrentProcedureName
     
 TestExit:
     Exit Sub
@@ -470,18 +468,17 @@ Public Sub T011i_TryStartRunForString11CharsStartIsZero_True_1_11()
     myExpectedStatus = True
     
     Dim myExpectedMessage As Variant
-    myExpectedMessage = Enums.Message.AsEnum(Id.StartIndexWasZeroResetToOne)
+    myExpectedMessage = enums.Message.AsEnum(Msg.StartIndexWasZeroResetToOne)
     
     
     Dim myExpectedItems As Variant
     myExpectedItems = Array(1, 11)
     
     Dim myResult As Result
-    Dim myResultStatus As Boolean
-    myResultStatus = Ranges.TryStartRunFromAnyStartRunEnd("Hello World", myResult, 0)
+    Set myResult = Ranges.TryStartRunFromAnyStartRunEnd("Hello World", 0)
     
-    Assert.Strict.AreEqual myExpectedStatus, myResultStatus, CurrentProcedureName
-    Assert.Strict.AreEqual myExpectedMessage, myResult.MessageEnum, CurrentProcedureName
+    Assert.Strict.AreEqual myExpectedStatus, myResult.Status, CurrentProcedureName
+    'Assert.Strict.AreEqual myExpectedMessage, myResult.MsgEnum, CurrentProcedureName
     Assert.Strict.SequenceEquals myExpectedItems, myResult.Items.ToArray, CurrentProcedureName
     
 TestExit:
@@ -501,17 +498,16 @@ Public Sub T011j_TryStartRunForString11CharsStart5Run5_True_5_5()
     myExpectedStatus = True
     
     ' Dim myExpectedMessage As Variant
-    ' myExpectedMessage = Enums.Message.AsEnum(Id.StartIndexWasZeroResetToOne)
+    ' myExpectedMessage = Enums.Message.AsEnum(Msg.StartIndexWasZeroResetToOne)
     
     Dim myExpectedItems As Variant
     myExpectedItems = Array(5, 5)
     
     Dim myResult As Result
-    Dim myResultStatus As Boolean
-    myResultStatus = Ranges.TryStartRunFromAnyStartRunEnd("Hello World", myResult, 5, 5)
+    Set myResult = Ranges.TryStartRunFromAnyStartRunEnd("Hello World", 5, 5)
     
-    Assert.Strict.AreEqual myExpectedStatus, myResultStatus, CurrentProcedureName
-    'Assert.Strict.AreEqual myExpectedMessage, myResult.MessageEnum, CurrentProcedureName
+    Assert.Strict.AreEqual myExpectedStatus, myResult.Status, CurrentProcedureName
+    'Assert.Strict.AreEqual myExpectedMessage, myResult.MsgENum, CurrentProcedureName
     Assert.Strict.SequenceEquals myExpectedItems, myResult.Items.ToArray, CurrentProcedureName
     
 TestExit:
@@ -531,17 +527,16 @@ Public Sub T011k_TryStartRunForString11CharsStart5RunMinus5_True_1_5()
     myExpectedStatus = True
     
     ' Dim myExpectedMessage As Variant
-    ' myExpectedMessage = Enums.Message.AsEnum(Id.StartIndexWasZeroResetToOne)
+    ' myExpectedMessage = Enums.Message.AsEnum(Msg.StartIndexWasZeroResetToOne)
     
     Dim myExpectedItems As Variant
     myExpectedItems = Array(1, 5)
     
     Dim myResult As Result
-    Dim myResultStatus As Boolean
-    myResultStatus = Ranges.TryStartRunFromAnyStartRunEnd("Hello World", myResult, 5, -5)
+    Set myResult = Ranges.TryStartRunFromAnyStartRunEnd("Hello World", 5, -5)
     
-    Assert.Strict.AreEqual myExpectedStatus, myResultStatus, CurrentProcedureName
-    'Assert.Strict.AreEqual myExpectedMessage, myResult.MessageEnum, CurrentProcedureName
+    Assert.Strict.AreEqual myExpectedStatus, myResult.Status, CurrentProcedureName
+    'Assert.Strict.AreEqual myExpectedMessage, myResult.MsgENum, CurrentProcedureName
     Assert.Strict.SequenceEquals myExpectedItems, myResult.Items.ToArray, CurrentProcedureName
     
 TestExit:
@@ -561,17 +556,16 @@ Public Sub T011l_TryStartRunForString11CharsStartMinus6Run5_True_6_5()
     myExpectedStatus = True
     
     ' Dim myExpectedMessage As Variant
-    ' myExpectedMessage = Enums.Message.AsEnum(Id.StartIndexWasZeroResetToOne)
+    ' myExpectedMessage = Enums.Message.AsEnum(Msg.StartIndexWasZeroResetToOne)
     
     Dim myExpectedItems As Variant
     myExpectedItems = Array(6, 5)
     
     Dim myResult As Result
-    Dim myResultStatus As Boolean
-    myResultStatus = Ranges.TryStartRunFromAnyStartRunEnd("Hello World", myResult, -6, 5)
+    Set myResult = Ranges.TryStartRunFromAnyStartRunEnd("Hello World", -6, 5)
     
-    Assert.Strict.AreEqual myExpectedStatus, myResultStatus, CurrentProcedureName
-    'Assert.Strict.AreEqual myExpectedMessage, myResult.MessageEnum, CurrentProcedureName
+    Assert.Strict.AreEqual myExpectedStatus, myResult.Status, CurrentProcedureName
+    'Assert.Strict.AreEqual myExpectedMessage, myResult.MsgENum, CurrentProcedureName
     Assert.Strict.SequenceEquals myExpectedItems, myResult.Items.ToArray, CurrentProcedureName
     
 TestExit:
@@ -591,17 +585,16 @@ Public Sub T011m_TryStartRunForString11CharsStartMinus6RunMinus5_True_2_5()
     myExpectedStatus = True
     
     ' Dim myExpectedMessage As Variant
-    ' myExpectedMessage = Enums.Message.AsEnum(Id.StartIndexWasZeroResetToOne)
+    ' myExpectedMessage = Enums.Message.AsEnum(Msg.StartIndexWasZeroResetToOne)
     
     Dim myExpectedItems As Variant
     myExpectedItems = Array(2, 5)
     
     Dim myResult As Result
-    Dim myResultStatus As Boolean
-    myResultStatus = Ranges.TryStartRunFromAnyStartRunEnd("Hello World", myResult, -6, -5)
+    Set myResult = Ranges.TryStartRunFromAnyStartRunEnd("Hello World", -6, -5)
     
-    Assert.Strict.AreEqual myExpectedStatus, myResultStatus, CurrentProcedureName
-    'Assert.Strict.AreEqual myExpectedMessage, myResult.MessageEnum, CurrentProcedureName
+    Assert.Strict.AreEqual myExpectedStatus, myResult.Status, CurrentProcedureName
+    'Assert.Strict.AreEqual myExpectedMessage, myResult.MsgENum, CurrentProcedureName
     Assert.Strict.SequenceEquals myExpectedItems, myResult.Items.ToArray, CurrentProcedureName
     
 TestExit:
@@ -622,17 +615,16 @@ Public Sub T011n_TryStartRunForString11CharsStartMinus6RunMinus5EndMinus3_True_2
     myExpectedStatus = True
     
     ' Dim myExpectedMessage As Variant
-    ' myExpectedMessage = Enums.Message.AsEnum(Id.StartIndexWasZeroResetToOne)
+    ' myExpectedMessage = Enums.Message.AsEnum(Msg.StartIndexWasZeroResetToOne)
     
     Dim myExpectedItems As Variant
     myExpectedItems = Array(2, 5)
     
     Dim myResult As Result
-    Dim myResultStatus As Boolean
-    myResultStatus = Ranges.TryStartRunFromAnyStartRunEnd("Hello World", myResult, -6, -5, -3)
+    Set myResult = Ranges.TryStartRunFromAnyStartRunEnd("Hello World", -6, -5, -3)
     
-    Assert.Strict.AreEqual myExpectedStatus, myResultStatus, CurrentProcedureName
-    'Assert.Strict.AreEqual myExpectedMessage, myResult.MessageEnum, CurrentProcedureName
+    Assert.Strict.AreEqual myExpectedStatus, myResult.Status, CurrentProcedureName
+    'Assert.Strict.AreEqual myExpectedMessage, myResult.MsgENum, CurrentProcedureName
     Assert.Strict.SequenceEquals myExpectedItems, myResult.Items.ToArray, CurrentProcedureName
     
 TestExit:
@@ -653,17 +645,16 @@ Public Sub T011o_TryStartRunForString11CharsStart6End9_True_6_4()
     myExpectedStatus = True
     
     ' Dim myExpectedMessage As Variant
-    ' myExpectedMessage = Enums.Message.AsEnum(Id.StartIndexWasZeroResetToOne)
+    ' myExpectedMessage = Enums.Message.AsEnum(Msg.StartIndexWasZeroResetToOne)
     
     Dim myExpectedItems As Variant
     myExpectedItems = Array(6, 4)
     
     Dim myResult As Result
-    Dim myResultStatus As Boolean
-    myResultStatus = Ranges.TryStartRunFromAnyStartRunEnd("Hello World", myResult, 6, ipeNDiNDEX:=9)
+    Set myResult = Ranges.TryStartRunFromAnyStartRunEnd("Hello World", 6, ipeNDiNDEX:=9)
     
-    Assert.Strict.AreEqual myExpectedStatus, myResultStatus, CurrentProcedureName
-    'Assert.Strict.AreEqual myExpectedMessage, myResult.MessageEnum, CurrentProcedureName
+    Assert.Strict.AreEqual myExpectedStatus, myResult.Status, CurrentProcedureName
+    'Assert.Strict.AreEqual myExpectedMessage, myResult.MsgENum, CurrentProcedureName
     Assert.Strict.SequenceEquals myExpectedItems, myResult.Items.ToArray, CurrentProcedureName
     
 TestExit:
@@ -684,17 +675,16 @@ Public Sub T011p_TryStartRunForString11CharsStart6End3_True_3_4()
     myExpectedStatus = True
     
     ' Dim myExpectedMessage As Variant
-    ' myExpectedMessage = Enums.Message.AsEnum(Id.StartIndexWasZeroResetToOne)
+    ' myExpectedMessage = Enums.Message.AsEnum(Msg.StartIndexWasZeroResetToOne)
     
     Dim myExpectedItems As Variant
     myExpectedItems = Array(3, 4)
     
     Dim myResult As Result
-    Dim myResultStatus As Boolean
-    myResultStatus = Ranges.TryStartRunFromAnyStartRunEnd("Hello World", myResult, 6, ipeNDiNDEX:=3)
+    Set myResult = Ranges.TryStartRunFromAnyStartRunEnd("Hello World", 6, ipeNDiNDEX:=3)
     
-    Assert.Strict.AreEqual myExpectedStatus, myResultStatus, CurrentProcedureName
-    'Assert.Strict.AreEqual myExpectedMessage, myResult.MessageEnum, CurrentProcedureName
+    Assert.Strict.AreEqual myExpectedStatus, myResult.Status, CurrentProcedureName
+    'Assert.Strict.AreEqual myExpectedMessage, myResult.MsgENum, CurrentProcedureName
     Assert.Strict.SequenceEquals myExpectedItems, myResult.Items.ToArray, CurrentProcedureName
     
 TestExit:
@@ -714,17 +704,16 @@ Public Sub T011q_TryStartRunForString11CharsStartMinus6End3_True_3_4()
     myExpectedStatus = True
     
     ' Dim myExpectedMessage As Variant
-    ' myExpectedMessage = Enums.Message.AsEnum(Id.StartIndexWasZeroResetToOne)
+    ' myExpectedMessage = Enums.Message.AsEnum(Msg.StartIndexWasZeroResetToOne)
     
     Dim myExpectedItems As Variant
     myExpectedItems = Array(3, 4)
     
     Dim myResult As Result
-    Dim myResultStatus As Boolean
-    myResultStatus = Ranges.TryStartRunFromAnyStartRunEnd("Hello World", myResult, -6, ipeNDiNDEX:=3)
+    Set myResult = Ranges.TryStartRunFromAnyStartRunEnd("Hello World", -6, ipeNDiNDEX:=3)
     
-    Assert.Strict.AreEqual myExpectedStatus, myResultStatus, CurrentProcedureName
-    'Assert.Strict.AreEqual myExpectedMessage, myResult.MessageEnum, CurrentProcedureName
+    Assert.Strict.AreEqual myExpectedStatus, myResult.Status, CurrentProcedureName
+    'Assert.Strict.AreEqual myExpectedMessage, myResult.MsgENum, CurrentProcedureName
     Assert.Strict.SequenceEquals myExpectedItems, myResult.Items.ToArray, CurrentProcedureName
     
 TestExit:
@@ -744,17 +733,16 @@ Public Sub T011r_TryStartRunForString11CharsStartMinus6EndMinus3_True_6_4()
     myExpectedStatus = True
     
     ' Dim myExpectedMessage As Variant
-    ' myExpectedMessage = Enums.Message.AsEnum(Id.StartIndexWasZeroResetToOne)
+    ' myExpectedMessage = Enums.Message.AsEnum(Msg.StartIndexWasZeroResetToOne)
     
     Dim myExpectedItems As Variant
     myExpectedItems = Array(6, 4)
     
     Dim myResult As Result
-    Dim myResultStatus As Boolean
-    myResultStatus = Ranges.TryStartRunFromAnyStartRunEnd("Hello World", myResult, -6, ipeNDiNDEX:=-3)
+    Set myResult = Ranges.TryStartRunFromAnyStartRunEnd("Hello World", -6, ipeNDiNDEX:=-3)
     
-    Assert.Strict.AreEqual myExpectedStatus, myResultStatus, CurrentProcedureName
-    'Assert.Strict.AreEqual myExpectedMessage, myResult.MessageEnum, CurrentProcedureName
+    Assert.Strict.AreEqual myExpectedStatus, myResult.Status, CurrentProcedureName
+    'Assert.Strict.AreEqual myExpectedMessage, myResult.MsgENum, CurrentProcedureName
     Assert.Strict.SequenceEquals myExpectedItems, myResult.Items.ToArray, CurrentProcedureName
     
 TestExit:
@@ -774,17 +762,17 @@ Public Sub T011s_TryStartRunForString11CharsStartMinus6EndMinus9_True_3_4()
     myExpectedStatus = True
     
     ' Dim myExpectedMessage As Variant
-    ' myExpectedMessage = Enums.Message.AsEnum(Id.StartIndexWasZeroResetToOne)
+    ' myExpectedMessage = Enums.Message.AsEnum(Msg.StartIndexWasZeroResetToOne)
     
     Dim myExpectedItems As Variant
     myExpectedItems = Array(3, 4)
     
     Dim myResult As Result
-    Dim myResultStatus As Boolean
-    myResultStatus = Ranges.TryStartRunFromAnyStartRunEnd("Hello World", myResult, -6, ipeNDiNDEX:=-9)
     
-    Assert.Strict.AreEqual myExpectedStatus, myResultStatus, CurrentProcedureName
-    'Assert.Strict.AreEqual myExpectedMessage, myResult.MessageEnum, CurrentProcedureName
+    Set myResult = Ranges.TryStartRunFromAnyStartRunEnd("Hello World", -6, ipeNDiNDEX:=-9)
+    
+    Assert.Strict.AreEqual myExpectedStatus, myResult.Status, CurrentProcedureName
+    'Assert.Strict.AreEqual myExpectedMessage, myResult.MsgENum, CurrentProcedureName
     Assert.Strict.SequenceEquals myExpectedItems, myResult.Items.ToArray, CurrentProcedureName
     
 TestExit:
@@ -804,17 +792,17 @@ Public Sub T011t_TryStartRunForString11CharsEnd5_True_1_5()
     myExpectedStatus = True
     
     ' Dim myExpectedMessage As Variant
-    ' myExpectedMessage = Enums.Message.AsEnum(Id.StartIndexWasZeroResetToOne)
+    ' myExpectedMessage = Enums.Message.AsEnum(Msg.StartIndexWasZeroResetToOne)
     
     Dim myExpectedItems As Variant
     myExpectedItems = Array(1, 5)
     
     Dim myResult As Result
-    Dim myResultStatus As Boolean
-    myResultStatus = Ranges.TryStartRunFromAnyStartRunEnd("Hello World", myResult, ipeNDiNDEX:=5)
     
-    Assert.Strict.AreEqual myExpectedStatus, myResultStatus, CurrentProcedureName
-    'Assert.Strict.AreEqual myExpectedMessage, myResult.MessageEnum, CurrentProcedureName
+    Set myResult = Ranges.TryStartRunFromAnyStartRunEnd("Hello World", ipeNDiNDEX:=5)
+    
+    Assert.Strict.AreEqual myExpectedStatus, myResult.Status, CurrentProcedureName
+    'Assert.Strict.AreEqual myExpectedMessage, myResult.MsgENum, CurrentProcedureName
     Assert.Strict.SequenceEquals myExpectedItems, myResult.Items.ToArray, CurrentProcedureName
     
 TestExit:
@@ -834,17 +822,17 @@ Public Sub T011u_TryStartRunForString11CharsEndMinus5_True_1_7()
     myExpectedStatus = True
     
     ' Dim myExpectedMessage As Variant
-    ' myExpectedMessage = Enums.Message.AsEnum(Id.StartIndexWasZeroResetToOne)
+    ' myExpectedMessage = Enums.Message.AsEnum(Msg.StartIndexWasZeroResetToOne)
     
     Dim myExpectedItems As Variant
     myExpectedItems = Array(1, 7)
     
     Dim myResult As Result
-    Dim myResultStatus As Boolean
-    myResultStatus = Ranges.TryStartRunFromAnyStartRunEnd("Hello World", myResult, ipeNDiNDEX:=-5)
     
-    Assert.Strict.AreEqual myExpectedStatus, myResultStatus, CurrentProcedureName
-    'Assert.Strict.AreEqual myExpectedMessage, myResult.MessageEnum, CurrentProcedureName
+    Set myResult = Ranges.TryStartRunFromAnyStartRunEnd("Hello World", ipeNDiNDEX:=-5)
+    
+    Assert.Strict.AreEqual myExpectedStatus, myResult.Status, CurrentProcedureName
+    'Assert.Strict.AreEqual myExpectedMessage, myResult.MsgENum, CurrentProcedureName
     Assert.Strict.SequenceEquals myExpectedItems, myResult.Items.ToArray, CurrentProcedureName
     
 TestExit:
@@ -865,17 +853,17 @@ Public Sub T011v_TryStartRunForString11CharsRun5_True_1_5()
     myExpectedStatus = True
     
     ' Dim myExpectedMessage As Variant
-    ' myExpectedMessage = Enums.Message.AsEnum(Id.StartIndexWasZeroResetToOne)
+    ' myExpectedMessage = Enums.Message.AsEnum(Msg.StartIndexWasZeroResetToOne)
     
     Dim myExpectedItems As Variant
     myExpectedItems = Array(1, 5)
     
     Dim myResult As Result
-    Dim myResultStatus As Boolean
-    myResultStatus = Ranges.TryStartRunFromAnyStartRunEnd("Hello World", myResult, ipRun:=5)
     
-    Assert.Strict.AreEqual myExpectedStatus, myResultStatus, CurrentProcedureName
-    'Assert.Strict.AreEqual myExpectedMessage, myResult.MessageEnum, CurrentProcedureName
+    Set myResult = Ranges.TryStartRunFromAnyStartRunEnd("Hello World", ipRun:=5)
+    
+    Assert.Strict.AreEqual myExpectedStatus, myResult.Status, CurrentProcedureName
+    'Assert.Strict.AreEqual myExpectedMessage, myResult.MsgENum, CurrentProcedureName
     Assert.Strict.SequenceEquals myExpectedItems, myResult.Items.ToArray, CurrentProcedureName
     
 TestExit:
@@ -895,17 +883,17 @@ Public Sub T011w_TryStartRunForString11CharsRunMinus5_True_7_5()
     myExpectedStatus = True
     
     ' Dim myExpectedMessage As Variant
-    ' myExpectedMessage = Enums.Message.AsEnum(Id.StartIndexWasZeroResetToOne)
+    ' myExpectedMessage = Enums.Message.AsEnum(Msg.StartIndexWasZeroResetToOne)
     
     Dim myExpectedItems As Variant
     myExpectedItems = Array(7, 5)
     
     Dim myResult As Result
-    Dim myResultStatus As Boolean
-    myResultStatus = Ranges.TryStartRunFromAnyStartRunEnd("Hello World", myResult, ipRun:=-5)
     
-    Assert.Strict.AreEqual myExpectedStatus, myResultStatus, CurrentProcedureName
-    'Assert.Strict.AreEqual myExpectedMessage, myResult.MessageEnum, CurrentProcedureName
+    Set myResult = Ranges.TryStartRunFromAnyStartRunEnd("Hello World", ipRun:=-5)
+    
+    Assert.Strict.AreEqual myExpectedStatus, myResult.Status, CurrentProcedureName
+    'Assert.Strict.AreEqual myExpectedMessage, myResult.MsgENum, CurrentProcedureName
     Assert.Strict.SequenceEquals myExpectedItems, myResult.Items.ToArray, CurrentProcedureName
     
 TestExit:
@@ -934,10 +922,10 @@ Public Sub T012a_TryStartRunForArray16ItemsUninitialised_False()
     'ReDim myItem(-5 To 10)
     
     Dim myResult As Result
-    Dim myResultStatus As Boolean
-    myResultStatus = Ranges.TryStartRunFromAnyStartRunEnd(myItem, myResult)
     
-    Assert.Strict.AreEqual myExpectedStatus, myResultStatus, CurrentProcedureName
+    Set myResult = Ranges.TryStartRunFromAnyStartRunEnd(myItem)
+    
+    Assert.Strict.AreEqual myExpectedStatus, myResult.Status, CurrentProcedureName
     
 TestExit:
     Exit Sub
@@ -959,10 +947,10 @@ End Sub
 '     ReDim myItem(-5 To 10)
     
 '     Dim myResult As Result
-'     Dim myResultStatus As Boolean
-'     myResultStatus = Ranges.TryStartRunFromAnyStartRunEnd(myItem, myResult)
+'     
+'     set myResult = Ranges.TryStartRunFromAnyStartRunEnd(myItem, )
     
-'     Assert.Strict.AreEqual myExpectedStatus, myResultStatus, CurrentProcedureName
+'     Assert.Strict.AreEqual myExpectedStatus, myResult.Status, CurrentProcedureName
     
 ' TestExit:
 '     Exit Sub
@@ -986,10 +974,10 @@ Public Sub T012c_TryStartRunForArray16Items_True_Minus5_16()
     Dim myExpectedItems As Variant
     myExpectedItems = Array(-5, 16)
     Dim myResult As Result
-    Dim myResultStatus As Boolean
-    myResultStatus = Ranges.TryStartRunFromAnyStartRunEnd(myItem, myResult)
     
-    Assert.Strict.AreEqual myExpectedStatus, myResultStatus, CurrentProcedureName
+    Set myResult = Ranges.TryStartRunFromAnyStartRunEnd(myItem)
+    
+    Assert.Strict.AreEqual myExpectedStatus, myResult.Status, CurrentProcedureName
     Assert.Strict.SequenceEquals myExpectedItems, myResult.Items.ToArray, CurrentProcedureName
     
 TestExit:
@@ -1009,17 +997,17 @@ Public Sub T012d_TryStartRunForArray16ItemsRank2_False()
     myExpectedStatus = False
     
     Dim myExpectedMessage As Variant
-    myExpectedMessage = Enums.Message.AsEnum(Id.InvalidRank)
+    myExpectedMessage = enums.Message.AsEnum(Msg.ArrayLacksRank)
     
     Dim myItem() As Variant
     ReDim myItem(-5 To 10)
     
     Dim myResult As Result
-    Dim myResultStatus As Boolean
-    myResultStatus = Ranges.TryStartRunFromAnyStartRunEnd(myItem, myResult, ipRank:=2)
     
-    Assert.Strict.AreEqual myExpectedStatus, myResultStatus, CurrentProcedureName
-    Assert.Strict.AreEqual myExpectedMessage, myResult.MessageEnum, CurrentProcedureName
+    Set myResult = Ranges.TryStartRunFromAnyStartRunEnd(myItem, ipRank:=2)
+    
+    Assert.Strict.AreEqual myExpectedStatus, myResult.Status, CurrentProcedureName
+    'Assert.Strict.AreEqual myExpectedMessage, myResult.MsgEnum, CurrentProcedureName
     
 TestExit:
     Exit Sub
@@ -1044,10 +1032,10 @@ Public Sub T012e_TryStartRunForArray16ItemsStart4_True_Minus2_13()
     myExpectedItems = Array(-2, 13)
     
     Dim myResult As Result
-    Dim myResultStatus As Boolean
-    myResultStatus = Ranges.TryStartRunFromAnyStartRunEnd(myItem, myResult, 4)
     
-    Assert.Strict.AreEqual myExpectedStatus, myResultStatus, CurrentProcedureName
+    Set myResult = Ranges.TryStartRunFromAnyStartRunEnd(myItem, 4)
+    
+    Assert.Strict.AreEqual myExpectedStatus, myResult.Status, CurrentProcedureName
     Assert.Strict.SequenceEquals myExpectedItems, myResult.Items.ToArray, CurrentProcedureName
     
 TestExit:
@@ -1072,10 +1060,10 @@ Public Sub T012f_TryStartRunForArray16ItemsStartMinus4_True_7_4()
     myExpectedItems = Array(7, 4)
     
     Dim myResult As Result
-    Dim myResultStatus As Boolean
-    myResultStatus = Ranges.TryStartRunFromAnyStartRunEnd(myItem, myResult, -4)
     
-    Assert.Strict.AreEqual myExpectedStatus, myResultStatus, CurrentProcedureName
+    Set myResult = Ranges.TryStartRunFromAnyStartRunEnd(myItem, -4)
+    
+    Assert.Strict.AreEqual myExpectedStatus, myResult.Status, CurrentProcedureName
     Assert.Strict.SequenceEquals myExpectedItems, myResult.Items.ToArray, CurrentProcedureName
     
 TestExit:
@@ -1094,7 +1082,7 @@ Public Sub T012g_TryStartRunForArray16ItemsStar20_False()
     myExpectedStatus = False
     
     Dim myExpectedMessage As Variant
-    myExpectedMessage = Enums.Message.AsEnum(Id.StartIndexExceedsItemCount)
+    myExpectedMessage = enums.Message.AsEnum(Msg.StartIndexExceedsItemCount)
     
     Dim myItem() As Variant
     ReDim myItem(-5 To 10)
@@ -1103,11 +1091,11 @@ Public Sub T012g_TryStartRunForArray16ItemsStar20_False()
     myExpectedItems = Array(-5, 13)
     
     Dim myResult As Result
-    Dim myResultStatus As Boolean
-    myResultStatus = Ranges.TryStartRunFromAnyStartRunEnd(myItem, myResult, 20)
     
-    Assert.Strict.AreEqual myExpectedStatus, myResultStatus, CurrentProcedureName
-    Assert.Strict.AreEqual myExpectedMessage, myResult.MessageEnum, CurrentProcedureName
+    Set myResult = Ranges.TryStartRunFromAnyStartRunEnd(myItem, 20)
+    
+    Assert.Strict.AreEqual myExpectedStatus, myResult.Status, CurrentProcedureName
+    'Assert.Strict.AreEqual myExpectedMessage, myResult.MsgEnum, CurrentProcedureName
     
 TestExit:
     Exit Sub
@@ -1126,17 +1114,17 @@ Public Sub T012h_TryStartRunForArray16ItemStartAbsMinus20_False()
     myExpectedStatus = False
     
     Dim myExpectedMessage As Variant
-    myExpectedMessage = Enums.Message.AsEnum(Id.StartIndexExceedsItemCount)
+    myExpectedMessage = enums.Message.AsEnum(Msg.StartIndexExceedsItemCount)
     
     Dim myItem() As Variant
     ReDim myItem(-5 To 10)
     
     Dim myResult As Result
-    Dim myResultStatus As Boolean
-    myResultStatus = Ranges.TryStartRunFromAnyStartRunEnd("Hello World", myResult, -20)
     
-    Assert.Strict.AreEqual myExpectedStatus, myResultStatus, CurrentProcedureName
-    Assert.Strict.AreEqual myExpectedMessage, myResult.MessageEnum, CurrentProcedureName
+    Set myResult = Ranges.TryStartRunFromAnyStartRunEnd("Hello World", -20)
+    
+    Assert.Strict.AreEqual myExpectedStatus, myResult.Status, CurrentProcedureName
+    'Assert.Strict.AreEqual myExpectedMessage, myResult.MsgEnum, CurrentProcedureName
     
 TestExit:
     Exit Sub
@@ -1155,7 +1143,7 @@ Public Sub T012i_TryStartRunForArray16IttemsStartIsZero_True_Minus5_16()
     myExpectedStatus = True
     
     Dim myExpectedMessage As Variant
-    myExpectedMessage = Enums.Message.AsEnum(Id.StartIndexWasZeroResetToOne)
+    myExpectedMessage = enums.Message.AsEnum(Msg.StartIndexWasZeroResetToOne)
     
     Dim myItem() As Variant
     ReDim myItem(-5 To 10)
@@ -1164,11 +1152,11 @@ Public Sub T012i_TryStartRunForArray16IttemsStartIsZero_True_Minus5_16()
     myExpectedItems = Array(-5, 16)
     
     Dim myResult As Result
-    Dim myResultStatus As Boolean
-    myResultStatus = Ranges.TryStartRunFromAnyStartRunEnd(myItem, myResult, 0)
     
-    Assert.Strict.AreEqual myExpectedStatus, myResultStatus, CurrentProcedureName
-    Assert.Strict.AreEqual myExpectedMessage, myResult.MessageEnum, CurrentProcedureName
+    Set myResult = Ranges.TryStartRunFromAnyStartRunEnd(myItem, 0)
+    
+    Assert.Strict.AreEqual myExpectedStatus, myResult.Status, CurrentProcedureName
+   ' Assert.Strict.AreEqual myExpectedMessage, myResult.MsgEnum, CurrentProcedureName
     Assert.Strict.SequenceEquals myExpectedItems, myResult.Items.ToArray, CurrentProcedureName
     
 TestExit:
@@ -1188,7 +1176,7 @@ Public Sub T012j_TryStartRunForArray16ItemsStart5Run5_True_Minus1_5()
     myExpectedStatus = True
     
     ' Dim myExpectedMessage As Variant
-    ' myExpectedMessage = Enums.Message.AsEnum(Id.StartIndexWasZeroResetToOne)
+    ' myExpectedMessage = Enums.Message.AsEnum(Msg.StartIndexWasZeroResetToOne)
     
     Dim myExpectedItems As Variant
     myExpectedItems = Array(-1, 5)
@@ -1197,11 +1185,11 @@ Public Sub T012j_TryStartRunForArray16ItemsStart5Run5_True_Minus1_5()
     ReDim myItem(-5 To 10)
     
     Dim myResult As Result
-    Dim myResultStatus As Boolean
-    myResultStatus = Ranges.TryStartRunFromAnyStartRunEnd(myItem, myResult, 5, 5)
     
-    Assert.Strict.AreEqual myExpectedStatus, myResultStatus, CurrentProcedureName
-    'Assert.Strict.AreEqual myExpectedMessage, myResult.MessageEnum, CurrentProcedureName
+    Set myResult = Ranges.TryStartRunFromAnyStartRunEnd(myItem, 5, 5)
+    
+    Assert.Strict.AreEqual myExpectedStatus, myResult.Status, CurrentProcedureName
+    'Assert.Strict.AreEqual myExpectedMessage, myResult.MsgENum, CurrentProcedureName
     Assert.Strict.SequenceEquals myExpectedItems, myResult.Items.ToArray, CurrentProcedureName
     
 TestExit:
@@ -1221,7 +1209,7 @@ Public Sub T012k_TryStartRunForArray16CharsStart5RunMinus5_True_Minus5_5()
     myExpectedStatus = True
     
     ' Dim myExpectedMessage As Variant
-    ' myExpectedMessage = Enums.Message.AsEnum(Id.StartIndexWasZeroResetToOne)
+    ' myExpectedMessage = Enums.Message.AsEnum(Msg.StartIndexWasZeroResetToOne)
     
     Dim myExpectedItems As Variant
     myExpectedItems = Array(-5, 5)
@@ -1230,11 +1218,11 @@ Public Sub T012k_TryStartRunForArray16CharsStart5RunMinus5_True_Minus5_5()
     ReDim myItem(-5 To 10)
     
     Dim myResult As Result
-    Dim myResultStatus As Boolean
-    myResultStatus = Ranges.TryStartRunFromAnyStartRunEnd(myItem, myResult, 5, -5)
     
-    Assert.Strict.AreEqual myExpectedStatus, myResultStatus, CurrentProcedureName
-    'Assert.Strict.AreEqual myExpectedMessage, myResult.MessageEnum, CurrentProcedureName
+    Set myResult = Ranges.TryStartRunFromAnyStartRunEnd(myItem, 5, -5)
+    
+    Assert.Strict.AreEqual myExpectedStatus, myResult.Status, CurrentProcedureName
+    'Assert.Strict.AreEqual myExpectedMessage, myResult.MsgENum, CurrentProcedureName
     Assert.Strict.SequenceEquals myExpectedItems, myResult.Items.ToArray, CurrentProcedureName
     
 TestExit:
@@ -1254,7 +1242,7 @@ Public Sub T012l_TryStartRunForArray16ItemsStartMinus6Run5_True_6_5()
     myExpectedStatus = True
     
     ' Dim myExpectedMessage As Variant
-    ' myExpectedMessage = Enums.Message.AsEnum(Id.StartIndexWasZeroResetToOne)
+    ' myExpectedMessage = Enums.Message.AsEnum(Msg.StartIndexWasZeroResetToOne)
     
     Dim myExpectedItems As Variant
     myExpectedItems = Array(5, 5)
@@ -1263,11 +1251,11 @@ Public Sub T012l_TryStartRunForArray16ItemsStartMinus6Run5_True_6_5()
     ReDim myItem(-5 To 10)
     
     Dim myResult As Result
-    Dim myResultStatus As Boolean
-    myResultStatus = Ranges.TryStartRunFromAnyStartRunEnd(myItem, myResult, -6, 5)
     
-    Assert.Strict.AreEqual myExpectedStatus, myResultStatus, CurrentProcedureName
-    'Assert.Strict.AreEqual myExpectedMessage, myResult.MessageEnum, CurrentProcedureName
+    Set myResult = Ranges.TryStartRunFromAnyStartRunEnd(myItem, -6, 5)
+    
+    Assert.Strict.AreEqual myExpectedStatus, myResult.Status, CurrentProcedureName
+    'Assert.Strict.AreEqual myExpectedMessage, myResult.MsgENum, CurrentProcedureName
     Assert.Strict.SequenceEquals myExpectedItems, myResult.Items.ToArray, CurrentProcedureName
     
 TestExit:
@@ -1287,7 +1275,7 @@ Public Sub T012m_TryStartRunForArray11CharsStartMinus6RunMinus5_True_2_5()
     myExpectedStatus = True
     
     ' Dim myExpectedMessage As Variant
-    ' myExpectedMessage = Enums.Message.AsEnum(Id.StartIndexWasZeroResetToOne)
+    ' myExpectedMessage = Enums.Message.AsEnum(Msg.StartIndexWasZeroResetToOne)
     
     Dim myExpectedItems As Variant
     myExpectedItems = Array(1, 5)
@@ -1296,11 +1284,11 @@ Public Sub T012m_TryStartRunForArray11CharsStartMinus6RunMinus5_True_2_5()
     ReDim myItem(-5 To 10)
     
     Dim myResult As Result
-    Dim myResultStatus As Boolean
-    myResultStatus = Ranges.TryStartRunFromAnyStartRunEnd(myItem, myResult, -6, -5)
     
-    Assert.Strict.AreEqual myExpectedStatus, myResultStatus, CurrentProcedureName
-    'Assert.Strict.AreEqual myExpectedMessage, myResult.MessageEnum, CurrentProcedureName
+    Set myResult = Ranges.TryStartRunFromAnyStartRunEnd(myItem, -6, -5)
+    
+    Assert.Strict.AreEqual myExpectedStatus, myResult.Status, CurrentProcedureName
+    'Assert.Strict.AreEqual myExpectedMessage, myResult.MsgENum, CurrentProcedureName
     Assert.Strict.SequenceEquals myExpectedItems, myResult.Items.ToArray, CurrentProcedureName
     
 TestExit:
@@ -1321,7 +1309,7 @@ Public Sub T012n_TryStartRunForArray16ItemsStartMinus6RunMinus5EndMinus3_True_1_
     myExpectedStatus = True
     
     ' Dim myExpectedMessage As Variant
-    ' myExpectedMessage = Enums.Message.AsEnum(Id.StartIndexWasZeroResetToOne)
+    ' myExpectedMessage = Enums.Message.AsEnum(Msg.StartIndexWasZeroResetToOne)
     
     Dim myExpectedItems As Variant
     myExpectedItems = Array(1, 5)
@@ -1330,11 +1318,11 @@ Public Sub T012n_TryStartRunForArray16ItemsStartMinus6RunMinus5EndMinus3_True_1_
     ReDim myItem(-5 To 10)
     
     Dim myResult As Result
-    Dim myResultStatus As Boolean
-    myResultStatus = Ranges.TryStartRunFromAnyStartRunEnd(myItem, myResult, -6, -5, -3)
     
-    Assert.Strict.AreEqual myExpectedStatus, myResultStatus, CurrentProcedureName
-    'Assert.Strict.AreEqual myExpectedMessage, myResult.MessageEnum, CurrentProcedureName
+    Set myResult = Ranges.TryStartRunFromAnyStartRunEnd(myItem, -6, -5, -3)
+    
+    Assert.Strict.AreEqual myExpectedStatus, myResult.Status, CurrentProcedureName
+    'Assert.Strict.AreEqual myExpectedMessage, myResult.MsgENum, CurrentProcedureName
     Assert.Strict.SequenceEquals myExpectedItems, myResult.Items.ToArray, CurrentProcedureName
     
 TestExit:
@@ -1355,7 +1343,7 @@ Public Sub T012o_TryStartRunForArray16ItemsStart6End9_True_6_4()
     myExpectedStatus = True
     
     ' Dim myExpectedMessage As Variant
-    ' myExpectedMessage = Enums.Message.AsEnum(Id.StartIndexWasZeroResetToOne)
+    ' myExpectedMessage = Enums.Message.AsEnum(Msg.StartIndexWasZeroResetToOne)
     
     Dim myExpectedItems As Variant
     myExpectedItems = Array(0, 4)
@@ -1364,11 +1352,11 @@ Public Sub T012o_TryStartRunForArray16ItemsStart6End9_True_6_4()
     ReDim myItem(-5 To 10)
     
     Dim myResult As Result
-    Dim myResultStatus As Boolean
-    myResultStatus = Ranges.TryStartRunFromAnyStartRunEnd(myItem, myResult, 6, ipEndIndex:=9)
     
-    Assert.Strict.AreEqual myExpectedStatus, myResultStatus, CurrentProcedureName
-    'Assert.Strict.AreEqual myExpectedMessage, myResult.MessageEnum, CurrentProcedureName
+    Set myResult = Ranges.TryStartRunFromAnyStartRunEnd(myItem, 6, ipEndIndex:=9)
+    
+    Assert.Strict.AreEqual myExpectedStatus, myResult.Status, CurrentProcedureName
+    'Assert.Strict.AreEqual myExpectedMessage, myResult.MsgENum, CurrentProcedureName
     Assert.Strict.SequenceEquals myExpectedItems, myResult.Items.ToArray, CurrentProcedureName
     
 TestExit:
@@ -1389,7 +1377,7 @@ Public Sub T012p_TryStartRunForArray16ItemsStart6End3_True_Minus3_4()
     myExpectedStatus = True
     
     ' Dim myExpectedMessage As Variant
-    ' myExpectedMessage = Enums.Message.AsEnum(Id.StartIndexWasZeroResetToOne)
+    ' myExpectedMessage = Enums.Message.AsEnum(Msg.StartIndexWasZeroResetToOne)
     
     Dim myExpectedItems As Variant
     myExpectedItems = Array(-3, 4)
@@ -1398,11 +1386,11 @@ Public Sub T012p_TryStartRunForArray16ItemsStart6End3_True_Minus3_4()
     ReDim myItem(-5 To 10)
     
     Dim myResult As Result
-    Dim myResultStatus As Boolean
-    myResultStatus = Ranges.TryStartRunFromAnyStartRunEnd(myItem, myResult, 6, ipeNDiNDEX:=3)
     
-    Assert.Strict.AreEqual myExpectedStatus, myResultStatus, CurrentProcedureName
-    'Assert.Strict.AreEqual myExpectedMessage, myResult.MessageEnum, CurrentProcedureName
+    Set myResult = Ranges.TryStartRunFromAnyStartRunEnd(myItem, 6, ipeNDiNDEX:=3)
+    
+    Assert.Strict.AreEqual myExpectedStatus, myResult.Status, CurrentProcedureName
+    'Assert.Strict.AreEqual myExpectedMessage, myResult.MsgENum, CurrentProcedureName
     Assert.Strict.SequenceEquals myExpectedItems, myResult.Items.ToArray, CurrentProcedureName
     
 TestExit:
@@ -1422,7 +1410,7 @@ Public Sub T012q_TryStartRunForArray16ItemsStartMinus6End3_True_Minus3_9()
     myExpectedStatus = True
     
     ' Dim myExpectedMessage As Variant
-    ' myExpectedMessage = Enums.Message.AsEnum(Id.StartIndexWasZeroResetToOne)
+    ' myExpectedMessage = Enums.Message.AsEnum(Msg.StartIndexWasZeroResetToOne)
     
     Dim myExpectedItems As Variant
     myExpectedItems = Array(-3, 9)
@@ -1431,11 +1419,11 @@ Public Sub T012q_TryStartRunForArray16ItemsStartMinus6End3_True_Minus3_9()
     ReDim myItem(-5 To 10)
     
     Dim myResult As Result
-    Dim myResultStatus As Boolean
-    myResultStatus = Ranges.TryStartRunFromAnyStartRunEnd(myItem, myResult, -6, ipeNDiNDEX:=3)
     
-    Assert.Strict.AreEqual myExpectedStatus, myResultStatus, CurrentProcedureName
-    'Assert.Strict.AreEqual myExpectedMessage, myResult.MessageEnum, CurrentProcedureName
+    Set myResult = Ranges.TryStartRunFromAnyStartRunEnd(myItem, -6, ipeNDiNDEX:=3)
+    
+    Assert.Strict.AreEqual myExpectedStatus, myResult.Status, CurrentProcedureName
+    'Assert.Strict.AreEqual myExpectedMessage, myResult.MsgENum, CurrentProcedureName
     Assert.Strict.SequenceEquals myExpectedItems, myResult.Items.ToArray, CurrentProcedureName
     
 TestExit:
@@ -1455,7 +1443,7 @@ Public Sub T012r_TryStartRunForArray16ItemsStartMinus6EndMinus3_True_5_4()
     myExpectedStatus = True
     
     ' Dim myExpectedMessage As Variant
-    ' myExpectedMessage = Enums.Message.AsEnum(Id.StartIndexWasZeroResetToOne)
+    ' myExpectedMessage = Enums.Message.AsEnum(Msg.StartIndexWasZeroResetToOne)
     
     Dim myExpectedItems As Variant
     myExpectedItems = Array(5, 4)
@@ -1464,11 +1452,11 @@ Public Sub T012r_TryStartRunForArray16ItemsStartMinus6EndMinus3_True_5_4()
     ReDim myItem(-5 To 10)
     
     Dim myResult As Result
-    Dim myResultStatus As Boolean
-    myResultStatus = Ranges.TryStartRunFromAnyStartRunEnd(myItem, myResult, -6, ipeNDiNDEX:=-3)
     
-    Assert.Strict.AreEqual myExpectedStatus, myResultStatus, CurrentProcedureName
-    'Assert.Strict.AreEqual myExpectedMessage, myResult.MessageEnum, CurrentProcedureName
+    Set myResult = Ranges.TryStartRunFromAnyStartRunEnd(myItem, -6, ipeNDiNDEX:=-3)
+    
+    Assert.Strict.AreEqual myExpectedStatus, myResult.Status, CurrentProcedureName
+    'Assert.Strict.AreEqual myExpectedMessage, myResult.MsgENum, CurrentProcedureName
     Assert.Strict.SequenceEquals myExpectedItems, myResult.Items.ToArray, CurrentProcedureName
     
 TestExit:
@@ -1488,7 +1476,7 @@ Public Sub T012s_TryStartRunForArray16ItemsStartMinus6EndMinus9_True_2_4()
     myExpectedStatus = True
     
     ' Dim myExpectedMessage As Variant
-    ' myExpectedMessage = Enums.Message.AsEnum(Id.StartIndexWasZeroResetToOne)
+    ' myExpectedMessage = Enums.Message.AsEnum(Msg.StartIndexWasZeroResetToOne)
     
     Dim myExpectedItems As Variant
     myExpectedItems = Array(2, 4)
@@ -1497,11 +1485,11 @@ Public Sub T012s_TryStartRunForArray16ItemsStartMinus6EndMinus9_True_2_4()
     ReDim myItem(-5 To 10)
     
     Dim myResult As Result
-    Dim myResultStatus As Boolean
-    myResultStatus = Ranges.TryStartRunFromAnyStartRunEnd(myItem, myResult, -6, ipeNDiNDEX:=-9)
     
-    Assert.Strict.AreEqual myExpectedStatus, myResultStatus, CurrentProcedureName
-    'Assert.Strict.AreEqual myExpectedMessage, myResult.MessageEnum, CurrentProcedureName
+    Set myResult = Ranges.TryStartRunFromAnyStartRunEnd(myItem, -6, ipeNDiNDEX:=-9)
+    
+    Assert.Strict.AreEqual myExpectedStatus, myResult.Status, CurrentProcedureName
+    'Assert.Strict.AreEqual myExpectedMessage, myResult.MsgENum, CurrentProcedureName
     Assert.Strict.SequenceEquals myExpectedItems, myResult.Items.ToArray, CurrentProcedureName
     
 TestExit:
@@ -1521,7 +1509,7 @@ Public Sub T012t_TryStartRunForArray16ItemsEnd5_True_MInus5_Minus1()
     myExpectedStatus = True
     
     ' Dim myExpectedMessage As Variant
-    ' myExpectedMessage = Enums.Message.AsEnum(Id.StartIndexWasZeroResetToOne)
+    ' myExpectedMessage = Enums.Message.AsEnum(Msg.StartIndexWasZeroResetToOne)
     
     Dim myExpectedItems As Variant
     myExpectedItems = Array(-5, 5)
@@ -1530,11 +1518,11 @@ Public Sub T012t_TryStartRunForArray16ItemsEnd5_True_MInus5_Minus1()
     ReDim myItem(-5 To 10)
     
     Dim myResult As Result
-    Dim myResultStatus As Boolean
-    myResultStatus = Ranges.TryStartRunFromAnyStartRunEnd(myItem, myResult, ipeNDiNDEX:=5)
     
-    Assert.Strict.AreEqual myExpectedStatus, myResultStatus, CurrentProcedureName
-    'Assert.Strict.AreEqual myExpectedMessage, myResult.MessageEnum, CurrentProcedureName
+    Set myResult = Ranges.TryStartRunFromAnyStartRunEnd(myItem, ipeNDiNDEX:=5)
+    
+    Assert.Strict.AreEqual myExpectedStatus, myResult.Status, CurrentProcedureName
+    'Assert.Strict.AreEqual myExpectedMessage, myResult.MsgENum, CurrentProcedureName
     Assert.Strict.SequenceEquals myExpectedItems, myResult.Items.ToArray, CurrentProcedureName
     
 TestExit:
@@ -1554,7 +1542,7 @@ Public Sub T012u_TryStartRunForArray16ItemsEndMinus5_True_Minus5_12()
     myExpectedStatus = True
     
     ' Dim myExpectedMessage As Variant
-    ' myExpectedMessage = Enums.Message.AsEnum(Id.StartIndexWasZeroResetToOne)
+    ' myExpectedMessage = Enums.Message.AsEnum(Msg.StartIndexWasZeroResetToOne)
     
     Dim myExpectedItems As Variant
     myExpectedItems = Array(-5, 12)
@@ -1563,11 +1551,11 @@ Public Sub T012u_TryStartRunForArray16ItemsEndMinus5_True_Minus5_12()
     ReDim myItem(-5 To 10)
     
     Dim myResult As Result
-    Dim myResultStatus As Boolean
-    myResultStatus = Ranges.TryStartRunFromAnyStartRunEnd(myItem, myResult, ipeNDiNDEX:=-5)
     
-    Assert.Strict.AreEqual myExpectedStatus, myResultStatus, CurrentProcedureName
-    'Assert.Strict.AreEqual myExpectedMessage, myResult.MessageEnum, CurrentProcedureName
+    Set myResult = Ranges.TryStartRunFromAnyStartRunEnd(myItem, ipeNDiNDEX:=-5)
+    
+    Assert.Strict.AreEqual myExpectedStatus, myResult.Status, CurrentProcedureName
+    'Assert.Strict.AreEqual myExpectedMessage, myResult.MsgENum, CurrentProcedureName
     Assert.Strict.SequenceEquals myExpectedItems, myResult.Items.ToArray, CurrentProcedureName
     
 TestExit:
@@ -1588,7 +1576,7 @@ Public Sub T012v_TryStartRunForArray16ItemsRun5_True_Minus5_5()
     myExpectedStatus = True
     
     ' Dim myExpectedMessage As Variant
-    ' myExpectedMessage = Enums.Message.AsEnum(Id.StartIndexWasZeroResetToOne)
+    ' myExpectedMessage = Enums.Message.AsEnum(Msg.StartIndexWasZeroResetToOne)
     
     Dim myExpectedItems As Variant
     myExpectedItems = Array(-5, 5)
@@ -1597,11 +1585,11 @@ Public Sub T012v_TryStartRunForArray16ItemsRun5_True_Minus5_5()
     ReDim myItem(-5 To 10)
     
     Dim myResult As Result
-    Dim myResultStatus As Boolean
-    myResultStatus = Ranges.TryStartRunFromAnyStartRunEnd(myItem, myResult, ipRun:=5)
     
-    Assert.Strict.AreEqual myExpectedStatus, myResultStatus, CurrentProcedureName
-    'Assert.Strict.AreEqual myExpectedMessage, myResult.MessageEnum, CurrentProcedureName
+    Set myResult = Ranges.TryStartRunFromAnyStartRunEnd(myItem, ipRun:=5)
+    
+    Assert.Strict.AreEqual myExpectedStatus, myResult.Status, CurrentProcedureName
+    'Assert.Strict.AreEqual myExpectedMessage, myResult.MsgENum, CurrentProcedureName
     Assert.Strict.SequenceEquals myExpectedItems, myResult.Items.ToArray, CurrentProcedureName
     
 TestExit:
@@ -1621,7 +1609,7 @@ Public Sub T012w_TryStartRunForArray11CharsRunMinus5_True_6_5()
     myExpectedStatus = True
     
     ' Dim myExpectedMessage As Variant
-    ' myExpectedMessage = Enums.Message.AsEnum(Id.StartIndexWasZeroResetToOne)
+    ' myExpectedMessage = Enums.Message.AsEnum(Msg.StartIndexWasZeroResetToOne)
     
     Dim myExpectedItems As Variant
     myExpectedItems = Array(6, 5)
@@ -1630,11 +1618,11 @@ Public Sub T012w_TryStartRunForArray11CharsRunMinus5_True_6_5()
     ReDim myItem(-5 To 10)
     
     Dim myResult As Result
-    Dim myResultStatus As Boolean
-    myResultStatus = Ranges.TryStartRunFromAnyStartRunEnd(myItem, myResult, ipRun:=-5)
     
-    Assert.Strict.AreEqual myExpectedStatus, myResultStatus, CurrentProcedureName
-    'Assert.Strict.AreEqual myExpectedMessage, myResult.MessageEnum, CurrentProcedureName
+    Set myResult = Ranges.TryStartRunFromAnyStartRunEnd(myItem, ipRun:=-5)
+    
+    Assert.Strict.AreEqual myExpectedStatus, myResult.Status, CurrentProcedureName
+    'Assert.Strict.AreEqual myExpectedMessage, myResult.MsgENum, CurrentProcedureName
     Assert.Strict.SequenceEquals myExpectedItems, myResult.Items.ToArray, CurrentProcedureName
     
 TestExit:
@@ -1661,10 +1649,10 @@ Public Sub T013a_TryStartRunForCollection16ItemsUninitialised_False()
     'ReDim myItem(-5 To 10)
     
     Dim myResult As Result
-    Dim myResultStatus As Boolean
-    myResultStatus = Ranges.TryStartRunFromAnyStartRunEnd(myItem, myResult)
     
-    Assert.Strict.AreEqual myExpectedStatus, myResultStatus, CurrentProcedureName
+    Set myResult = Ranges.TryStartRunFromAnyStartRunEnd(myItem)
+    
+    Assert.Strict.AreEqual myExpectedStatus, myResult.Status, CurrentProcedureName
     
 TestExit:
     Exit Sub
@@ -1686,10 +1674,10 @@ Public Sub T013b_TryStartRunForCollectionNew_False()
     Set myItem = New Collection
     
     Dim myResult As Result
-    Dim myResultStatus As Boolean
-    myResultStatus = Ranges.TryStartRunFromAnyStartRunEnd(myItem, myResult)
     
-    Assert.Strict.AreEqual myExpectedStatus, myResultStatus, CurrentProcedureName
+    Set myResult = Ranges.TryStartRunFromAnyStartRunEnd(myItem)
+    
+    Assert.Strict.AreEqual myExpectedStatus, myResult.Status, CurrentProcedureName
     
 TestExit:
     Exit Sub
@@ -1708,16 +1696,16 @@ Public Sub T013c_TryStartRunForCollection16Items_True_1_16()
     myExpectedStatus = True
     
     Dim myItem As Collection
-    Set myItem = Types.Iterable.ToCollection(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
+    Set myItem = Types.Iterable.ToCollection(10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160)
     
     
     Dim myExpectedItems As Variant
     myExpectedItems = Array(1, 16)
     Dim myResult As Result
-    Dim myResultStatus As Boolean
-    myResultStatus = Ranges.TryStartRunFromAnyStartRunEnd(myItem, myResult)
     
-    Assert.Strict.AreEqual myExpectedStatus, myResultStatus, CurrentProcedureName
+    Set myResult = Ranges.TryStartRunFromAnyStartRunEnd(myItem)
+    
+    Assert.Strict.AreEqual myExpectedStatus, myResult.Status, CurrentProcedureName
     Assert.Strict.SequenceEquals myExpectedItems, myResult.Items.ToArray, CurrentProcedureName
     
 TestExit:
@@ -1737,17 +1725,17 @@ Public Sub T013d_TryStartRunForCollection16ItemsRank2_False()
     myExpectedStatus = False
     
     Dim myExpectedMessage As Variant
-    myExpectedMessage = Enums.Message.AsEnum(Id.ObjectDoesNotSupportRanks)
+    myExpectedMessage = enums.Message.AsEnum(Msg.ItemDoesNotSupportRanks)
     
     Dim myItem As Collection
     Set myItem = Types.Iterable.ToCollection(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
     
     Dim myResult As Result
-    Dim myResultStatus As Boolean
-    myResultStatus = Ranges.TryStartRunFromAnyStartRunEnd(myItem, myResult, ipRank:=2)
     
-    Assert.Strict.AreEqual myExpectedStatus, myResultStatus, CurrentProcedureName
-    Assert.Strict.AreEqual myExpectedMessage, myResult.MessageEnum, CurrentProcedureName
+    Set myResult = Ranges.TryStartRunFromAnyStartRunEnd(myItem, ipRank:=2)
+    
+    Assert.Strict.AreEqual myExpectedStatus, myResult.Status, CurrentProcedureName
+    'Assert.Strict.AreEqual myExpectedMessage, myResult.MsgEnum, CurrentProcedureName
     
 TestExit:
     Exit Sub
@@ -1774,10 +1762,10 @@ Public Sub T013e_TryStartRunForCollection16ItemsStartLessThanCount_True_4_13()
     
     
     Dim myResult As Result
-    Dim myResultStatus As Boolean
-    myResultStatus = Ranges.TryStartRunFromAnyStartRunEnd(myItem, myResult, 4)
     
-    Assert.Strict.AreEqual myExpectedStatus, myResultStatus, CurrentProcedureName
+    Set myResult = Ranges.TryStartRunFromAnyStartRunEnd(myItem, 4)
+    
+    Assert.Strict.AreEqual myExpectedStatus, myResult.Status, CurrentProcedureName
     Assert.Strict.SequenceEquals myExpectedItems, myResult.Items.ToArray, CurrentProcedureName
     
 TestExit:
@@ -1802,10 +1790,10 @@ Public Sub T013f_TryStartRunForCollection16ItemsStartMinus4_True_13_4()
     myExpectedItems = Array(13, 4)
     
     Dim myResult As Result
-    Dim myResultStatus As Boolean
-    myResultStatus = Ranges.TryStartRunFromAnyStartRunEnd(myItem, myResult, -4)
     
-    Assert.Strict.AreEqual myExpectedStatus, myResultStatus, CurrentProcedureName
+    Set myResult = Ranges.TryStartRunFromAnyStartRunEnd(myItem, -4)
+    
+    Assert.Strict.AreEqual myExpectedStatus, myResult.Status, CurrentProcedureName
     Assert.Strict.SequenceEquals myExpectedItems, myResult.Items.ToArray, CurrentProcedureName
     
 TestExit:
@@ -1824,7 +1812,7 @@ Public Sub T013g_TryStartRunForCollection16ItemsStar20_False()
     myExpectedStatus = False
     
     Dim myExpectedMessage As Variant
-    myExpectedMessage = Enums.Message.AsEnum(Id.StartIndexExceedsItemCount)
+    myExpectedMessage = enums.Message.AsEnum(Msg.StartIndexExceedsItemCount)
     
     Dim myItem As Collection
     Set myItem = Types.Iterable.ToCollection(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
@@ -1833,11 +1821,11 @@ Public Sub T013g_TryStartRunForCollection16ItemsStar20_False()
     myExpectedItems = Array(-5, 13)
     
     Dim myResult As Result
-    Dim myResultStatus As Boolean
-    myResultStatus = Ranges.TryStartRunFromAnyStartRunEnd(myItem, myResult, 20)
     
-    Assert.Strict.AreEqual myExpectedStatus, myResultStatus, CurrentProcedureName
-    Assert.Strict.AreEqual myExpectedMessage, myResult.MessageEnum, CurrentProcedureName
+    Set myResult = Ranges.TryStartRunFromAnyStartRunEnd(myItem, 20)
+    
+    Assert.Strict.AreEqual myExpectedStatus, myResult.Status, CurrentProcedureName
+    'Assert.Strict.AreEqual myExpectedMessage, myResult.MsgEnum, CurrentProcedureName
     
 TestExit:
     Exit Sub
@@ -1856,17 +1844,17 @@ Public Sub T013h_TryStartRunForCollection16ItemStartAbsMinus20_False()
     myExpectedStatus = False
     
     Dim myExpectedMessage As Variant
-    myExpectedMessage = Enums.Message.AsEnum(Id.StartIndexExceedsItemCount)
+    myExpectedMessage = enums.Message.AsEnum(Msg.StartIndexExceedsItemCount)
     
     Dim myItem As Collection
     Set myItem = Types.Iterable.ToCollection(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
     
     Dim myResult As Result
-    Dim myResultStatus As Boolean
-    myResultStatus = Ranges.TryStartRunFromAnyStartRunEnd("Hello World", myResult, -20)
     
-    Assert.Strict.AreEqual myExpectedStatus, myResultStatus, CurrentProcedureName
-    Assert.Strict.AreEqual myExpectedMessage, myResult.MessageEnum, CurrentProcedureName
+    Set myResult = Ranges.TryStartRunFromAnyStartRunEnd("Hello World", -20)
+    
+    Assert.Strict.AreEqual myExpectedStatus, myResult.Status, CurrentProcedureName
+    'Assert.Strict.AreEqual myExpectedMessage, myResult.MsgEnum, CurrentProcedureName
     
 TestExit:
     Exit Sub
@@ -1885,7 +1873,7 @@ Public Sub T013i_TryStartRunForCollection16IttemsStartIsZero_True_1_16()
     myExpectedStatus = True
     
     Dim myExpectedMessage As Variant
-    myExpectedMessage = Enums.Message.AsEnum(Id.StartIndexWasZeroResetToOne)
+    myExpectedMessage = enums.Message.AsEnum(Msg.StartIndexWasZeroResetToOne)
     
     Dim myItem As Collection
     Set myItem = Types.Iterable.ToCollection(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
@@ -1894,11 +1882,11 @@ Public Sub T013i_TryStartRunForCollection16IttemsStartIsZero_True_1_16()
     myExpectedItems = Array(1, 16)
     
     Dim myResult As Result
-    Dim myResultStatus As Boolean
-    myResultStatus = Ranges.TryStartRunFromAnyStartRunEnd(myItem, myResult, 0)
     
-    Assert.Strict.AreEqual myExpectedStatus, myResultStatus, CurrentProcedureName
-    Assert.Strict.AreEqual myExpectedMessage, myResult.MessageEnum, CurrentProcedureName
+    Set myResult = Ranges.TryStartRunFromAnyStartRunEnd(myItem, 0)
+    
+    Assert.Strict.AreEqual myExpectedStatus, myResult.Status, CurrentProcedureName
+    'Assert.Strict.AreEqual myExpectedMessage, myResult.MsgEnum, CurrentProcedureName
     Assert.Strict.SequenceEquals myExpectedItems, myResult.Items.ToArray, CurrentProcedureName
     
 TestExit:
@@ -1918,7 +1906,7 @@ Public Sub T013j_TryStartRunForCollection16ItemsStart5Run5_True_5_5()
     myExpectedStatus = True
     
     ' Dim myExpectedMessage As Variant
-    ' myExpectedMessage = Enums.Message.AsEnum(Id.StartIndexWasZeroResetToOne)
+    ' myExpectedMessage = Enums.Message.AsEnum(Msg.StartIndexWasZeroResetToOne)
     
     Dim myExpectedItems As Variant
     myExpectedItems = Array(5, 5)
@@ -1927,11 +1915,11 @@ Public Sub T013j_TryStartRunForCollection16ItemsStart5Run5_True_5_5()
     Set myItem = Types.Iterable.ToCollection(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
     
     Dim myResult As Result
-    Dim myResultStatus As Boolean
-    myResultStatus = Ranges.TryStartRunFromAnyStartRunEnd(myItem, myResult, 5, 5)
     
-    Assert.Strict.AreEqual myExpectedStatus, myResultStatus, CurrentProcedureName
-    'Assert.Strict.AreEqual myExpectedMessage, myResult.MessageEnum, CurrentProcedureName
+    Set myResult = Ranges.TryStartRunFromAnyStartRunEnd(myItem, 5, 5)
+    
+    Assert.Strict.AreEqual myExpectedStatus, myResult.Status, CurrentProcedureName
+    'Assert.Strict.AreEqual myExpectedMessage, myResult.MsgENum, CurrentProcedureName
     Assert.Strict.SequenceEquals myExpectedItems, myResult.Items.ToArray, CurrentProcedureName
     
 TestExit:
@@ -1951,7 +1939,7 @@ Public Sub T013k_TryStartRunForCollection16CharsStart5RunMinus5_True_1_5()
     myExpectedStatus = True
     
     ' Dim myExpectedMessage As Variant
-    ' myExpectedMessage = Enums.Message.AsEnum(Id.StartIndexWasZeroResetToOne)
+    ' myExpectedMessage = Enums.Message.AsEnum(Msg.StartIndexWasZeroResetToOne)
     
     Dim myExpectedItems As Variant
     myExpectedItems = Array(1, 5)
@@ -1960,11 +1948,11 @@ Public Sub T013k_TryStartRunForCollection16CharsStart5RunMinus5_True_1_5()
     Set myItem = Types.Iterable.ToCollection(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
     
     Dim myResult As Result
-    Dim myResultStatus As Boolean
-    myResultStatus = Ranges.TryStartRunFromAnyStartRunEnd(myItem, myResult, 5, -5)
     
-    Assert.Strict.AreEqual myExpectedStatus, myResultStatus, CurrentProcedureName
-    'Assert.Strict.AreEqual myExpectedMessage, myResult.MessageEnum, CurrentProcedureName
+    Set myResult = Ranges.TryStartRunFromAnyStartRunEnd(myItem, 5, -5)
+    
+    Assert.Strict.AreEqual myExpectedStatus, myResult.Status, CurrentProcedureName
+    'Assert.Strict.AreEqual myExpectedMessage, myResult.MsgENum, CurrentProcedureName
     Assert.Strict.SequenceEquals myExpectedItems, myResult.Items.ToArray, CurrentProcedureName
     
 TestExit:
@@ -1984,7 +1972,7 @@ Public Sub T013l_TryStartRunForCollection16ItemsStartMinus6Run5_True_11_5()
     myExpectedStatus = True
     
     ' Dim myExpectedMessage As Variant
-    ' myExpectedMessage = Enums.Message.AsEnum(Id.StartIndexWasZeroResetToOne)
+    ' myExpectedMessage = Enums.Message.AsEnum(Msg.StartIndexWasZeroResetToOne)
     
     Dim myExpectedItems As Variant
     myExpectedItems = Array(11, 5)
@@ -1993,11 +1981,11 @@ Public Sub T013l_TryStartRunForCollection16ItemsStartMinus6Run5_True_11_5()
     Set myItem = Types.Iterable.ToCollection(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
         
     Dim myResult As Result
-    Dim myResultStatus As Boolean
-    myResultStatus = Ranges.TryStartRunFromAnyStartRunEnd(myItem, myResult, -6, 5)
     
-    Assert.Strict.AreEqual myExpectedStatus, myResultStatus, CurrentProcedureName
-    'Assert.Strict.AreEqual myExpectedMessage, myResult.MessageEnum, CurrentProcedureName
+    Set myResult = Ranges.TryStartRunFromAnyStartRunEnd(myItem, -6, 5)
+    
+    Assert.Strict.AreEqual myExpectedStatus, myResult.Status, CurrentProcedureName
+    'Assert.Strict.AreEqual myExpectedMessage, myResult.MsgENum, CurrentProcedureName
     Assert.Strict.SequenceEquals myExpectedItems, myResult.Items.ToArray, CurrentProcedureName
     
 TestExit:
@@ -2017,7 +2005,7 @@ Public Sub T013m_TryStartRunForCollection11CharsStartMinus6RunMinus5_True_7_5()
     myExpectedStatus = True
     
     ' Dim myExpectedMessage As Variant
-    ' myExpectedMessage = Enums.Message.AsEnum(Id.StartIndexWasZeroResetToOne)
+    ' myExpectedMessage = Enums.Message.AsEnum(Msg.StartIndexWasZeroResetToOne)
     
     Dim myExpectedItems As Variant
     myExpectedItems = Array(7, 5)
@@ -2026,11 +2014,11 @@ Public Sub T013m_TryStartRunForCollection11CharsStartMinus6RunMinus5_True_7_5()
     Set myItem = Types.Iterable.ToCollection(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
     
     Dim myResult As Result
-    Dim myResultStatus As Boolean
-    myResultStatus = Ranges.TryStartRunFromAnyStartRunEnd(myItem, myResult, -6, -5)
     
-    Assert.Strict.AreEqual myExpectedStatus, myResultStatus, CurrentProcedureName
-    'Assert.Strict.AreEqual myExpectedMessage, myResult.MessageEnum, CurrentProcedureName
+    Set myResult = Ranges.TryStartRunFromAnyStartRunEnd(myItem, -6, -5)
+    
+    Assert.Strict.AreEqual myExpectedStatus, myResult.Status, CurrentProcedureName
+    'Assert.Strict.AreEqual myExpectedMessage, myResult.MsgENum, CurrentProcedureName
     Assert.Strict.SequenceEquals myExpectedItems, myResult.Items.ToArray, CurrentProcedureName
     
 TestExit:
@@ -2051,7 +2039,7 @@ Public Sub T013n_TryStartRunForCollection16ItemsStartMinus6RunMinus5EndMinus3_Tr
     myExpectedStatus = True
     
     ' Dim myExpectedMessage As Variant
-    ' myExpectedMessage = Enums.Message.AsEnum(Id.StartIndexWasZeroResetToOne)
+    ' myExpectedMessage = Enums.Message.AsEnum(Msg.StartIndexWasZeroResetToOne)
     
     Dim myExpectedItems As Variant
     myExpectedItems = Array(7, 5)
@@ -2060,11 +2048,11 @@ Public Sub T013n_TryStartRunForCollection16ItemsStartMinus6RunMinus5EndMinus3_Tr
     Set myItem = Types.Iterable.ToCollection(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
     
     Dim myResult As Result
-    Dim myResultStatus As Boolean
-    myResultStatus = Ranges.TryStartRunFromAnyStartRunEnd(myItem, myResult, -6, -5, -3)
     
-    Assert.Strict.AreEqual myExpectedStatus, myResultStatus, CurrentProcedureName
-    'Assert.Strict.AreEqual myExpectedMessage, myResult.MessageEnum, CurrentProcedureName
+    Set myResult = Ranges.TryStartRunFromAnyStartRunEnd(myItem, -6, -5, -3)
+    
+    Assert.Strict.AreEqual myExpectedStatus, myResult.Status, CurrentProcedureName
+    'Assert.Strict.AreEqual myExpectedMessage, myResult.MsgENum, CurrentProcedureName
     Assert.Strict.SequenceEquals myExpectedItems, myResult.Items.ToArray, CurrentProcedureName
     
 TestExit:
@@ -2085,7 +2073,7 @@ Public Sub T013o_TryStartRunForCollection16ItemsStart6End9_True_6_4()
     myExpectedStatus = True
     
     ' Dim myExpectedMessage As Variant
-    ' myExpectedMessage = Enums.Message.AsEnum(Id.StartIndexWasZeroResetToOne)
+    ' myExpectedMessage = Enums.Message.AsEnum(Msg.StartIndexWasZeroResetToOne)
     
     Dim myExpectedItems As Variant
     myExpectedItems = Array(6, 4)
@@ -2094,11 +2082,11 @@ Public Sub T013o_TryStartRunForCollection16ItemsStart6End9_True_6_4()
     Set myItem = Types.Iterable.ToCollection(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
     
     Dim myResult As Result
-    Dim myResultStatus As Boolean
-    myResultStatus = Ranges.TryStartRunFromAnyStartRunEnd(myItem, myResult, 6, ipEndIndex:=9)
     
-    Assert.Strict.AreEqual myExpectedStatus, myResultStatus, CurrentProcedureName
-    'Assert.Strict.AreEqual myExpectedMessage, myResult.MessageEnum, CurrentProcedureName
+    Set myResult = Ranges.TryStartRunFromAnyStartRunEnd(myItem, 6, ipEndIndex:=9)
+    
+    Assert.Strict.AreEqual myExpectedStatus, myResult.Status, CurrentProcedureName
+    'Assert.Strict.AreEqual myExpectedMessage, myResult.MsgENum, CurrentProcedureName
     Assert.Strict.SequenceEquals myExpectedItems, myResult.Items.ToArray, CurrentProcedureName
     
 TestExit:
@@ -2119,7 +2107,7 @@ Public Sub T013p_TryStartRunForCollection16ItemsStart6End3_True_3_4()
     myExpectedStatus = True
     
     ' Dim myExpectedMessage As Variant
-    ' myExpectedMessage = Enums.Message.AsEnum(Id.StartIndexWasZeroResetToOne)
+    ' myExpectedMessage = Enums.Message.AsEnum(Msg.StartIndexWasZeroResetToOne)
     
     Dim myExpectedItems As Variant
     myExpectedItems = Array(3, 4)
@@ -2128,11 +2116,11 @@ Public Sub T013p_TryStartRunForCollection16ItemsStart6End3_True_3_4()
     Set myItem = Types.Iterable.ToCollection(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
     
     Dim myResult As Result
-    Dim myResultStatus As Boolean
-    myResultStatus = Ranges.TryStartRunFromAnyStartRunEnd(myItem, myResult, 6, ipeNDiNDEX:=3)
     
-    Assert.Strict.AreEqual myExpectedStatus, myResultStatus, CurrentProcedureName
-    'Assert.Strict.AreEqual myExpectedMessage, myResult.MessageEnum, CurrentProcedureName
+    Set myResult = Ranges.TryStartRunFromAnyStartRunEnd(myItem, 6, ipeNDiNDEX:=3)
+    
+    Assert.Strict.AreEqual myExpectedStatus, myResult.Status, CurrentProcedureName
+    'Assert.Strict.AreEqual myExpectedMessage, myResult.MsgENum, CurrentProcedureName
     Assert.Strict.SequenceEquals myExpectedItems, myResult.Items.ToArray, CurrentProcedureName
     
 TestExit:
@@ -2152,7 +2140,7 @@ Public Sub T013q_TryStartRunForCollection16ItemsStartMinus6End3_True_3_9()
     myExpectedStatus = True
     
     ' Dim myExpectedMessage As Variant
-    ' myExpectedMessage = Enums.Message.AsEnum(Id.StartIndexWasZeroResetToOne)
+    ' myExpectedMessage = Enums.Message.AsEnum(Msg.StartIndexWasZeroResetToOne)
     
     Dim myExpectedItems As Variant
     myExpectedItems = Array(3, 9)
@@ -2161,11 +2149,11 @@ Public Sub T013q_TryStartRunForCollection16ItemsStartMinus6End3_True_3_9()
     Set myItem = Types.Iterable.ToCollection(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
     
     Dim myResult As Result
-    Dim myResultStatus As Boolean
-    myResultStatus = Ranges.TryStartRunFromAnyStartRunEnd(myItem, myResult, -6, ipeNDiNDEX:=3)
     
-    Assert.Strict.AreEqual myExpectedStatus, myResultStatus, CurrentProcedureName
-    'Assert.Strict.AreEqual myExpectedMessage, myResult.MessageEnum, CurrentProcedureName
+    Set myResult = Ranges.TryStartRunFromAnyStartRunEnd(myItem, -6, ipeNDiNDEX:=3)
+    
+    Assert.Strict.AreEqual myExpectedStatus, myResult.Status, CurrentProcedureName
+    'Assert.Strict.AreEqual myExpectedMessage, myResult.MsgENum, CurrentProcedureName
     Assert.Strict.SequenceEquals myExpectedItems, myResult.Items.ToArray, CurrentProcedureName
     
 TestExit:
@@ -2185,7 +2173,7 @@ Public Sub T013r_TryStartRunForCollection16ItemsStartMinus6EndMinus3_True_11_4()
     myExpectedStatus = True
     
     ' Dim myExpectedMessage As Variant
-    ' myExpectedMessage = Enums.Message.AsEnum(Id.StartIndexWasZeroResetToOne)
+    ' myExpectedMessage = Enums.Message.AsEnum(Msg.StartIndexWasZeroResetToOne)
     
     Dim myExpectedItems As Variant
     myExpectedItems = Array(11, 4)
@@ -2194,11 +2182,11 @@ Public Sub T013r_TryStartRunForCollection16ItemsStartMinus6EndMinus3_True_11_4()
     Set myItem = Types.Iterable.ToCollection(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
     
     Dim myResult As Result
-    Dim myResultStatus As Boolean
-    myResultStatus = Ranges.TryStartRunFromAnyStartRunEnd(myItem, myResult, -6, ipeNDiNDEX:=-3)
     
-    Assert.Strict.AreEqual myExpectedStatus, myResultStatus, CurrentProcedureName
-    'Assert.Strict.AreEqual myExpectedMessage, myResult.MessageEnum, CurrentProcedureName
+    Set myResult = Ranges.TryStartRunFromAnyStartRunEnd(myItem, -6, ipeNDiNDEX:=-3)
+    
+    Assert.Strict.AreEqual myExpectedStatus, myResult.Status, CurrentProcedureName
+    'Assert.Strict.AreEqual myExpectedMessage, myResult.MsgENum, CurrentProcedureName
     Assert.Strict.SequenceEquals myExpectedItems, myResult.Items.ToArray, CurrentProcedureName
     
 TestExit:
@@ -2218,7 +2206,7 @@ Public Sub T013s_TryStartRunForCollection16ItemsStartMinus6EndMinus9_True_8_4()
     myExpectedStatus = True
     
     ' Dim myExpectedMessage As Variant
-    ' myExpectedMessage = Enums.Message.AsEnum(Id.StartIndexWasZeroResetToOne)
+    ' myExpectedMessage = Enums.Message.AsEnum(Msg.StartIndexWasZeroResetToOne)
     
     Dim myExpectedItems As Variant
     myExpectedItems = Array(8, 4)
@@ -2227,11 +2215,11 @@ Public Sub T013s_TryStartRunForCollection16ItemsStartMinus6EndMinus9_True_8_4()
     Set myItem = Types.Iterable.ToCollection(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
     
     Dim myResult As Result
-    Dim myResultStatus As Boolean
-    myResultStatus = Ranges.TryStartRunFromAnyStartRunEnd(myItem, myResult, -6, ipeNDiNDEX:=-9)
     
-    Assert.Strict.AreEqual myExpectedStatus, myResultStatus, CurrentProcedureName
-    'Assert.Strict.AreEqual myExpectedMessage, myResult.MessageEnum, CurrentProcedureName
+    Set myResult = Ranges.TryStartRunFromAnyStartRunEnd(myItem, -6, ipeNDiNDEX:=-9)
+    
+    Assert.Strict.AreEqual myExpectedStatus, myResult.Status, CurrentProcedureName
+    'Assert.Strict.AreEqual myExpectedMessage, myResult.MsgENum, CurrentProcedureName
     Assert.Strict.SequenceEquals myExpectedItems, myResult.Items.ToArray, CurrentProcedureName
     
 TestExit:
@@ -2251,7 +2239,7 @@ Public Sub T013t_TryStartRunForCollection16ItemsEnd5_True_1_5()
     myExpectedStatus = True
     
     ' Dim myExpectedMessage As Variant
-    ' myExpectedMessage = Enums.Message.AsEnum(Id.StartIndexWasZeroResetToOne)
+    ' myExpectedMessage = Enums.Message.AsEnum(Msg.StartIndexWasZeroResetToOne)
     
     Dim myExpectedItems As Variant
     myExpectedItems = Array(1, 5)
@@ -2260,11 +2248,11 @@ Public Sub T013t_TryStartRunForCollection16ItemsEnd5_True_1_5()
     Set myItem = Types.Iterable.ToCollection(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
     
     Dim myResult As Result
-    Dim myResultStatus As Boolean
-    myResultStatus = Ranges.TryStartRunFromAnyStartRunEnd(myItem, myResult, ipeNDiNDEX:=5)
     
-    Assert.Strict.AreEqual myExpectedStatus, myResultStatus, CurrentProcedureName
-    'Assert.Strict.AreEqual myExpectedMessage, myResult.MessageEnum, CurrentProcedureName
+    Set myResult = Ranges.TryStartRunFromAnyStartRunEnd(myItem, ipeNDiNDEX:=5)
+    
+    Assert.Strict.AreEqual myExpectedStatus, myResult.Status, CurrentProcedureName
+    'Assert.Strict.AreEqual myExpectedMessage, myResult.MsgENum, CurrentProcedureName
     Assert.Strict.SequenceEquals myExpectedItems, myResult.Items.ToArray, CurrentProcedureName
     
 TestExit:
@@ -2284,7 +2272,7 @@ Public Sub T013u_TryStartRunForCollection16ItemsEndMinus5_True_1_12()
     myExpectedStatus = True
     
     ' Dim myExpectedMessage As Variant
-    ' myExpectedMessage = Enums.Message.AsEnum(Id.StartIndexWasZeroResetToOne)
+    ' myExpectedMessage = Enums.Message.AsEnum(Msg.StartIndexWasZeroResetToOne)
     
     Dim myExpectedItems As Variant
     myExpectedItems = Array(1, 12)
@@ -2293,11 +2281,11 @@ Public Sub T013u_TryStartRunForCollection16ItemsEndMinus5_True_1_12()
     Set myItem = Types.Iterable.ToCollection(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
     
     Dim myResult As Result
-    Dim myResultStatus As Boolean
-    myResultStatus = Ranges.TryStartRunFromAnyStartRunEnd(myItem, myResult, ipeNDiNDEX:=-5)
     
-    Assert.Strict.AreEqual myExpectedStatus, myResultStatus, CurrentProcedureName
-    'Assert.Strict.AreEqual myExpectedMessage, myResult.MessageEnum, CurrentProcedureName
+    Set myResult = Ranges.TryStartRunFromAnyStartRunEnd(myItem, ipeNDiNDEX:=-5)
+    
+    Assert.Strict.AreEqual myExpectedStatus, myResult.Status, CurrentProcedureName
+    'Assert.Strict.AreEqual myExpectedMessage, myResult.MsgENum, CurrentProcedureName
     Assert.Strict.SequenceEquals myExpectedItems, myResult.Items.ToArray, CurrentProcedureName
     
 TestExit:
@@ -2318,7 +2306,7 @@ Public Sub T013v_TryStartRunForCollection16ItemsRun5_True_1_5()
     myExpectedStatus = True
     
     ' Dim myExpectedMessage As Variant
-    ' myExpectedMessage = Enums.Message.AsEnum(Id.StartIndexWasZeroResetToOne)
+    ' myExpectedMessage = Enums.Message.AsEnum(Msg.StartIndexWasZeroResetToOne)
     
     Dim myExpectedItems As Variant
     myExpectedItems = Array(1, 5)
@@ -2327,11 +2315,11 @@ Public Sub T013v_TryStartRunForCollection16ItemsRun5_True_1_5()
     Set myItem = Types.Iterable.ToCollection(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
     
     Dim myResult As Result
-    Dim myResultStatus As Boolean
-    myResultStatus = Ranges.TryStartRunFromAnyStartRunEnd(myItem, myResult, ipRun:=5)
     
-    Assert.Strict.AreEqual myExpectedStatus, myResultStatus, CurrentProcedureName
-    'Assert.Strict.AreEqual myExpectedMessage, myResult.MessageEnum, CurrentProcedureName
+    Set myResult = Ranges.TryStartRunFromAnyStartRunEnd(myItem, ipRun:=5)
+    
+    Assert.Strict.AreEqual myExpectedStatus, myResult.Status, CurrentProcedureName
+    'Assert.Strict.AreEqual myExpectedMessage, myResult.MsgENum, CurrentProcedureName
     Assert.Strict.SequenceEquals myExpectedItems, myResult.Items.ToArray, CurrentProcedureName
     
 TestExit:
@@ -2351,7 +2339,7 @@ Public Sub T013w_TryStartRunForCollection11CharsRunMinus5_True_12_5()
     myExpectedStatus = True
     
     ' Dim myExpectedMessage As Variant
-    ' myExpectedMessage = Enums.Message.AsEnum(Id.StartIndexWasZeroResetToOne)
+    ' myExpectedMessage = Enums.Message.AsEnum(Msg.StartIndexWasZeroResetToOne)
     
     Dim myExpectedItems As Variant
     myExpectedItems = Array(12, 5)
@@ -2360,11 +2348,11 @@ Public Sub T013w_TryStartRunForCollection11CharsRunMinus5_True_12_5()
     Set myItem = Types.Iterable.ToCollection(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
     
     Dim myResult As Result
-    Dim myResultStatus As Boolean
-    myResultStatus = Ranges.TryStartRunFromAnyStartRunEnd(myItem, myResult, ipRun:=-5)
     
-    Assert.Strict.AreEqual myExpectedStatus, myResultStatus, CurrentProcedureName
-    'Assert.Strict.AreEqual myExpectedMessage, myResult.MessageEnum, CurrentProcedureName
+    Set myResult = Ranges.TryStartRunFromAnyStartRunEnd(myItem, ipRun:=-5)
+    
+    Assert.Strict.AreEqual myExpectedStatus, myResult.Status, CurrentProcedureName
+    'Assert.Strict.AreEqual myExpectedMessage, myResult.MsgENum, CurrentProcedureName
     Assert.Strict.SequenceEquals myExpectedItems, myResult.Items.ToArray, CurrentProcedureName
     
 TestExit:
@@ -2391,10 +2379,10 @@ Public Sub T014a_TryStartRunForLyst16ItemsUninitialised_False()
     'ReDim myItem(-5 To 10)
     
     Dim myResult As Result
-    Dim myResultStatus As Boolean
-    myResultStatus = Ranges.TryStartRunFromAnyStartRunEnd(myItem, myResult)
     
-    Assert.Strict.AreEqual myExpectedStatus, myResultStatus, CurrentProcedureName
+    Set myResult = Ranges.TryStartRunFromAnyStartRunEnd(myItem)
+    
+    Assert.Strict.AreEqual myExpectedStatus, myResult.Status, CurrentProcedureName
     
 TestExit:
     Exit Sub
@@ -2416,10 +2404,10 @@ Public Sub T014b_TryStartRunForLystNew_False()
     Set myItem = Lyst.Deb
     
     Dim myResult As Result
-    Dim myResultStatus As Boolean
-    myResultStatus = Ranges.TryStartRunFromAnyStartRunEnd(myItem, myResult)
     
-    Assert.Strict.AreEqual myExpectedStatus, myResultStatus, CurrentProcedureName
+    Set myResult = Ranges.TryStartRunFromAnyStartRunEnd(myItem)
+    
+    Assert.Strict.AreEqual myExpectedStatus, myResult.Status, CurrentProcedureName
     
 TestExit:
     Exit Sub
@@ -2441,12 +2429,12 @@ Public Sub T014c_TryStartRunForLyst16Items_True_0_16()
     Set myItem = Types.Iterable.ToLyst(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
     
     Dim myExpectedItems As Variant
-    myExpectedItems = Array(0, 16)
+    myExpectedItems = Array(1, 16)
     Dim myResult As Result
-    Dim myResultStatus As Boolean
-    myResultStatus = Ranges.TryStartRunFromAnyStartRunEnd(myItem, myResult)
     
-    Assert.Strict.AreEqual myExpectedStatus, myResultStatus, CurrentProcedureName
+    Set myResult = Ranges.TryStartRunFromAnyStartRunEnd(myItem)
+    
+    Assert.Strict.AreEqual myExpectedStatus, myResult.Status, CurrentProcedureName
     Assert.Strict.SequenceEquals myExpectedItems, myResult.Items.ToArray, CurrentProcedureName
     
 TestExit:
@@ -2466,17 +2454,17 @@ Public Sub T014d_TryStartRunForLyst16ItemsRank2_False()
     myExpectedStatus = False
     
     Dim myExpectedMessage As Variant
-    myExpectedMessage = Enums.Message.AsEnum(Id.ObjectDoesNotSupportRanks)
+    myExpectedMessage = enums.Message.AsEnum(Msg.ItemDoesNotSupportRanks)
     
     Dim myItem As Lyst
     Set myItem = Types.Iterable.ToLyst(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
     
     Dim myResult As Result
-    Dim myResultStatus As Boolean
-    myResultStatus = Ranges.TryStartRunFromAnyStartRunEnd(myItem, myResult, ipRank:=2)
     
-    Assert.Strict.AreEqual myExpectedStatus, myResultStatus, CurrentProcedureName
-    Assert.Strict.AreEqual myExpectedMessage, myResult.MessageEnum, CurrentProcedureName
+    Set myResult = Ranges.TryStartRunFromAnyStartRunEnd(myItem, ipRank:=2)
+    
+    Assert.Strict.AreEqual myExpectedStatus, myResult.Status, CurrentProcedureName
+    'Assert.Strict.AreEqual myExpectedMessage, myResult.MsgEnum, CurrentProcedureName
     
 TestExit:
     Exit Sub
@@ -2499,14 +2487,14 @@ Public Sub T014e_TryStartRunForLyst16ItemsStart4_True_4_13()
     
     
     Dim myExpectedItems As Variant
-    myExpectedItems = Array(3, 13)
+    myExpectedItems = Array(4, 13)
     
     
     Dim myResult As Result
-    Dim myResultStatus As Boolean
-    myResultStatus = Ranges.TryStartRunFromAnyStartRunEnd(myItem, myResult, 4)
     
-    Assert.Strict.AreEqual myExpectedStatus, myResultStatus, CurrentProcedureName
+    Set myResult = Ranges.TryStartRunFromAnyStartRunEnd(myItem, 4)
+    
+    Assert.Strict.AreEqual myExpectedStatus, myResult.Status, CurrentProcedureName
     Assert.Strict.SequenceEquals myExpectedItems, myResult.Items.ToArray, CurrentProcedureName
     
 TestExit:
@@ -2528,13 +2516,13 @@ Public Sub T014f_TryStartRunForLyst16ItemsStartMinus4_True_13_4()
     Set myItem = Types.Iterable.ToLyst(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
     
     Dim myExpectedItems As Variant
-    myExpectedItems = Array(12, 4)
+    myExpectedItems = Array(13, 4)
     
     Dim myResult As Result
-    Dim myResultStatus As Boolean
-    myResultStatus = Ranges.TryStartRunFromAnyStartRunEnd(myItem, myResult, -4)
     
-    Assert.Strict.AreEqual myExpectedStatus, myResultStatus, CurrentProcedureName
+    Set myResult = Ranges.TryStartRunFromAnyStartRunEnd(myItem, -4)
+    
+    Assert.Strict.AreEqual myExpectedStatus, myResult.Status, CurrentProcedureName
     Assert.Strict.SequenceEquals myExpectedItems, myResult.Items.ToArray, CurrentProcedureName
     
 TestExit:
@@ -2553,7 +2541,7 @@ Public Sub T014g_TryStartRunForLyst16ItemsStart20_False()
     myExpectedStatus = False
     
     Dim myExpectedMessage As Variant
-    myExpectedMessage = Enums.Message.AsEnum(Id.StartIndexExceedsItemCount)
+    myExpectedMessage = enums.Message.AsEnum(Msg.StartIndexExceedsItemCount)
     
     Dim myItem As Lyst
     Set myItem = Types.Iterable.ToLyst(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
@@ -2562,11 +2550,11 @@ Public Sub T014g_TryStartRunForLyst16ItemsStart20_False()
     myExpectedItems = Array(-5, 13)
     
     Dim myResult As Result
-    Dim myResultStatus As Boolean
-    myResultStatus = Ranges.TryStartRunFromAnyStartRunEnd(myItem, myResult, 20)
     
-    Assert.Strict.AreEqual myExpectedStatus, myResultStatus, CurrentProcedureName
-    Assert.Strict.AreEqual myExpectedMessage, myResult.MessageEnum, CurrentProcedureName
+    Set myResult = Ranges.TryStartRunFromAnyStartRunEnd(myItem, 20)
+    
+    Assert.Strict.AreEqual myExpectedStatus, myResult.Status, CurrentProcedureName
+    'Assert.Strict.AreEqual myExpectedMessage, myResult.MsgEnum, CurrentProcedureName
     
 TestExit:
     Exit Sub
@@ -2585,17 +2573,17 @@ Public Sub T014h_TryStartRunForLyst16ItemStartMinus20_False()
     myExpectedStatus = False
     
     Dim myExpectedMessage As Variant
-    myExpectedMessage = Enums.Message.AsEnum(Id.StartIndexExceedsItemCount)
+    myExpectedMessage = enums.Message.AsEnum(Msg.StartIndexExceedsItemCount)
     
     Dim myItem As Lyst
     Set myItem = Types.Iterable.ToLyst(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
     
     Dim myResult As Result
-    Dim myResultStatus As Boolean
-    myResultStatus = Ranges.TryStartRunFromAnyStartRunEnd("Hello World", myResult, -20)
     
-    Assert.Strict.AreEqual myExpectedStatus, myResultStatus, CurrentProcedureName
-    Assert.Strict.AreEqual myExpectedMessage, myResult.MessageEnum, CurrentProcedureName
+    Set myResult = Ranges.TryStartRunFromAnyStartRunEnd("Hello World", -20)
+    
+    Assert.Strict.AreEqual myExpectedStatus, myResult.Status, CurrentProcedureName
+    'Assert.Strict.AreEqual myExpectedMessage, myResult.MsgEnum, CurrentProcedureName
     
 TestExit:
     Exit Sub
@@ -2614,20 +2602,20 @@ Public Sub T014i_TryStartRunForLyst16IttemsStartIsZero_True_0_16()
     myExpectedStatus = True
     
     Dim myExpectedMessage As Variant
-    myExpectedMessage = Enums.Message.AsEnum(Id.StartIndexWasZeroResetToOne)
+    myExpectedMessage = enums.Message.AsEnum(Msg.StartIndexWasZeroResetToOne)
     
     Dim myItem As Lyst
     Set myItem = Types.Iterable.ToLyst(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
         
     Dim myExpectedItems As Variant
-    myExpectedItems = Array(0, 16)
+    myExpectedItems = Array(1, 16)
     
     Dim myResult As Result
-    Dim myResultStatus As Boolean
-    myResultStatus = Ranges.TryStartRunFromAnyStartRunEnd(myItem, myResult, 0)
     
-    Assert.Strict.AreEqual myExpectedStatus, myResultStatus, CurrentProcedureName
-    Assert.Strict.AreEqual myExpectedMessage, myResult.MessageEnum, CurrentProcedureName
+    Set myResult = Ranges.TryStartRunFromAnyStartRunEnd(myItem, 0)
+    
+    Assert.Strict.AreEqual myExpectedStatus, myResult.Status, CurrentProcedureName
+    'Assert.Strict.AreEqual myExpectedMessage, myResult.MsgEnum, CurrentProcedureName
     Assert.Strict.SequenceEquals myExpectedItems, myResult.Items.ToArray, CurrentProcedureName
     
 TestExit:
@@ -2647,20 +2635,20 @@ Public Sub T014j_TryStartRunForLyst16ItemsStart5Run5_True_4_5()
     myExpectedStatus = True
     
     ' Dim myExpectedMessage As Variant
-    ' myExpectedMessage = Enums.Message.AsEnum(Id.StartIndexWasZeroResetToOne)
+    ' myExpectedMessage = Enums.Message.AsEnum(Msg.StartIndexWasZeroResetToOne)
     
     Dim myExpectedItems As Variant
-    myExpectedItems = Array(4, 5)
+    myExpectedItems = Array(5, 5)
     
     Dim myItem As Lyst
     Set myItem = Types.Iterable.ToLyst(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
     
     Dim myResult As Result
-    Dim myResultStatus As Boolean
-    myResultStatus = Ranges.TryStartRunFromAnyStartRunEnd(myItem, myResult, 5, 5)
     
-    Assert.Strict.AreEqual myExpectedStatus, myResultStatus, CurrentProcedureName
-    'Assert.Strict.AreEqual myExpectedMessage, myResult.MessageEnum, CurrentProcedureName
+    Set myResult = Ranges.TryStartRunFromAnyStartRunEnd(myItem, 5, 5)
+    
+    Assert.Strict.AreEqual myExpectedStatus, myResult.Status, CurrentProcedureName
+    'Assert.Strict.AreEqual myExpectedMessage, myResult.MsgENum, CurrentProcedureName
     Assert.Strict.SequenceEquals myExpectedItems, myResult.Items.ToArray, CurrentProcedureName
     
 TestExit:
@@ -2680,20 +2668,20 @@ Public Sub T014k_TryStartRunForLyst16CharsStart5RunMinus5_True_0_5()
     myExpectedStatus = True
     
     ' Dim myExpectedMessage As Variant
-    ' myExpectedMessage = Enums.Message.AsEnum(Id.StartIndexWasZeroResetToOne)
+    ' myExpectedMessage = Enums.Message.AsEnum(Msg.StartIndexWasZeroResetToOne)
     
     Dim myExpectedItems As Variant
-    myExpectedItems = Array(0, 5)
+    myExpectedItems = Array(1, 5)
     
     Dim myItem As Lyst
     Set myItem = Types.Iterable.ToLyst(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
     
     Dim myResult As Result
-    Dim myResultStatus As Boolean
-    myResultStatus = Ranges.TryStartRunFromAnyStartRunEnd(myItem, myResult, 5, -5)
     
-    Assert.Strict.AreEqual myExpectedStatus, myResultStatus, CurrentProcedureName
-    'Assert.Strict.AreEqual myExpectedMessage, myResult.MessageEnum, CurrentProcedureName
+    Set myResult = Ranges.TryStartRunFromAnyStartRunEnd(myItem, 5, -5)
+    
+    Assert.Strict.AreEqual myExpectedStatus, myResult.Status, CurrentProcedureName
+    'Assert.Strict.AreEqual myExpectedMessage, myResult.MsgENum, CurrentProcedureName
     Assert.Strict.SequenceEquals myExpectedItems, myResult.Items.ToArray, CurrentProcedureName
     
 TestExit:
@@ -2713,20 +2701,20 @@ Public Sub T014l_TryStartRunForLyst16ItemsStartMinus6Run5_True_10_5()
     myExpectedStatus = True
     
     ' Dim myExpectedMessage As Variant
-    ' myExpectedMessage = Enums.Message.AsEnum(Id.StartIndexWasZeroResetToOne)
+    ' myExpectedMessage = Enums.Message.AsEnum(Msg.StartIndexWasZeroResetToOne)
     
     Dim myExpectedItems As Variant
-    myExpectedItems = Array(10, 5)
+    myExpectedItems = Array(11, 5)
     
     Dim myItem As Lyst
     Set myItem = Types.Iterable.ToLyst(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
         
     Dim myResult As Result
-    Dim myResultStatus As Boolean
-    myResultStatus = Ranges.TryStartRunFromAnyStartRunEnd(myItem, myResult, -6, 5)
     
-    Assert.Strict.AreEqual myExpectedStatus, myResultStatus, CurrentProcedureName
-    'Assert.Strict.AreEqual myExpectedMessage, myResult.MessageEnum, CurrentProcedureName
+    Set myResult = Ranges.TryStartRunFromAnyStartRunEnd(myItem, -6, 5)
+    
+    Assert.Strict.AreEqual myExpectedStatus, myResult.Status, CurrentProcedureName
+    'Assert.Strict.AreEqual myExpectedMessage, myResult.MsgENum, CurrentProcedureName
     Assert.Strict.SequenceEquals myExpectedItems, myResult.Items.ToArray, CurrentProcedureName
     
 TestExit:
@@ -2746,20 +2734,20 @@ Public Sub T014m_TryStartRunForLyst11CharsStartMinus6RunMinus5_True_6_5()
     myExpectedStatus = True
     
     ' Dim myExpectedMessage As Variant
-    ' myExpectedMessage = Enums.Message.AsEnum(Id.StartIndexWasZeroResetToOne)
+    ' myExpectedMessage = Enums.Message.AsEnum(Msg.StartIndexWasZeroResetToOne)
     
     Dim myExpectedItems As Variant
-    myExpectedItems = Array(6, 5)
+    myExpectedItems = Array(7, 5)
     
     Dim myItem As Lyst
     Set myItem = Types.Iterable.ToLyst(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
     
     Dim myResult As Result
-    Dim myResultStatus As Boolean
-    myResultStatus = Ranges.TryStartRunFromAnyStartRunEnd(myItem, myResult, -6, -5)
     
-    Assert.Strict.AreEqual myExpectedStatus, myResultStatus, CurrentProcedureName
-    'Assert.Strict.AreEqual myExpectedMessage, myResult.MessageEnum, CurrentProcedureName
+    Set myResult = Ranges.TryStartRunFromAnyStartRunEnd(myItem, -6, -5)
+    
+    Assert.Strict.AreEqual myExpectedStatus, myResult.Status, CurrentProcedureName
+    'Assert.Strict.AreEqual myExpectedMessage, myResult.MsgENum, CurrentProcedureName
     Assert.Strict.SequenceEquals myExpectedItems, myResult.Items.ToArray, CurrentProcedureName
     
 TestExit:
@@ -2780,20 +2768,20 @@ Public Sub T014n_TryStartRunForLyst16ItemsStartMinus6RunMinus5EndMinus3_True_6_5
     myExpectedStatus = True
     
     ' Dim myExpectedMessage As Variant
-    ' myExpectedMessage = Enums.Message.AsEnum(Id.StartIndexWasZeroResetToOne)
+    ' myExpectedMessage = Enums.Message.AsEnum(Msg.StartIndexWasZeroResetToOne)
     
     Dim myExpectedItems As Variant
-    myExpectedItems = Array(6, 5)
+    myExpectedItems = Array(7, 5)
     
     Dim myItem As Lyst
     Set myItem = Types.Iterable.ToLyst(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
     
     Dim myResult As Result
-    Dim myResultStatus As Boolean
-    myResultStatus = Ranges.TryStartRunFromAnyStartRunEnd(myItem, myResult, -6, -5, -3)
     
-    Assert.Strict.AreEqual myExpectedStatus, myResultStatus, CurrentProcedureName
-    'Assert.Strict.AreEqual myExpectedMessage, myResult.MessageEnum, CurrentProcedureName
+    Set myResult = Ranges.TryStartRunFromAnyStartRunEnd(myItem, -6, -5, -3)
+    
+    Assert.Strict.AreEqual myExpectedStatus, myResult.Status, CurrentProcedureName
+    'Assert.Strict.AreEqual myExpectedMessage, myResult.MsgENum, CurrentProcedureName
     Assert.Strict.SequenceEquals myExpectedItems, myResult.Items.ToArray, CurrentProcedureName
     
 TestExit:
@@ -2814,20 +2802,20 @@ Public Sub T014o_TryStartRunForLyst16ItemsStart6End9_True_5_4()
     myExpectedStatus = True
     
     ' Dim myExpectedMessage As Variant
-    ' myExpectedMessage = Enums.Message.AsEnum(Id.StartIndexWasZeroResetToOne)
+    ' myExpectedMessage = Enums.Message.AsEnum(Msg.StartIndexWasZeroResetToOne)
     
     Dim myExpectedItems As Variant
-    myExpectedItems = Array(5, 4)
+    myExpectedItems = Array(6, 4)
     
     Dim myItem As Lyst
     Set myItem = Types.Iterable.ToLyst(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
     
     Dim myResult As Result
-    Dim myResultStatus As Boolean
-    myResultStatus = Ranges.TryStartRunFromAnyStartRunEnd(myItem, myResult, 6, ipEndIndex:=9)
     
-    Assert.Strict.AreEqual myExpectedStatus, myResultStatus, CurrentProcedureName
-    'Assert.Strict.AreEqual myExpectedMessage, myResult.MessageEnum, CurrentProcedureName
+    Set myResult = Ranges.TryStartRunFromAnyStartRunEnd(myItem, 6, ipEndIndex:=9)
+    
+    Assert.Strict.AreEqual myExpectedStatus, myResult.Status, CurrentProcedureName
+    'Assert.Strict.AreEqual myExpectedMessage, myResult.MsgENum, CurrentProcedureName
     Assert.Strict.SequenceEquals myExpectedItems, myResult.Items.ToArray, CurrentProcedureName
     
 TestExit:
@@ -2848,20 +2836,20 @@ Public Sub T014p_TryStartRunForLyst16ItemsStart6End3_True_2_4()
     myExpectedStatus = True
     
     ' Dim myExpectedMessage As Variant
-    ' myExpectedMessage = Enums.Message.AsEnum(Id.StartIndexWasZeroResetToOne)
+    ' myExpectedMessage = Enums.Message.AsEnum(Msg.StartIndexWasZeroResetToOne)
     
     Dim myExpectedItems As Variant
-    myExpectedItems = Array(2, 4)
+    myExpectedItems = Array(3, 4)
     
     Dim myItem As Lyst
     Set myItem = Types.Iterable.ToLyst(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
     
     Dim myResult As Result
-    Dim myResultStatus As Boolean
-    myResultStatus = Ranges.TryStartRunFromAnyStartRunEnd(myItem, myResult, 6, ipeNDiNDEX:=3)
     
-    Assert.Strict.AreEqual myExpectedStatus, myResultStatus, CurrentProcedureName
-    'Assert.Strict.AreEqual myExpectedMessage, myResult.MessageEnum, CurrentProcedureName
+    Set myResult = Ranges.TryStartRunFromAnyStartRunEnd(myItem, 6, ipeNDiNDEX:=3)
+    
+    Assert.Strict.AreEqual myExpectedStatus, myResult.Status, CurrentProcedureName
+    'Assert.Strict.AreEqual myExpectedMessage, myResult.MsgENum, CurrentProcedureName
     Assert.Strict.SequenceEquals myExpectedItems, myResult.Items.ToArray, CurrentProcedureName
     
 TestExit:
@@ -2881,20 +2869,20 @@ Public Sub T014q_TryStartRunForLyst16ItemsStartMinus6End3_True_2_9()
     myExpectedStatus = True
     
     ' Dim myExpectedMessage As Variant
-    ' myExpectedMessage = Enums.Message.AsEnum(Id.StartIndexWasZeroResetToOne)
+    ' myExpectedMessage = Enums.Message.AsEnum(Msg.StartIndexWasZeroResetToOne)
     
     Dim myExpectedItems As Variant
-    myExpectedItems = Array(2, 9)
+    myExpectedItems = Array(3, 9)
     
     Dim myItem As Lyst
     Set myItem = Types.Iterable.ToLyst(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
     
     Dim myResult As Result
-    Dim myResultStatus As Boolean
-    myResultStatus = Ranges.TryStartRunFromAnyStartRunEnd(myItem, myResult, -6, ipeNDiNDEX:=3)
     
-    Assert.Strict.AreEqual myExpectedStatus, myResultStatus, CurrentProcedureName
-    'Assert.Strict.AreEqual myExpectedMessage, myResult.MessageEnum, CurrentProcedureName
+    Set myResult = Ranges.TryStartRunFromAnyStartRunEnd(myItem, -6, ipeNDiNDEX:=3)
+    
+    Assert.Strict.AreEqual myExpectedStatus, myResult.Status, CurrentProcedureName
+    'Assert.Strict.AreEqual myExpectedMessage, myResult.MsgENum, CurrentProcedureName
     Assert.Strict.SequenceEquals myExpectedItems, myResult.Items.ToArray, CurrentProcedureName
     
 TestExit:
@@ -2914,20 +2902,20 @@ Public Sub T014r_TryStartRunForLyst16ItemsStartMinus6EndMinus3_True_10_4()
     myExpectedStatus = True
     
     ' Dim myExpectedMessage As Variant
-    ' myExpectedMessage = Enums.Message.AsEnum(Id.StartIndexWasZeroResetToOne)
+    ' myExpectedMessage = Enums.Message.AsEnum(Msg.StartIndexWasZeroResetToOne)
     
     Dim myExpectedItems As Variant
-    myExpectedItems = Array(10, 4)
+    myExpectedItems = Array(11, 4)
     
     Dim myItem As Lyst
     Set myItem = Types.Iterable.ToLyst(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
     
     Dim myResult As Result
-    Dim myResultStatus As Boolean
-    myResultStatus = Ranges.TryStartRunFromAnyStartRunEnd(myItem, myResult, -6, ipeNDiNDEX:=-3)
     
-    Assert.Strict.AreEqual myExpectedStatus, myResultStatus, CurrentProcedureName
-    'Assert.Strict.AreEqual myExpectedMessage, myResult.MessageEnum, CurrentProcedureName
+    Set myResult = Ranges.TryStartRunFromAnyStartRunEnd(myItem, -6, ipeNDiNDEX:=-3)
+    
+    Assert.Strict.AreEqual myExpectedStatus, myResult.Status, CurrentProcedureName
+    'Assert.Strict.AreEqual myExpectedMessage, myResult.MsgENum, CurrentProcedureName
     Assert.Strict.SequenceEquals myExpectedItems, myResult.Items.ToArray, CurrentProcedureName
     
 TestExit:
@@ -2947,20 +2935,20 @@ Public Sub T014s_TryStartRunForLyst16ItemsStartMinus6EndMinus9_True_7_4()
     myExpectedStatus = True
     
     ' Dim myExpectedMessage As Variant
-    ' myExpectedMessage = Enums.Message.AsEnum(Id.StartIndexWasZeroResetToOne)
+    ' myExpectedMessage = Enums.Message.AsEnum(Msg.StartIndexWasZeroResetToOne)
     
     Dim myExpectedItems As Variant
-    myExpectedItems = Array(7, 4)
+    myExpectedItems = Array(8, 4)
     
     Dim myItem As Lyst
     Set myItem = Types.Iterable.ToLyst(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
     
     Dim myResult As Result
-    Dim myResultStatus As Boolean
-    myResultStatus = Ranges.TryStartRunFromAnyStartRunEnd(myItem, myResult, -6, ipeNDiNDEX:=-9)
     
-    Assert.Strict.AreEqual myExpectedStatus, myResultStatus, CurrentProcedureName
-    'Assert.Strict.AreEqual myExpectedMessage, myResult.MessageEnum, CurrentProcedureName
+    Set myResult = Ranges.TryStartRunFromAnyStartRunEnd(myItem, -6, ipeNDiNDEX:=-9)
+    
+    Assert.Strict.AreEqual myExpectedStatus, myResult.Status, CurrentProcedureName
+    'Assert.Strict.AreEqual myExpectedMessage, myResult.MsgENum, CurrentProcedureName
     Assert.Strict.SequenceEquals myExpectedItems, myResult.Items.ToArray, CurrentProcedureName
     
 TestExit:
@@ -2980,20 +2968,20 @@ Public Sub T014t_TryStartRunForLyst16ItemsEnd5_True_0_5()
     myExpectedStatus = True
     
     ' Dim myExpectedMessage As Variant
-    ' myExpectedMessage = Enums.Message.AsEnum(Id.StartIndexWasZeroResetToOne)
+    ' myExpectedMessage = Enums.Message.AsEnum(Msg.StartIndexWasZeroResetToOne)
     
     Dim myExpectedItems As Variant
-    myExpectedItems = Array(0, 5)
+    myExpectedItems = Array(1, 5)
     
     Dim myItem As Lyst
     Set myItem = Types.Iterable.ToLyst(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
     
     Dim myResult As Result
-    Dim myResultStatus As Boolean
-    myResultStatus = Ranges.TryStartRunFromAnyStartRunEnd(myItem, myResult, ipeNDiNDEX:=5)
     
-    Assert.Strict.AreEqual myExpectedStatus, myResultStatus, CurrentProcedureName
-    'Assert.Strict.AreEqual myExpectedMessage, myResult.MessageEnum, CurrentProcedureName
+    Set myResult = Ranges.TryStartRunFromAnyStartRunEnd(myItem, ipeNDiNDEX:=5)
+    
+    Assert.Strict.AreEqual myExpectedStatus, myResult.Status, CurrentProcedureName
+    'Assert.Strict.AreEqual myExpectedMessage, myResult.MsgENum, CurrentProcedureName
     Assert.Strict.SequenceEquals myExpectedItems, myResult.Items.ToArray, CurrentProcedureName
     
 TestExit:
@@ -3013,20 +3001,20 @@ Public Sub T014u_TryStartRunForLyst16ItemsEndMinus5_True_0_12()
     myExpectedStatus = True
     
     ' Dim myExpectedMessage As Variant
-    ' myExpectedMessage = Enums.Message.AsEnum(Id.StartIndexWasZeroResetToOne)
+    ' myExpectedMessage = Enums.Message.AsEnum(Msg.StartIndexWasZeroResetToOne)
     
     Dim myExpectedItems As Variant
-    myExpectedItems = Array(0, 12)
+    myExpectedItems = Array(1, 12)
     
     Dim myItem As Lyst
     Set myItem = Types.Iterable.ToLyst(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
     
     Dim myResult As Result
-    Dim myResultStatus As Boolean
-    myResultStatus = Ranges.TryStartRunFromAnyStartRunEnd(myItem, myResult, ipeNDiNDEX:=-5)
     
-    Assert.Strict.AreEqual myExpectedStatus, myResultStatus, CurrentProcedureName
-    'Assert.Strict.AreEqual myExpectedMessage, myResult.MessageEnum, CurrentProcedureName
+    Set myResult = Ranges.TryStartRunFromAnyStartRunEnd(myItem, ipeNDiNDEX:=-5)
+    
+    Assert.Strict.AreEqual myExpectedStatus, myResult.Status, CurrentProcedureName
+    'Assert.Strict.AreEqual myExpectedMessage, myResult.MsgENum, CurrentProcedureName
     Assert.Strict.SequenceEquals myExpectedItems, myResult.Items.ToArray, CurrentProcedureName
     
 TestExit:
@@ -3047,20 +3035,20 @@ Public Sub T014v_TryStartRunForLyst16ItemsRun5_True_0_5()
     myExpectedStatus = True
     
     ' Dim myExpectedMessage As Variant
-    ' myExpectedMessage = Enums.Message.AsEnum(Id.StartIndexWasZeroResetToOne)
+    ' myExpectedMessage = Enums.Message.AsEnum(Msg.StartIndexWasZeroResetToOne)
     
     Dim myExpectedItems As Variant
-    myExpectedItems = Array(0, 5)
+    myExpectedItems = Array(1, 5)
     
     Dim myItem As Lyst
     Set myItem = Types.Iterable.ToLyst(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
     
     Dim myResult As Result
-    Dim myResultStatus As Boolean
-    myResultStatus = Ranges.TryStartRunFromAnyStartRunEnd(myItem, myResult, ipRun:=5)
     
-    Assert.Strict.AreEqual myExpectedStatus, myResultStatus, CurrentProcedureName
-    'Assert.Strict.AreEqual myExpectedMessage, myResult.MessageEnum, CurrentProcedureName
+    Set myResult = Ranges.TryStartRunFromAnyStartRunEnd(myItem, ipRun:=5)
+    
+    Assert.Strict.AreEqual myExpectedStatus, myResult.Status, CurrentProcedureName
+    'Assert.Strict.AreEqual myExpectedMessage, myResult.MsgENum, CurrentProcedureName
     Assert.Strict.SequenceEquals myExpectedItems, myResult.Items.ToArray, CurrentProcedureName
     
 TestExit:
@@ -3080,20 +3068,20 @@ Public Sub T014w_TryStartRunForLyst11CharsRunMinus5_True_11_5()
     myExpectedStatus = True
     
     ' Dim myExpectedMessage As Variant
-    ' myExpectedMessage = Enums.Message.AsEnum(Id.StartIndexWasZeroResetToOne)
+    ' myExpectedMessage = Enums.Message.AsEnum(Msg.StartIndexWasZeroResetToOne)
     
     Dim myExpectedItems As Variant
-    myExpectedItems = Array(11, 5)
+    myExpectedItems = Array(12, 5)
     
     Dim myItem As Lyst
     Set myItem = Types.Iterable.ToLyst(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
     
     Dim myResult As Result
-    Dim myResultStatus As Boolean
-    myResultStatus = Ranges.TryStartRunFromAnyStartRunEnd(myItem, myResult, ipRun:=-5)
     
-    Assert.Strict.AreEqual myExpectedStatus, myResultStatus, CurrentProcedureName
-    'Assert.Strict.AreEqual myExpectedMessage, myResult.MessageEnum, CurrentProcedureName
+    Set myResult = Ranges.TryStartRunFromAnyStartRunEnd(myItem, ipRun:=-5)
+    
+    Assert.Strict.AreEqual myExpectedStatus, myResult.Status, CurrentProcedureName
+    'Assert.Strict.AreEqual myExpectedMessage, myResult.MsgENum, CurrentProcedureName
     Assert.Strict.SequenceEquals myExpectedItems, myResult.Items.ToArray, CurrentProcedureName
     
 TestExit:

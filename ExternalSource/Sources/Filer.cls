@@ -28,7 +28,8 @@ End Function
 
 Public Function GetFileAsString(ByVal ipPath As String) As String
 
-    Dim myFso  As Scripting.FileSystemObject: Set myFso = New Scripting.FileSystemObject
+    Dim myFso  As Scripting.FileSystemObject
+    Set myFso = New Scripting.FileSystemObject
     Dim myfile As TextStream
     Set myfile = myFso.OpenTextFile(ipPath, Scripting.IOMode.ForReading)
         

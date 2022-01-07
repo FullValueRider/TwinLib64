@@ -48,8 +48,9 @@ Private Type Properties
     IterableByMethod                        As Lyst ' items can be retrieved using a specific method
     IterableKeysByEnum                      As Lyst ' Has a Keys method and 'for each' gives the key
     Iterables                               As Lyst
-    IterableObjects                         As Lyst ' Iteables sans Arrays
-        
+    IterableObject                          As Lyst ' Iterables sans Arrays
+    IterableOneBased                        As Lyst ' Iterables (excluding arrays) that have a 1 based rather than 0 based indexing
+       
         
 End Type
 
@@ -74,7 +75,8 @@ Private Sub Class_Initialize()
             Set p.IterableKeysByEnum = MakeLyst(IterableKeysByEnumTypes)
             Set p.Iterables = MakeLyst(IterableTypes)
             Set p.Admin = MakeLyst(AdminTypes)
-            Set p.IterableObjects = MakeLyst(IterableObjectTypes)
+            Set p.IterableObject = MakeLyst(IterableObjectTypes)
+            Set p.IterableOneBased = MakeLyst(IterableOneBasedTypes)
         End If
             
     End If
@@ -89,10 +91,10 @@ Public Function MakeLyst(ByVal ipString As String) As Lyst
     Dim myAL As ArrayList
     Set myAL = New ArrayList
                 
-    Dim myItem As Variant
-    For Each myItem In myArray
+    Dim myitem As Variant
+    For Each myitem In myArray
             
-        myAL.Add myItem
+        myAL.Add myitem
             
     Next
         
@@ -111,12 +113,12 @@ Public Property Get AdminTypes() As String
 End Property
 
 Public Property Get ShortNumberTypes() As String
-    ShortNumberTypes = "Byte,Currency,Date,Decimal,Double,Integer,Long,Single"
-    #If VBA7 Then
-        #If Win64 Then
-            ShortNumberTypes = "Byte,Currency,Date,Decimal,Double,Integer,Long,Single,LongLong,LongPtr"
-        #End If
-    #End If
+    ShortNumberTypes = "Byte,Currency,Date,Decimal,Double,Integer,Long,LongLong,LongPtr,Single"
+    ' #If VBA7 Then
+    '     #If Win64 Then
+    '         ShortNumberTypes = "Byte,Currency,Date,Decimal,Double,Integer,Long,Single,LongLong,LongPtr"
+    '     #End If
+    ' #End If
 End Property
 
 Public Property Get ShortTypes() As String
@@ -153,6 +155,7 @@ Public Property Get IterableByIndexTypes() As String
                        & Types.Name.OfArrayList & Char.twComma _
                        & Types.Name.OfLyst & Char.twComma _
                        & Types.Name.OfCollection & Char.twComma _
+                       & Types.Name.OfRoc & Char.twComma _
                        & IterablePrimitiveTypes
     'Debug.Print IterableByIndexTypes
 End Property
@@ -166,7 +169,7 @@ Public Property Get IterableItemsByEnumTypes() As String
 End Property
 
 Public Property Get IterableKeysByEnumTypes() As String
-    IterableKeysByEnumTypes = Types.Name.OfScriptingDictionary & Char.twComma & Types.Name.OfKvp & Types.Name.OfKVPair
+    IterableKeysByEnumTypes = Types.Name.OfScriptingDictionary & Char.twComma & Types.Name.OfKvp & Char.twComma & Types.Name.OfKVPair
 End Property
 
 Public Property Get IterableTypes() As String
@@ -177,6 +180,9 @@ Public Property Get IterableObjectTypes() As String
     IterableObjectTypes = IterableByMethodTypes & Char.twComma & IterableItemsByEnumTypes & Char.twComma & IterableKeysByEnumTypes
 End Property
 
+Public Property Get IterableOneBasedTypes() As String
+  IterableOneBasedTypes = Types.Name.OfCollection & Char.twComma & Types.Name.OfLyst & Char.twComma & Types.Name.OfKvp
+End Property
 ' Additional groups may be defined depending on user requirements.
 
 '========1=========2=========3=========4=========5=========6=========7=========8=========9=========A=========B=========C
@@ -234,7 +240,11 @@ Public Property Get Iterables() As Lyst
 End Property
 
 Public Property Get IterableObjects() As Lyst
-    Set IterableObjects = p.IterableObjects
+    Set IterableObjects = p.IterableObject
+End Property
+
+Public Property Get IterableOneBased() As Lyst
+  Set IterableOneBased = p.IterableOneBased
 End Property
 
 '========1=========2=========3=========4=========5=========6=========7=========8=========9=========A=========B=========C
@@ -253,16 +263,16 @@ End Property
 '========1=========2=========3=========4=========5=========6=========7=========8=========9=========A=========B=========C
     
 Public Function IsAdmin(ParamArray ipArgs() As Variant) As Boolean
-    IsAdmin = pvIsAdminByCvar(CVar(ipArgs))
+    IsAdmin = IsAdminByCvar(CVar(ipArgs))
 End Function
 
 Public Function IsNotAdmin(ParamArray ipArgs() As Variant) As Boolean
-    IsNotAdmin = Not pvIsAdminByCvar(CVar(ipArgs))
+    IsNotAdmin = Not IsAdminByCvar(CVar(ipArgs))
 End Function
 
-Public Function pvIsAdminByCvar(ByVal ipArgs As Variant) As Boolean
+Friend Function IsAdminByCvar(ByVal ipArgs As Variant) As Boolean
 
-    pvIsAdminByCvar = False
+    IsAdminByCvar = False
         
     Dim myArg As Variant
     For Each myArg In ipArgs
@@ -271,21 +281,21 @@ Public Function pvIsAdminByCvar(ByVal ipArgs As Variant) As Boolean
         
     Next
         
-    pvIsAdminByCvar = True
+    IsAdminByCvar = True
         
 End Function
 
 Public Function IsNumber(ParamArray ipArgs() As Variant) As Boolean
-    IsNumber = pvIsNumberByCvar(CVar(ipArgs))
+    IsNumber = IsNumberByCvar(CVar(ipArgs))
 End Function
 
 Public Function IsNotNumber(ParamArray ipArgs() As Variant) As Boolean
-    IsNotNumber = Not pvIsNumberByCvar(CVar(ipArgs))
+    IsNotNumber = Not IsNumberByCvar(CVar(ipArgs))
 End Function
 
-Public Function pvIsNumberByCvar(ByVal ipArgs As Variant) As Boolean
+Friend Function IsNumberByCvar(ByVal ipArgs As Variant) As Boolean
 
-    pvIsNumberByCvar = False
+    IsNumberByCvar = False
         
     Dim myArg As Variant
     For Each myArg In ipArgs
@@ -294,21 +304,21 @@ Public Function pvIsNumberByCvar(ByVal ipArgs As Variant) As Boolean
         
     Next
         
-    pvIsNumberByCvar = True
+    IsNumberByCvar = True
         
 End Function
 
 Public Function IsShort(ParamArray ipArgs() As Variant) As Boolean
-    IsShort = pvIsShortByCvar(CVar(ipArgs))
+    IsShort = IsShortByCvar(CVar(ipArgs))
 End Function
 
 Public Function IsNotShort(ParamArray ipArgs() As Variant) As Boolean
-    IsNotShort = Not pvIsShortByCvar(CVar(ipArgs))
+    IsNotShort = Not IsShortByCvar(CVar(ipArgs))
 End Function
 
-Public Function pvIsShortByCvar(ByVal ipArgs As Variant) As Boolean
+Friend Function IsShortByCvar(ByVal ipArgs As Variant) As Boolean
 
-    pvIsShortByCvar = False
+    IsShortByCvar = False
         
     Dim myArg As Variant
     For Each myArg In ipArgs
@@ -317,21 +327,21 @@ Public Function pvIsShortByCvar(ByVal ipArgs As Variant) As Boolean
         
     Next
         
-    pvIsShortByCvar = True
+    IsShortByCvar = True
         
 End Function
 
 Public Function IsPrimitive(ParamArray ipArgs() As Variant) As Boolean
-    IsPrimitive = pvIsPrimitiveByCvar(CVar(ipArgs))
+    IsPrimitive = IsPrimitiveByCvar(CVar(ipArgs))
 End Function
 
 Public Function IsNotPrimitive(ParamArray ipArgs() As Variant) As Boolean
-    IsNotPrimitive = Not pvIsPrimitiveByCvar(CVar(ipArgs))
+    IsNotPrimitive = Not IsPrimitiveByCvar(CVar(ipArgs))
 End Function
 
-Public Function pvIsPrimitiveByCvar(ByVal ipArgs As Variant) As Boolean
+Friend Function IsPrimitiveByCvar(ByVal ipArgs As Variant) As Boolean
 
-    pvIsPrimitiveByCvar = False
+    IsPrimitiveByCvar = False
         
     Dim myArg As Variant
     For Each myArg In ipArgs
@@ -340,21 +350,21 @@ Public Function pvIsPrimitiveByCvar(ByVal ipArgs As Variant) As Boolean
         
     Next
         
-    pvIsPrimitiveByCvar = True
+    IsPrimitiveByCvar = True
         
 End Function
 
 Public Function IsIterableNumber(ParamArray ipArgs() As Variant) As Boolean
-    IsIterableNumber = pvIsIterableNumberByCvar(CVar(ipArgs))
+    IsIterableNumber = IsIterableNumberByCvar(CVar(ipArgs))
 End Function
 
 Public Function IsNotIterableNumber(ParamArray ipArgs() As Variant) As Boolean
-    IsNotIterableNumber = Not pvIsIterableNumberByCvar(CVar(ipArgs))
+    IsNotIterableNumber = Not IsIterableNumberByCvar(CVar(ipArgs))
 End Function
 
-Public Function pvIsIterableNumberByCvar(ByVal ipArgs As Variant) As Boolean
+Friend Function IsIterableNumberByCvar(ByVal ipArgs As Variant) As Boolean
 
-    pvIsIterableNumberByCvar = False
+    IsIterableNumberByCvar = False
         
     Dim myArg As Variant
     For Each myArg In ipArgs
@@ -363,21 +373,21 @@ Public Function pvIsIterableNumberByCvar(ByVal ipArgs As Variant) As Boolean
         
     Next
         
-    pvIsIterableNumberByCvar = True
+    IsIterableNumberByCvar = True
         
 End Function
 
 Public Function IsIterableShort(ParamArray ipArgs() As Variant) As Boolean
-    IsIterableShort = pvIsIterableShortByCvar(CVar(ipArgs))
+    IsIterableShort = IsIterableShortByCvar(CVar(ipArgs))
 End Function
 
 Public Function IsNotIterableShort(ParamArray ipArgs() As Variant) As Boolean
-    IsNotIterableShort = Not pvIsIterableShortByCvar(CVar(ipArgs))
+    IsNotIterableShort = Not IsIterableShortByCvar(CVar(ipArgs))
 End Function
 
-Public Function pvIsIterableShortByCvar(ByVal ipArgs As Variant) As Boolean
+Friend Function IsIterableShortByCvar(ByVal ipArgs As Variant) As Boolean
 
-    pvIsIterableShortByCvar = False
+    IsIterableShortByCvar = False
         
     Dim myArg As Variant
     For Each myArg In ipArgs
@@ -386,95 +396,95 @@ Public Function pvIsIterableShortByCvar(ByVal ipArgs As Variant) As Boolean
         
     Next
         
-    pvIsIterableShortByCvar = True
+    IsIterableShortByCvar = True
         
 End Function
 
 Public Function IsIterablePrimitive(ParamArray ipArgs() As Variant) As Boolean
-    IsIterablePrimitive = pvIsIterablePrimitiveByCvar(CVar(ipArgs))
+    IsIterablePrimitive = IsIterablePrimitiveByCvar(CVar(ipArgs))
 End Function
 
 Public Function IsNotIterablePrimitive(ParamArray ipArgs() As Variant) As Boolean
-    IsNotIterablePrimitive = Not pvIsIterablePrimitiveByCvar(CVar(ipArgs))
+    IsNotIterablePrimitive = Not IsIterablePrimitiveByCvar(CVar(ipArgs))
 End Function
 
-Public Function pvIsIterablePrimitiveByCvar(ByVal ipArgs As Variant) As Boolean
+Friend Function IsIterablePrimitiveByCvar(ByVal ipArgs As Variant) As Boolean
 
-    pvIsIterablePrimitiveByCvar = False
+    IsIterablePrimitiveByCvar = False
         
-    Dim myItem As Variant
-    For Each myItem In ipArgs
+    Dim myitem As Variant
+    For Each myitem In ipArgs
         
-        If Types.Group.IterablePrimitives.LacksItem(TypeName(myItem)) Then Exit Function
+        If Types.Group.IterablePrimitives.LacksItem(TypeName(myitem)) Then Exit Function
         
     Next
         
-    pvIsIterablePrimitiveByCvar = True
+    IsIterablePrimitiveByCvar = True
         
 End Function
 
 Public Function IsIterableByIndex(ParamArray ipArgs() As Variant) As Boolean
-    IsIterableByIndex = pvIsIterableByIndexByCVar(CVar(ipArgs))
+    IsIterableByIndex = IsIterableByIndexByCVar(CVar(ipArgs))
 End Function
 
 Public Function IsNotIterableByIndex(ParamArray ipArgs() As Variant) As Boolean
-    IsNotIterableByIndex = Not pvIsIterableByIndexByCVar(CVar(ipArgs))
+    IsNotIterableByIndex = Not IsIterableByIndexByCVar(CVar(ipArgs))
 End Function
 
-Public Function pvIsIterableByIndexByCVar(ByVal ipArgs As Variant) As Boolean
+Friend Function IsIterableByIndexByCVar(ByVal ipArgs As Variant) As Boolean
 
-    pvIsIterableByIndexByCVar = False
+    IsIterableByIndexByCVar = False
         
-    Dim myItem As Variant
-    For Each myItem In ipArgs
+    Dim myitem As Variant
+    For Each myitem In ipArgs
         
-        If Types.Group.IterableByIndex.LacksItem(TypeName(myItem)) Then Exit Function
+        If Types.Group.IterableByIndex.LacksItem(TypeName(myitem)) Then Exit Function
         
     Next
         
-    pvIsIterableByIndexByCVar = True
+    IsIterableByIndexByCVar = True
         
 End Function
 
 Public Function IsIterableByMethod(ParamArray ipArgs() As Variant) As Boolean
-    IsIterableByMethod = pvIsIterableByMethodByCvar(CVar(ipArgs))
+    IsIterableByMethod = IsIterableByMethodByCvar(CVar(ipArgs))
 End Function
 
 Public Function IsNotIterableByMethod(ParamArray ipArgs() As Variant) As Boolean
-    IsNotIterableByMethod = Not pvIsIterableByMethodByCvar(CVar(ipArgs))
+    IsNotIterableByMethod = Not IsIterableByMethodByCvar(CVar(ipArgs))
 End Function
 
-Public Function pvIsIterableByMethodByCvar(ByVal ipArgs As Variant) As Boolean
+Friend Function IsIterableByMethodByCvar(ByVal ipArgs As Variant) As Boolean
 
-    pvIsIterableByMethodByCvar = False
+    IsIterableByMethodByCvar = False
         
-    Dim myItem As Variant
-    For Each myItem In ipArgs
+    Dim myitem As Variant
+    For Each myitem In ipArgs
         
-        If Types.Group.IterableByMethod.LacksItem(TypeName(myItem)) Then Exit Function
+        If Types.Group.IterableByMethod.LacksItem(TypeName(myitem)) Then Exit Function
         
     Next
         
-    pvIsIterableByMethodByCvar = True
+    IsIterableByMethodByCvar = True
         
 End Function
 
 Public Function IsIterableItemsByEnum(ParamArray ipArgs() As Variant) As Boolean
-    IsIterableItemsByEnum = pvIsIterableItemsByEnumByCvar(CVar(ipArgs))
+    IsIterableItemsByEnum = IsIterableItemsByEnumByCvar(CVar(ipArgs))
 End Function
 
 Public Function IsNotIterableItemsByEnum(ParamArray ipArgs() As Variant) As Boolean
-    IsNotIterableItemsByEnum = Not pvIsIterableItemsByEnumByCvar(CVar(ipArgs))
+    IsNotIterableItemsByEnum = Not IsIterableItemsByEnumByCvar(CVar(ipArgs))
 End Function
 
-Public Function pvIsIterableItemsByEnumByCvar(ByVal ipArgs As Variant) As Boolean
+Friend Function IsIterableItemsByEnumByCvar(ByVal ipArgs As Variant) As Boolean
 
-    pvIsIterableItemsByEnumByCvar = False
+    IsIterableItemsByEnumByCvar = False
         
-    Dim myItem As Variant
-    For Each myItem In ipArgs
+    Dim myitem As Variant
+    For Each myitem In ipArgs
         
-        If Types.Group.IterableItemsByEnum.LacksItem(TypeName(myItem)) Then Exit Function
+        If Types.Group.IterableItemsByEnum.LacksItem(TypeName(myitem)) Then Exit Function
         'ToDO:Figure out how to do a generic n by m array
         ' If Arrays.HasItems(myItem) Then
                 
@@ -484,70 +494,70 @@ Public Function pvIsIterableItemsByEnumByCvar(ByVal ipArgs As Variant) As Boolea
             
     Next
         
-    pvIsIterableItemsByEnumByCvar = True
+    IsIterableItemsByEnumByCvar = True
         
 End Function
 
 Public Function IsIterableKeysByEnum(ParamArray ipArgs() As Variant) As Boolean
-    IsIterableKeysByEnum = pvIsIterableByKeyByCvar(CVar(ipArgs))
+    IsIterableKeysByEnum = IsIterableByKeyByCvar(CVar(ipArgs))
 End Function
 
 Public Function IsNotIterableByKey(ParamArray ipArgs() As Variant) As Boolean
-    IsNotIterableByKey = Not pvIsIterableByKeyByCvar(CVar(ipArgs))
+    IsNotIterableByKey = Not IsIterableByKeyByCvar(CVar(ipArgs))
 End Function
 
-Public Function pvIsIterableByKeyByCvar(ByVal ipArgs As Variant) As Boolean
+Friend Function IsIterableByKeyByCvar(ByVal ipArgs As Variant) As Boolean
 
-    pvIsIterableByKeyByCvar = False
+    IsIterableByKeyByCvar = False
         
-    Dim myItem As Variant
-    For Each myItem In ipArgs
+    Dim myitem As Variant
+    For Each myitem In ipArgs
         
-        If IterableKeysByEnum.LacksItem(TypeName(myItem)) Then Exit Function
+        If IterableKeysByEnum.LacksItem(TypeName(myitem)) Then Exit Function
         
     Next
         
-    pvIsIterableByKeyByCvar = True
+    IsIterableByKeyByCvar = True
         
 End Function
 
 Public Function IsIterable(ParamArray ipArgs() As Variant) As Boolean
-    IsIterable = pvIsIterableByCvar(CVar(ipArgs))
+    IsIterable = IsIterableByCvar(CVar(ipArgs))
 End Function
 
 Public Function IsNotIterable(ParamArray ipArgs() As Variant) As Boolean
-    IsNotIterable = Not pvIsIterableByCvar(CVar(ipArgs))
+    IsNotIterable = Not IsIterableByCvar(CVar(ipArgs))
 End Function
 
-Public Function pvIsIterableByCvar(ByVal ipArgs As Variant) As Boolean
+Friend Function IsIterableByCvar(ByVal ipArgs As Variant) As Boolean
 
-    pvIsIterableByCvar = False
+    IsIterableByCvar = False
     ' If Arrays.HasNoItems(ipArgs) Then Exit Function
        
     Dim myArg As Variant
     'Debug.Print
     For Each myArg In ipArgs
-        Dim myName As String
-        myName = TypeName(myArg)
+'        Dim myName As String
+'        myName = TypeName(myArg)
         If Iterables.LacksItem(TypeName(myArg)) Then Exit Function
         
     Next
         
-    pvIsIterableByCvar = True
+    IsIterableByCvar = True
         
 End Function
 
 Public Function IsIterableObject(ParamArray ipArgs() As Variant) As Boolean
-    IsIterableObject = pvIsIterableByCvar(CVar(ipArgs))
+    IsIterableObject = IsIterableByCvar(CVar(ipArgs))
 End Function
 
 Public Function IsNotIterableObject(ParamArray ipArgs() As Variant) As Boolean
-    IsNotIterableObject = Not pvIsIterableByCvar(CVar(ipArgs))
+    IsNotIterableObject = Not IsIterableByCvar(CVar(ipArgs))
 End Function
 
-Public Function pvIsIterableObjectByCvar(ByVal ipArgs As Variant) As Boolean
+Friend Function IsIterableObjectByCvar(ByVal ipArgs As Variant) As Boolean
 
-    pvIsIterableObjectByCvar = False
+    IsIterableObjectByCvar = False
         
     Dim myArg As Variant
     For Each myArg In ipArgs
@@ -556,8 +566,30 @@ Public Function pvIsIterableObjectByCvar(ByVal ipArgs As Variant) As Boolean
         
     Next
         
-    pvIsIterableObjectByCvar = True
+    IsIterableObjectByCvar = True
         
 End Function
 
 
+Public Function IsIterableOneBased(ParamArray ipArgs() As Variant) As Boolean
+  IsIterableOneBased = IsIterableOneBasedByCvar(CVar(ipArgs))
+End Function
+
+Public Function IsNotIterableOneBased(ParamArray ipArgs() As Variant) As Boolean
+  IsNotIterableOneBased = Not IsIterableOneBasedByCvar(CVar(ipArgs))
+End Function
+
+Friend Function IsIterableOneBasedByCvar(ByVal ipArgs As Variant) As Boolean
+
+  IsIterableOneBasedByCvar = False
+      
+  Dim myArg As Variant
+  For Each myArg In ipArgs
+          
+      If p.IterableOneBased.LacksItem(TypeName(myArg)) Then Exit Function
+      
+  Next
+      
+  IsIterableOneBasedByCvar = True
+      
+End Function

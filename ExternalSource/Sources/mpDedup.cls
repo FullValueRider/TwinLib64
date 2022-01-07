@@ -14,7 +14,7 @@ Option Explicit
 '@Folder("VBALib.Mappers")
 Private Type State
 
-    DedupItems                 As Variant
+    DedupItems                 As Lyst
         
 End Type
 
@@ -27,7 +27,7 @@ Private Function IMapper_ExecMapper(ByVal ipHostItem As Variant) As Variant
 End Function
 
 Private Sub Class_Initialize()
-    s.DedupItems = Array(" ")
+    Set s.DedupItems = Lyst.Deb.AddKnownItemsAsItems(" ")
 End Sub
 
 Public Function ExecMap(ByVal ipHostItem As Variant) As Variant
@@ -53,11 +53,12 @@ Public Function Deb(ParamArray ipDedupItems() As Variant) As mpDedup
             
 End Function
 
-Friend Function ReadyToUseInstance(ByRef ipDedupItems As Variant) As mpDedup
+Friend Function ReadyToUseInstance(Optional ByRef ipDedupItems As Lyst) As mpDedup
         
-    If VBA.IsMissing(ipDedupItems) Then ipDedupItems = Array(Char.twSpace)
-    If VBA.IsEmpty(ipDedupItems) Then ipDedupItems = Array(Char.twSpace)
-    s.DedupItems = ipDedupItems
+    '@Ignore IsMissingOnInappropriateArgument
+    If VBA.IsMissing(ipDedupItems) Then Set ipDedupItems = Lyst.Deb.AddKnownItemsAsItems(Char.twSpace)
+    If ipDedupItems.HasNoItems Then Set ipDedupItems = Lyst.Deb.AddKnownItemsAsItems(Char.twSpace)
+    Set s.DedupItems = ipDedupItems
     Set ReadyToUseInstance = Me
         
 End Function

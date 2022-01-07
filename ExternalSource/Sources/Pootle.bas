@@ -1,24 +1,19 @@
-Attribute VB_Name = "Pootle"
-'@IgnoreModule
-'@Folder("VBALib")
-Public Sub TestArrayInLyst()
+Attribute VB_Name = "pootle"
+Option Explicit
+
+Sub testarraylist()
+
+    Dim myAL As Lyst
+    Set myAL = Lyst.Deb
     
-    Dim myLyst As Lyst
-    Set myLyst = Lyst.Deb
+    myAL.Add 1
+    myAL.Add 2
+    myAL.Add 3
+    myAL.Add 4
     
-    Dim myArray1 As Lyst
-    Set myArray1 = Lyst.Deb.AddKnownIterableAsItems(Array(1, 2, 3, 4, 5, 6))
-    
-    Dim myArray2 As Lyst
-    Set myArray2 = Lyst.Deb.AddKnownIterableAsItems(Array(2, 3, 4, 5, 6, 7))
-    
-    Dim myArray3 As Lyst
-    Set myArray3 = Lyst.Deb.AddKnownIterableAsItems(Array(3, 4, 5, 6, 7, 8))
-    
-    myLyst.Add myArray1
-    myLyst.Add myArray2
-    myLyst.Add myArray3
-    
-    Debug.Print myLyst.IndexOf(myArray2)
+    Dim myitem As Variant
+    For Each myitem In myAL
+    Debug.Print myitem
+    Next
 End Sub
 

@@ -12,20 +12,20 @@ Option Explicit
 '@PredeclaredId
 '@Folder("VBALib.Mappers")
     
-Private Type State
-    
-    Separator                       As String
-    Count                           As Long
-    Compare                         As VbCompareMethod
-        
-End Type
-
-Private s                           As State
+'Private Type State
+'
+'    Separator                       As String
+'    Count                           As Long
+'    Compare                         As VbCompareMethod
+'
+'End Type
+'
+'Private s                           As State
     
 Implements IMapper
 
 Private Function IMapper_ExecMapper(ByVal ipHostItem As Variant) As Variant
-    IMapper_ExecMapper = ExecMapper(ipHostItem)
+    Set IMapper_ExecMapper = ExecMapper(ipHostItem)
 End Function
 
 Public Function ExecMapper(ByVal ipHostItem As Variant) As Variant
@@ -38,7 +38,7 @@ Public Function ExecMapper(ByVal ipHostItem As Variant) As Variant
             
     End If
         
-    ExecMapper = Strs.ToCharLyst(ipHostItem)
+    Set ExecMapper = Strs.ToCharLyst(ipHostItem)
         
 End Function
 

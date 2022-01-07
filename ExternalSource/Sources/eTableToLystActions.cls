@@ -2,7 +2,7 @@ VERSION 1.0 CLASS
 BEGIN
   MultiUse = -1  'True
 END
-Attribute VB_Name = "EnumTableToLystActions"
+Attribute VB_Name = "eTableToLystActions"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
@@ -12,16 +12,6 @@ Option Explicit
 '@PredeclaredId
 '@Exposed
 
-Public Enum TableToLystAction
-                
-    RankIsColumnFirstItemActionIsNoAction = 1
-    RankIsRowFirstItemActionIsNoAction
-    RankIsColumnFirstItemActionIsCopy
-    RankIsRowFirstItemActionIsCopy
-    RankIsColumnFirstItemActionIsSplit
-    RankIsRowFirstItemActionIsSplit
-
-End Enum
 
 'OK, so they are not constants but you know the intent.
 Private Type InternalConstants
@@ -46,7 +36,7 @@ Private s                   As State
 Private Sub Class_Initialize()
         
     ic.Location = "VBALib.EnumTableToLystActions."
-    Guard InvalidNew, Not (Me Is Enums.TableToLystActions), ic.Location & "Class_Initialize"
+    If BailOut.When(Not (Me Is enums.TableToLystActions), Msg.InvalidNew) Then Exit Sub
     SetupDictionaries
         
 End Sub
@@ -103,13 +93,13 @@ End Function
 
 Public Function Ord(ByVal ipEnum As TableToLystAction) As Long
         
-    Dim myItem As Variant
+    Dim myitem As Variant
     Dim myOrd As Long
     myOrd = 1
     Ord = -1
-    For Each myItem In s.Strings.Keys
+    For Each myitem In s.Strings.Keys
             
-        If myItem = ipEnum Then
+        If myitem = ipEnum Then
                 
             Ord = myOrd
             Exit Function

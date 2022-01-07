@@ -15,45 +15,66 @@ Option Explicit
 Private Type Properties
         
     Separator               As String
-        
+    Nums                    As ROC
+    Upper                   As ROC
+    Lower                   As ROC
+    Alphanum                As ROC
+    WhiteSpace              As ROC
+    
 End Type
 
 Private p                   As Properties
 
 Private Sub Class_Initialize()
+  
     p.Separator = Char.twComma
+    Set p.WhiteSpace = ROC.Deb(ToCharLyst(WhiteSpaceChars).ToArrayList)
+    Set p.Nums = ROC.Deb(ToCharLyst(NumberChars).ToArrayList)
+    Set p.Upper = ROC.Deb(ToCharLyst(UCaseChars).ToArrayList)
+    Set p.Lower = ROC.Deb(ToCharLyst(LCaseChars).ToArrayList)
+    Set p.Alphanum = ROC.Deb(ToCharLyst(AlphanumChars).ToArrayList)
+    
 End Sub
 
-Public Function WhiteSpace() As Variant: WhiteSpace = Array(Char.twSpace, Char.twPeriod, Char.twSemiColon, Char.twColon, Char.twComma, vbTab, vbCrLf): End Function
-Public Function NumberChars() As String: NumberChars = "0123456789": End Function
-
-Public Function LCaseChars() As String: LCaseChars = "abcdefghijklmnopqrstuvwxyz": End Function
-Public Function UCaseChars() As String: UCaseChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ": End Function
-
-Friend Function TryExtent(ByVal ipItem As String, ByRef iopResult As Result) As Result
+Public Function WhiteSpaceChars() As String: WhiteSpaceChars = Char.twSpace & Char.twPeriod & Char.twSemiColon & Char.twColon & Char.twComma & vbTab & vbCrLf: End Function
+Public Function WhitespaceList() As ROC: Set WhitespaceList = p.WhiteSpace: End Function
+  
+Public Function NumberChars() As Variant: NumberChars = "0123456789": End Function
+Public Function LCaseChars() As Variant: LCaseChars = "abcdefghijklmnopqrstuvwxyz": End Function
+Public Function UCaseChars() As Variant: UCaseChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ": End Function
+Public Function AlphanumChars() As Variant: AlphanumChars = NumberChars & UCaseChars & LCaseChars: End Function
+ 
+Public Function NumbersList() As ROC: Set NumbersList = p.Nums: End Function
+Public Function LCaseList() As ROC: Set LCaseList = p.Lower: End Function
+Public Function UCaseList() As ROC: Set UCaseList = p.Upper: End Function
+Public Function AlphaNumList() As ROC: Set AlphaNumList = p.Alphanum: End Function
+  
+' Friend Function TryExtent(ByVal ipItem As String) As Result
         
-    If iopResult Is Nothing Then Set iopResult = Result.Deb
     
-
-    Dim myCount As Long
-    myCount = VBA.Len(ipItem)
-    If myCount = 0 Then
-            
-        iopResult.MessageEnum = Enums.Message.AsEnum(Id.StringIsEmpty)
-        Set TryExtent = iopResult
-        Exit Function
-            
-            
-    End If
         
-    iopResult.SetOkay 1, myCount, myCount
-    Set TryExtent = iopResult
+'     Set TryExtent = Globals.Res.Init(Msg.Okay).SetItems(1, myCount, myCount)
      
+' End Function
+
+Public Function TryExtent(ByVal ipString As String, Optional ByVal ipRank As Long = 1) As Result
+  
+    Globals.Res.SetNotOkay
+    Set TryExtent = Globals.Res
+    
+    If BailOut.When(ipRank <> 1, Msg.ItemDoesNotSupportRanks) Then Exit Function
+        
+    Dim myCount As Long
+    myCount = VBA.Len(ipString)
+    If BailOut.When(myCount = 0, Msg.StringIsEmpty) Then Exit Function
+    
+    Set TryExtent = Globals.Res.SetOkay.SetItems(1, myCount, myCount)
+  
 End Function
 
-'@Description("Returny the long value of a string containing a binary number")
+'@Description("Return the long value of a string containing a binary number")
 Public Function BinToLong(ByVal ipBinary As String) As Long
-Attribute BinToLong.VB_Description = "Returny the long value of a string containing a binary number"
+Attribute BinToLong.VB_Description = "Return the long value of a string containing a binary number"
 
         
     Dim myValue As Long
@@ -96,43 +117,33 @@ Public Property Let DefaultSeparator(ByVal ipSeparator As String)
     p.Separator = ipSeparator
 End Property
 
-Public Function Dedup(ByVal ipSource As String, ParamArray ipDedupArray() As Variant) As String
+Public Function Dedup(ByVal ipSource As String, ParamArray ipDedupItems() As Variant) As String
 
     Dedup = ipSource
-    If VBA.Len(ipSource) = 0 Then Exit Function
-    If VBA.IsMissing(ipDedupArray) Then ipDedupArray = Array(Char.twSpace)
-    If Arrays.HasNoItems(ipDedupArray) Then ipDedupArray = Array(Char.twSpace)
+    If BailOut.When(VBA.Len(ipSource) = 0, Msg.StringIsEmpty) Then Exit Function
         
-    ' DO some dodgy stuff if only one parameter is provided
+    Dim myDedupItems As Lyst
+    If Arrays.IsNotValid(ipDedupItems) Then
         
-    Dim myResult As Result
-    Dim myDedupItems As Variant
+        Set myDedupItems = Lyst.Deb.AddKnownItemsAsItems(Char.twSpace)
         
-    If Arrays.HasOneItem(ipDedupArray) Then
+    ElseIf Arrays.HasOneItem(ipDedupItems) Then
         
-        If ParamArrayParsing.OneItem(CVar(ipDedupArray), myResult).NotOkay Then Exit Function
-        If Types.IsNotString(myResult.Item(1).Item(0)) Then Exit Function
-        
-        myDedupItems = myResult.Item(1).ToArray
-           
-                
-        If VBA.Len(myDedupItems(0)) = 1 Then
-                    
-            myDedupItems = Array(myDedupItems(0))
-                        
-        ElseIf VBA.InStr(myDedupItems(0), p.Separator) > 0 Then
-                        
-            myDedupItems = VBA.Split(myDedupItems(0), p.Separator)
-                    
+        If Types.Group.IsIterable(ipDedupItems(0)) Then
+            
+            Set myDedupItems = Lyst.Deb.AddKnownIterableAsItems(ipDedupItems(0))
+            
+        Else
+            
+            Set myDedupItems = Lyst.Deb.AddKnownIterableAsItems(ipDedupItems)
+            
         End If
-            
-    Else
-           
-        myDedupItems = ipDedupArray
-                          
-            
-    End If
         
+    Else
+        
+        Set myDedupItems = Lyst.Deb.AddKnownIterableAsItems(ipDedupItems)
+        
+    End If
         
     Dim mySource As String
     mySource = ipSource
@@ -140,16 +151,21 @@ Public Function Dedup(ByVal ipSource As String, ParamArray ipDedupArray() As Var
     Dim myDeDup As Variant
     For Each myDeDup In myDedupItems
         
-        Dim MyDedupDedup As String
-        MyDedupDedup = myDeDup & myDeDup
+        If Types.IsString(myDeDup) Then
             
-        Do
-            
-            Dim myLen As Long
-            myLen = Len(mySource)
-            mySource = Replace(mySource, MyDedupDedup, myDeDup)
+            Dim MyDedupDedup As String
+            MyDedupDedup = myDeDup & myDeDup
                 
-        Loop Until myLen = Len(mySource)
+            Do
+            
+                DoEvents
+                Dim myLen As Long
+                myLen = Len(mySource)
+                mySource = Replace(mySource, MyDedupDedup, myDeDup)
+                    
+            Loop Until myLen = Len(mySource)
+            
+        End If
             
     Next
         
@@ -157,21 +173,23 @@ Public Function Dedup(ByVal ipSource As String, ParamArray ipDedupArray() As Var
         
 End Function
 
-'@Description("Takes a list of characters and removed them from both ends of the target string.  If the list contains strings >1 character then these are ignored")
+'@Description("Takes a list of characters and removes them from both ends of the target string.  If the list contains strings >1 character then these are ignored")
 Public Function Trimmer(ByVal ipSource As String, ParamArray ipTrimChars() As Variant) As String
-Attribute Trimmer.VB_Description = "Takes a list of characters and removed them from both ends of the target string.  If the list contains strings >1 character then these are ignored"
+Attribute Trimmer.VB_Description = "Takes a list of characters and removes them from both ends of the target string.  If the list contains strings >1 character then these are ignored"
 
     Trimmer = ipSource
     If VBA.Len(ipSource) = 0 Then Exit Function
-    If VBA.IsMissing(ipTrimChars) Then ipTrimChars = Strs.WhiteSpace
-    If Arrays.HasNoItems(ipTrimChars) Then ipTrimChars = Strs.WhiteSpace
+    
+      Dim mywhite As Variant
+      Set mywhite = Strs.WhitespaceList '.ToArray
+    If Arrays.HasNoItems(ipTrimChars) Then ipTrimChars = mywhite.ToArray
         
     Dim myTrimArray As Variant
     If Arrays.HasOneItem(ipTrimChars) Then
         
-        Dim myResult As Result
-        If ParamArrayParsing.OneItem(ipTrimChars(0), myResult).NotOkay Then Exit Function
-        myTrimArray = myResult.Item(0)
+        'Dim myResult As Result
+        If Parser.ParseVariantWithOneItem(ipTrimChars(0)).IsNotOkay Then Exit Function
+        myTrimArray = Globals.Res.Item(ResultItemsEnums.ParsedVariant(pvItems))
             
     Else
             
@@ -180,26 +198,25 @@ Attribute Trimmer.VB_Description = "Takes a list of characters and removed them 
     End If
         
     Dim myTrimLyst As Lyst
-    Set myTrimLyst = Lyst.Deb.AddRange(myTrimArray)
+    Set myTrimLyst = Lyst.Deb.AddKnownIterableAsItems(myTrimArray)
     Dim myString As String
     myString = ipSource
       
     Dim myLen As Long
-    myLen = VBA.Len(myString)
     Do
   
-        myLen = VBA.Len(myString)
-        DoEvents                                 ' Always put a do event statement in a do loop
-        If myTrimLyst.HoldsItem(VBA.Left$(myString, 1)) Then myString = VBA.Mid$(myString, 2)
+      DoEvents  'Always put a do event statement in a do loop
+      myLen = VBA.Len(myString)
+      If myTrimLyst.HoldsItem(VBA.Left$(myString, 1)) Then myString = VBA.Mid$(myString, 2)
        
                 
     Loop Until myLen = VBA.Len(myString)
          
     Do
         
-        myLen = VBA.Len(myString)
-        DoEvents                                 ' Always put a do event statement in a do loop
-        If myTrimLyst.HoldsItem(VBA.Right$(myString, 1)) Then myString = VBA.Mid$(myString, 1, myLen - 1)
+      DoEvents                                 ' Always put a do event statement in a do loop
+      myLen = VBA.Len(myString)
+      If myTrimLyst.HoldsItem(VBA.Right$(myString, 1)) Then myString = VBA.Mid$(myString, 1, myLen - 1)
 
             
     Loop Until myLen = VBA.Len(myString)
@@ -258,7 +275,7 @@ Attribute ToSubStrLyst.VB_Description = "Converts a string to an Lyst of trimmed
     Dim myArray As Variant
     Dim myString As String
     ipSeparator_twComma = IIf(VBA.IsMissing(ipSeparator_twComma), Char.twComma, ipSeparator_twComma)
-    ipDeleteChars_WhiteSpace = IIf(VBA.IsMissing(ipDeleteChars_WhiteSpace), Strs.WhiteSpace, ipDeleteChars_WhiteSpace)
+    ipDeleteChars_WhiteSpace = IIf(VBA.IsMissing(ipDeleteChars_WhiteSpace), Strs.WhiteSpaceChars, ipDeleteChars_WhiteSpace)
         
     myString = Strs.Trimmer(ipString, ipDeleteChars_WhiteSpace)
     If InStr(myString, ipSeparator_twComma) = 0 Then
@@ -271,12 +288,12 @@ Attribute ToSubStrLyst.VB_Description = "Converts a string to an Lyst of trimmed
             
     End If
         
-    Dim myItem As Variant
+    Dim myitem As Variant
     Dim myLyst As Lyst
     Set myLyst = Lyst.Deb
-    For Each myItem In myArray
+    For Each myitem In myArray
         
-        myLyst.Add myItem
+        myLyst.Add myitem
             
     Next
 
@@ -284,25 +301,75 @@ Attribute ToSubStrLyst.VB_Description = "Converts a string to an Lyst of trimmed
         
 End Function
 
-Public Function Replacer(ByVal ipString As String, Optional ByVal ipReplaceChars_whiteSpace As Variant) As String
+Public Function RepeatReplacer(ByVal ipHost As String, Optional ByVal ipFind As Variant, Optional ByVal ipReplace As Variant) As String
+    
+    RepeatReplacer = ipHost
+    If VBA.Len(ipHost) = 0 Then Exit Function
+    If VBA.IsMissing(ipFind) Then ipFind = Char.twSpace
+    If VBA.IsMissing(ipReplace) Then ipReplace = vbNullString
         
-    ipReplaceChars_whiteSpace = IIf(VBA.IsMissing(ipReplaceChars_whiteSpace), Strs.WhiteSpace, ipReplaceChars_whiteSpace)
-    Dim myString As String
-    myString = ipString
+    Dim myFind As String
+    Dim myReplace As String
+    
+    If Types.IsNotString(ipFind) Then
         
-    If VBA.Len(ipReplaceChars_whiteSpace) = 0 Then Exit Function
+        myFind = Stringifier.ToString(ipFind)
         
-    'Dim myResult As String
-    Dim myIndex As Long
-    For myIndex = 1 To Len(ipReplaceChars_whiteSpace)
-            
         
-        myString = VBA.Replace(myString, VBA.Mid$(ipReplaceChars_whiteSpace, myIndex, 1), vbNullString)
-            
-    Next
+    Else
+        
+        myFind = ipFind
+        
+        
+    End If
+       
+    If Types.IsNotString(ipReplace) Then
+        
+        myReplace = Stringifier.ToString(ipReplace)
+        
+        
+    Else
+        
+        myReplace = ipReplace
+        
+        
+    End If
+    
+    Do
+    
+        DoEvents
+        
+        Dim myLen As Long
+        myLen = VBA.Len(ipHost)
+        ipHost = VBA.Replace(ipHost, myFind, myReplace)
+        
+        
+    Loop While myLen > VBA.Len(ipHost)
 
-    Replacer = myString
+    RepeatReplacer = ipHost
         
+End Function
+
+
+
+
+Public Function MultiReplacer(ByVal ipHost As String, Optional ByVal ipFindReplaceItems As Variant) As String
+    
+    MultiReplacer = ipHost
+    If VBA.Len(ipHost) = 0 Then Exit Function
+
+    'Dim myFindReplaceItems As Variant
+    If VBA.IsMissing(ipFindReplaceItems) Or Arrays.HasNoItems(ipFindReplaceItems) Then ipFindReplaceItems = Array(Char.twSpace, vbNullString)
+        
+    Dim myitem As Variant
+    For Each myitem In ipFindReplaceItems
+        
+        ipHost = RepeatReplacer(ipHost, myitem(0), myitem(1))
+        
+    Next
+    
+    MultiReplacer = ipHost
+    
 End Function
 
 Public Function ToAnsiBytes(ByVal ipString As String) As Lyst
@@ -313,7 +380,7 @@ Public Function ToAnsiBytes(ByVal ipString As String) As Lyst
             
     Else
         
-        Set ToAnsiBytes = Lyst.Deb(VBA.Split(StrConv(ipString, vbFromUnicode)))
+        Set ToAnsiBytes = Lyst.Deb.AddKnownIterableAsItems(VBA.Split(StrConv(ipString, vbFromUnicode)))
             
     End If
         
@@ -329,7 +396,7 @@ Public Function ToUnicodeBytes(ByVal ipString As String) As Lyst
         
         Dim myBytes() As Byte
         myBytes = ipString
-        Set ToUnicodeBytes = Lyst.Deb.AddRange(myBytes)
+        Set ToUnicodeBytes = Lyst.Deb.AddKnownIterableAsItems(myBytes)
             
     End If
         
@@ -344,14 +411,164 @@ Public Function ToCharLyst(ByVal ipString As String) As Lyst
     Dim myLen As Long
     myLen = VBA.Len(ipString)
     If myLen = 0 Then Exit Function
-        
+     
+   
     Dim myIndex As Long
     For myIndex = 1 To myLen
         
-        myLyst.Add VBA.Mid$(ipString, myIndex, 1)
+        myLyst.AddKnownItemsAsItems VBA.Mid$(ipString, myIndex, 1)
             
     Next
         
     Set ToCharLyst = myLyst
 
+End Function
+'@Description("increments characters based on thier position in the ipAllowedChar list")
+Public Function Inc(ByVal ipString As String, Optional ByRef ipAllowedChar As ROC) As String
+Attribute Inc.VB_Description = "increments characters based on thier position in the ipAllowedChar list"
+  
+  If VBA.Len(ipString) = 0 Then
+    
+      Inc = vbNullString
+      Exit Function
+      
+  End If
+  
+  Dim myAllowedChar As ROC
+  If ipAllowedChar Is Nothing Then
+    
+    Set myAllowedChar = p.Alphanum
+      
+  ElseIf ipAllowedChar.HasNoItems Then
+    
+    Set myAllowedChar = p.Alphanum
+    
+  Else
+    
+    Set myAllowedChar = ipAllowedChar
+    
+  End If
+  
+  
+  Dim myChars As Lyst
+  Set myChars = Strs.ToCharLyst(ipString)
+  
+  Dim myIndex As Long
+  myIndex = myChars.LastIndex
+  Dim myChar As String
+  Dim myCarryFlag As Boolean
+  myCarryFlag = False
+  Do
+  
+    DoEvents
+    
+    If myIndex = 0 And myCarryFlag Then
+      
+      myChars.InsertAt myChars.FirstIndex, myAllowedChar.Item(myAllowedChar.FirstIndex + 1)
+      Inc = myChars.ToString
+      Exit Function
+      
+      
+    Else
+    
+        myChar = IncChar(myChars.Item(myIndex), myAllowedChar)
+    
+    
+    End If
+    
+    Select Case VBA.Len(myChar)
+      
+      Case 1
+      
+        If myChar <> myChars.Item(myIndex) Then
+          ' the character was incremented so replace in mychars
+          myChars.Item(myIndex) = myChar
+          Inc = myChars.ToString
+          Exit Function
+          
+          
+        Else
+          ' the character is the same so we can exit
+          ' but first check for carry status
+          
+          If myCarryFlag Then
+            
+            ' we had a rollover before finding a character we couldn't increment so we need to
+            ' insert the character of allowedchars.firstindex +1
+            
+            myChars.InsertAt myIndex + 1, myAllowedChar.Item(myAllowedChar.FirstIndex + 1)
+            Inc = myChars.ToString
+            Exit Function
+            
+            
+          End If
+          
+        End If
+      
+      
+      Case 2
+        ' if two chars are returned a rollover has occurred
+        myChars.Item(myIndex) = VBA.Left$(myChar, 1)
+        myIndex = myIndex - 1
+        myCarryFlag = True
+      
+    End Select
+    ' If VBA.Left$(myChar, 1) = myChars.Item(myIndex) Then
+    '   ' if the character is unchanged we can exit the loop
+    '   ' but if the carry flag is true we firt also need to
+    '   ' insert a character after location myindex
+      
+    '   'e.g. "\zzzz" would become "\10000"
+      
+    '   If myCarryFlag Then
+        
+    '     myChars.InsertAt myIndex + 1, myAllowedChar.Item(myAllowedChar.FirstIndex + 1)
+    '     Exit Do
+        
+    '   End If
+      
+    ' End If
+    
+    ' If VBA.Len(myChar) = 1 Then
+    '   ' if only one character is returned no rollover occured
+    '   ' so we can update mychars and exit the loop
+    '   myChars.Item(myIndex) = myChar
+    '   Exit Do
+      
+    ' End If
+    
+    ' 'A rollover occurred so we need to update mychars
+    ' ' and continue incrementing
+    
+    ' myChars.Item(myIndex) = VBA.Left$(myChar, 1)
+    ' myIndex = myIndex - 1
+    ' myCarryFlag = True
+    
+  Loop
+  
+  Inc = myChars.ToString
+  
+End Function
+
+
+Friend Function IncChar(ByVal ipChar As String, ByRef ipAllowedChars As ROC) As String
+  
+  IncChar = ipChar
+  If ipAllowedChars.LacksItem(ipChar) Then Exit Function
+    
+  Dim myCharIndex As Long
+  myCharIndex = ipAllowedChars.IndexOf(ipChar)
+  If myCharIndex = ipAllowedChars.LastIndex Then
+    
+    ' if the returned character string has two chars this indicated
+    ' that a rollover has occurred and only the first character needs to be
+    ' used for further processing
+    IncChar = ipAllowedChars.Item(ipAllowedChars.FirstIndex) & Char.twHash
+    
+  Else
+    
+    IncChar = ipAllowedChars.Item(myCharIndex + 1)
+    
+  End If
+    
 End Function

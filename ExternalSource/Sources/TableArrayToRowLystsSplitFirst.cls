@@ -22,7 +22,8 @@ Public Function Deb() As TableArrayToRowLystsSplitFirst
 End Function
 
 Public Function ExecAction(ByVal ipTablearray As Variant) As Lyst
-        
+      
+    If BailOut.When(Arrays.IsNotTableArray(ipTablearray), Msg.IsNotTableArray) Then Exit Function
     Dim myLystOfRankLysts As Lyst
     Set myLystOfRankLysts = TableArrayToRowLysts.ExecAction(ipTablearray)
         
@@ -32,20 +33,13 @@ Public Function ExecAction(ByVal ipTablearray As Variant) As Lyst
     Dim myRankLysts As Lyst
     Set myRankLysts = Lyst.Deb
         
-    Dim myItem As Variant
-    For Each myItem In myLystOfRankLysts
+    Dim myitem As Variant
+    For Each myitem In myLystOfRankLysts
             
         Dim myInnerLyst As Lyst
-        Set myInnerLyst = myItem
+        Set myInnerLyst = myitem
         myRankFirstItemsLyst.AddKnownItemsAsItems myInnerLyst.First
-            
-        Dim myExtent As Result
-        If Types.TryExtent(myInnerLyst, myExtent).NotOkay Then Exit Function
-                
-                
-        ' Dim myStartrun As Result
-        ' Set myStartrun = Ranges.TryStartRunFromAnyStartRunEnd(myInnerLyst, myStartrun, 1)  'trystartrunfromanystartrunend(myinnerlyst)
-        myRankLysts.AddKnownItemsAsItems myInnerLyst.GetRange(1, myInnerLyst.Count - 1)
+        myRankLysts.AddKnownItemsAsItems myInnerLyst.GetRange(2, ipEndIndex:=myInnerLyst.LastIndex)
             
     Next
         

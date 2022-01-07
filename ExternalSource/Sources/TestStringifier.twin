@@ -112,7 +112,7 @@ Module TestStringifier
             
             
             Dim myResult As String
-            'Stringifier.ResetArrayMarkup
+            Stringifier.ResetArrayMarkup
             'Act:
             myResult = Stringifier.StringifyIterable(Array(1, 2, 3))
             
@@ -134,7 +134,7 @@ Module TestStringifier
             
             'Arrange:
             Dim myExpected  As String
-            myExpected = "[1,2,3]"
+            myExpected = "1,2,3"
             
             
             Dim myResult As String

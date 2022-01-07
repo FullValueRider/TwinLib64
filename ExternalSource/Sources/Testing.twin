@@ -16,17 +16,15 @@ Module Testing
         ' Set assert = New AssertClass
         
         Debug.Print "Testing started"
-        TestRanges.RangeTests
-        TestStrings.Stringtests
         TestStringifier.StringifierTests
         TestFmt.FmtTests
-        
+        TestRanges.RangeTests
+        TestStrs.StrsTests
+        TestTypes.TypesTests
         TestArrays.ArraysTests
-    
         TestLyst.LystTests
 
-        TestTypes.TypesTests
-        'TestKvp.KvpTests
+        TestKvp.KvpTests
         
         Debug.Print "Testing completed"
         

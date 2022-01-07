@@ -7,10 +7,11 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = True
-'@Exposed
+
 Option Explicit
 '@Folder("Reducers")
+'@PredeclaredId
 '@Interface
+'@Exposed
 Public Function ExecRed(ByRef ipHostItems As Lyst) As Variant
 End Function
-

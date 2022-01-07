@@ -4,7 +4,7 @@ BEGIN
 END
 Attribute VB_Name = "Logger"
 Attribute VB_GlobalNameSpace = False
-Attribute VB_Creatable = False
+Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = True
 Option Explicit
@@ -22,7 +22,7 @@ End Type
 Private s                   As State
 
 Private Sub Class_Initialize()
-    Guard Id.InvalidNew, Types.IsNotSameInstance(Me, Logger), Location & "Class_Initialize"
+    BailOut Msg.InvalidNew, Types.IsNotSameInstance(Me, Logger), Location & "Class_Initialize"
 End Sub
 
 Public Sub Push(ParamArray ipArgs() As Variant)

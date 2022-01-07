@@ -2,7 +2,7 @@ VERSION 1.0 CLASS
 BEGIN
   MultiUse = -1  'True
 END
-Attribute VB_Name = "Enums"
+Attribute VB_Name = "enums"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
@@ -13,12 +13,18 @@ Option Explicit
 '@Folder("Enums")
 '@PredeclaredId
 '@exposed
+Private Sub Class_Initialize()
+End Sub
 
 ' Complex enumerations are enumerations embedded in a class
-Public Property Get Message() As enumMessages
-    Set Message = enumMessages
+Public Property Get Message() As eMessage
+    Set Message = eMessage
 End Property
 
-Public Property Get TableToLystActions() As EnumTableToLystActions
-    Set TableToLystActions = EnumTableToLystActions
+Public Property Get TableToLystActions() As eTableToLystActions
+    Set TableToLystActions = eTableToLystActions
 End Property
+
+' Public Property Get LookupConst() As eLookupConst
+'     Set LookupConst = eLookupConst
+' End Property

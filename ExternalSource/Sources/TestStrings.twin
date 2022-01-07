@@ -1,5 +1,5 @@
-Module TestStrings
-    'Attribute VB_Name = "TestStrings"
+Module TestStrs
+    'Attribute VB_Name = "TestStrs"
     Option Explicit
     'Option Private Module
     '@IgnoreModule
@@ -24,21 +24,21 @@ Module TestStrings
     ' End Sub
 
     ' '@TestInitialize
-    ' Private Sub TestInitialize()
+    ' Private Sub TInitialize()
     '     'This method runs before every test in the module..
     ' End Sub
 
     ' '@TestCleanup
-    ' Private Sub TestCleanup()
+    ' Private Sub TCleanup()
     '     'this method runs after every test in the module.
     ' End Sub
     '@TestMethod("Primitive")
 
-    Public Sub Stringtests()
+    Public Sub StrsTests()
 
-        Debug.Print "Testing ", CurrentComponentName vbTab, vbTab,
-        Test01_Dedup
-        Test02_TrimmerDefault
+        Debug.Print "Testing ", CurrentProcedureName vbTab, vbTab, vbTab,
+        T01_Dedup
+        T02_TrimmerDefault
         T03_TryStringExtentvbNullstring
         T04_TryStringExtentEmptyString
         T05_TryStringExtentHelloWOrld
@@ -47,7 +47,8 @@ Module TestStrings
         
     End Sub
     
-    Private Sub Test01_Dedup()
+    '@TestMethod("Dedup")
+    Private Sub T01_Dedup()
             On Error GoTo TestFail
             
             'Arrange:
@@ -72,7 +73,8 @@ Module TestStrings
             
     End Sub
 
-    Private Sub Test02_TrimmerDefault()
+    '@TestMethod("TrimmerDefault")
+    Private Sub T02_TrimmerDefault()
             On Error GoTo TestFail
             
             'Arrange:
@@ -97,6 +99,7 @@ Module TestStrings
             
     End Sub
 
+    
     '@TestMethod("GetStringExtent")
     Public Sub T03_TryStringExtentvbNullstring()
 
@@ -109,12 +112,12 @@ Module TestStrings
         myItem = vbNullString
         
         Dim myResult As Result
-        Dim myResultstatus As Boolean
-        myResultstatus = Types.TryExtent(myItem, myResult)
         
-        Assert.Strict.AreEqual myExpectedStatus, myResultstatus, CurrentProcedureName
+        Set myResult = Strs.TryExtent(myItem)
         
-        Assert.Strict.AreEqual myExpectedStatus, myResultstatus, CurrentProcedureName
+        Assert.Strict.AreEqual myExpectedStatus, Globals.Res.Status, CurrentProcedureName
+        
+        Assert.Strict.AreEqual myExpectedStatus, myResult.Status, CurrentProcedureName
         
     TestExit:
         Exit Sub
@@ -137,8 +140,8 @@ Module TestStrings
         
         Dim myResult As Result
         Dim myResultstatus As Boolean
-        myResultstatus = Types.TryExtent(myItem, myResult)
-        
+        myResultstatus = Types.TryExtent(myItem)
+        Assert.Strict.AreEqual myExpectedStatus, Globals.Res.Status, CurrentProcedureName
         Assert.Strict.AreEqual myExpectedStatus, myResultstatus, CurrentProcedureName
         
     TestExit:
@@ -165,10 +168,10 @@ Module TestStrings
         myItem = "Hello World"
         
         Dim myResult As Result
-        Dim myResultstatus As Boolean
-        myResultstatus = Types.TryExtent(myItem, myResult)
+       
+        Set myResult = Strs.TryExtent(myItem)
         
-        Assert.Strict.AreEqual myExpectedStatus, myResultstatus, CurrentProcedureName
+        Assert.Strict.AreEqual myExpectedStatus, myResult.Status, CurrentProcedureName
         Assert.Strict.SequenceEquals myExpectedItems, myResult.Items.ToArray, CurrentProcedureName
         
     TestExit:

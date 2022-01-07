@@ -12,19 +12,6 @@ Option Explicit
 '@Exposed
 '@Folder("VBALib")
 
-Private Type ReadOnly                            ' Pseudo constants
-
-    Location                        As String
-        
-
-End Type
-
-'@Ignore MoveFieldCloserToUsage
-Private r                           As ReadOnly
-
-Private Sub Class_Initialize()
-    r.Location = "VBALib.Ranges."
-End Sub
 
 Public Function GetSeries(ByVal ipStart As Variant, ByVal ipCount As Long, Optional ByVal ipStep As Variant = 1) As Lyst
 
@@ -34,13 +21,15 @@ Public Function GetSeries(ByVal ipStart As Variant, ByVal ipCount As Long, Optio
         
     If Types.Group.IsNotNumber(ipStart, ipCount, ipStep) Then Exit Function
         
-    Dim myItem As Variant
-    For myItem = 1 To ipCount
+    Dim myitem As Variant
+    For myitem = 1 To ipCount
         
-        myLyst.Host.add ipStart
+        myLyst.Host.Add ipStart
         ipStart = ipStart + ipStep
             
     Next
+    
+    Set GetSeries = myLyst
         
 End Function
 
@@ -50,25 +39,26 @@ Public Function GetConstSeries(ByVal ipCount As Long, ByVal ipValue As Variant) 
     Set myLyst = Lyst.Deb
     Set GetConstSeries = myLyst
         
-    Dim myItem As Long
-    For myItem = 1 To ipCount
+    Dim myitem As Long
+    For myitem = 1 To ipCount
         
-        myLyst.Host.add ipValue
+        myLyst.Host.Add ipValue
             
     Next
         
 End Function
 
-'@Description("Takes an iterable or string and returns a Result (see Result.fields.StartRun). The Input StartIndex and EndIndex  use a 1 based index and may be negative.")
+'@Description("Takes any iterable or string. The startindex and endindex should be specified using a 1 based index. The result.items lyst returns the startindex based on the actual indexing used by the iterable")
 Friend Function TryStartRunFromAnyStartRunEnd _
-       ( _
-       ByVal ipItem As Variant, _
-       Optional ByRef iopResult As Result, _
-       Optional ByVal ipStartIndex As Variant, _
-       Optional ByVal ipRun As Variant, _
-       Optional ByVal ipEndIndex As Variant, _
-       Optional ByVal ipRank As Long = 1 _
-       ) As Result
+( _
+    ByVal ipItem As Variant, _
+    Optional ByVal ipStartIndex As Variant, _
+    Optional ByVal ipRun As Variant, _
+    Optional ByVal ipEndIndex As Variant, _
+    Optional ByVal ipRank As Long = Constant.ArrayFirstRank _
+) As Result
+Attribute TryStartRunFromAnyStartRunEnd.VB_Description = "Takes any iterable or string. The startindex and endindex should be specified using a 1 based index. The result.items lyst returns the startindex based on the actual indexing used by the iterable"
+' Optional ByRef iopResult As Result, _
 Attribute TryStartRunFromAnyStartRunEnd.VB_Description = "Takes an iterable or string and returns a Result (see Result.fields.StartRun). The Input StartIndex and EndIndex  use a 1 based index and may be negative."
     ' Item must be an iterable or a string
     ' If ipRun is provided, any value for ipEndIndex is ignored
@@ -76,7 +66,7 @@ Attribute TryStartRunFromAnyStartRunEnd.VB_Description = "Takes an iterable or s
     ' The method attempts to return valid start and run values so may
     ' coerce input values to do so
     ' Where coercion is used a message retuned about the coercion applied
-    ' Only the most recent coercion message is returned.
+    ' Only the mfirst coercion message is returned.
     '
     ' To emulate other programming languages, values
     ' for the start, end or run can be negative to indicate counting down from a high to low index.
@@ -87,82 +77,49 @@ Attribute TryStartRunFromAnyStartRunEnd.VB_Description = "Takes an iterable or s
     ' and proceeeds to a value of '-.count'
     ' The output startindex is givem in terms of the indexing of the input iterable
         
+    ' input parameters are stated in terms of virtual item with 1 based indexing
+    ' the return is the actual indexes to use.
+    
+ 
+    Set TryStartRunFromAnyStartRunEnd = Globals.Res.SetOkay
         
-    If iopResult Is Nothing Then
-            
-        Set iopResult = Result.Deb
-            
-            
-    Else
-            
-        iopResult.SetNotOkay
-            
-            
-    End If
+    ' If Types.Group.IsNotIterable(ipItem) Then
+    '     ' we want to allow strings because they **do** have an extent
+    '     If BailOut.When(Types.IsNotString(ipItem), Msg.IsNotIterable) Then Exit Function
+    ' End If
         
-    Set TryStartRunFromAnyStartRunEnd = iopResult
+    ' If Types.IsNotArray(ipItem) Then
+    '     If BailOut.When(ipRank > 1, Msg.ItemDoesNotSupportRanks) Then Exit Function
+    ' End If
         
-    If Types.Group.IsNotIterable(ipItem) Then
-            
-        ' we want to allow strings
-        If Types.IsNotString(ipItem) Then
-                
-            iopResult.MessageEnum = Enums.Message.AsEnum(Id.IsNotIterable)
-            Exit Function
-            
-                
-        End If
-            
-    End If
+    If Types.TryExtent(ipItem, ipRank).IsNotOkay Then Exit Function
         
-    If Types.IsNotArray(ipItem) Then
-        
-        If ipRank > 1 Then
-            
-            iopResult.MessageEnum = Enums.Message.AsEnum(Id.ObjectDoesNotSupportRanks)
-            Exit Function
-                
-                
-        End If
-        
-    End If
-        
-    If Types.TryExtent(ipItem, iopResult, ipRank).NotOkay Then Exit Function
-        
-    ' Preserve the first index for later use
-    Dim myFirstIndex As Long
-    myFirstIndex = iopResult.Item(ResultItemsEnums.ItemExtent(ieFirstIndex))
+    ' Preserve the extent for later use
+    Dim myItemExtent As ResultExtent
+    Set myItemExtent = Globals.Res.GetResultExtent
         
     ' Guard against invalid conditions
     ' Guard against a run of zero
         
     If Types.IsNotMissing(ipRun) Then
-            
-        If ipRun = 0 Then
-                
-            iopResult.MessageEnum = Enums.Message.AsEnum(Id.RunLengthIsZero)
-            Exit Function
-                
-                
-        End If
-            
+        If BailOut.When(ipRun = 0, Msg.RunLengthIsZero) Then Exit Function
     End If
         
     ' Ensure a legal start index
     If Types.IsNotMissing(ipStartIndex) Then
             
-        If VBA.Abs(ipStartIndex) > iopResult.Item(ResultItemsEnums.ItemExtent(ieCount)) Then
-                
-            iopResult.SetNotOkay
-            iopResult.MessageEnum = Enums.Message.AsEnum(Id.StartIndexExceedsItemCount)
-            Set TryStartRunFromAnyStartRunEnd = iopResult
-            Exit Function
+        If BailOut.When _
+        ( _
+            VBA.Abs(ipStartIndex) > myItemExtent.Count, _
+            Msg.StartIndexExceedsItemCount _
+        ) _
+        Then Exit Function
                 
             
-        ElseIf ipStartIndex = 0 Then
+        If ipStartIndex = 0 Then
                 
             ipStartIndex = 1
-            iopResult.MessageEnum = Enums.Message.AsEnum(Id.StartIndexWasZeroResetToOne)
+            Globals.Res.SetOkay (Msg.StartIndexWasZeroResetToOne)
                 
             
         End If
@@ -172,16 +129,16 @@ Attribute TryStartRunFromAnyStartRunEnd.VB_Description = "Takes an iterable or s
     ' Ensure a legal end index
     If Types.IsNotMissing(ipEndIndex) Then
             
-        If VBA.Abs(ipEndIndex) > iopResult.Item(ResultItemsEnums.ItemExtent(ieCount)) Then
+        If VBA.Abs(ipEndIndex) > myItemExtent.Count Then
                 
-            ipEndIndex = iopResult.Item(ResultItemsEnums.ItemExtent(ieCount)) * VBA.Sgn(ipEndIndex)
-            iopResult.MessageEnum = Enums.Message.AsEnum(Id.EndIndexExceedsItemCount)
+            ipEndIndex = myItemExtent.Count * VBA.Sgn(ipEndIndex)
+            Globals.Res.MsgEnum = enums.Message.AsEnum(Msg.EndIndexExceedsItemCount)
                 
                 
         ElseIf ipEndIndex = 0 Then
                 
             ipEndIndex = 1
-            iopResult.MessageEnum = Enums.Message.AsEnum(Id.EndIndexWasZeroResetToOne)
+            Globals.Res.MsgEnum = enums.Message.AsEnum(Msg.EndIndexWasZeroResetToOne)
             
 
         End If
@@ -196,62 +153,62 @@ Attribute TryStartRunFromAnyStartRunEnd.VB_Description = "Takes an iterable or s
             
     Case Types.IsNotMissing(ipStartIndex, ipRun)
             
-        Set iopResult.Items = GetStartRunFromAnyStartRun(ipStartIndex, ipRun, iopResult)
+        DeduceStartRunFromAnyStartRun ipStartIndex, ipRun, myItemExtent
                 
             
     Case Types.IsNotMissing(ipStartIndex, ipEndIndex)
             
-        Set iopResult.Items = GetStartRunFromAnyStartEnd(ipStartIndex, ipEndIndex, iopResult)
+        DeduceStartRunFromAnyStartEnd ipStartIndex, ipEndIndex, myItemExtent
                 
             
     Case Types.IsNotMissing(ipStartIndex)
             
-        Set iopResult.Items = GetStartRunFromAnyStartOnly(ipStartIndex, iopResult)
+        DeduceStartRunFromAnyStartOnly ipStartIndex, myItemExtent
                 
             
     Case Types.IsNotMissing(ipRun)
             
-        Set iopResult.Items = GetStartRunFromAnyRunOnly(ipRun, iopResult)
+        DeduceStartRunFromAnyRunOnly ipRun, myItemExtent
                 
             
-    Case Types.IsNotMissing(ipEndIndex)
+    Case Types.IsNotMissing(ipEndIndex, myItemExtent)
             
-        Set iopResult.Items = GetStartRunFromAnyEndOnly(ipEndIndex, iopResult)
+        DeduceStartRunFromAnyEndOnly ipEndIndex, myItemExtent
                 
             
-    Case Types.IsMissing(ipStartIndex, ipRun, ipEndIndex)
+    Case Types.IsMissing(ipStartIndex, ipRun, ipEndIndex, myItemExtent)
             
-        Set iopResult.Items = GetStartRunFromNoStartRunOrEnd(iopResult)
+        DeduceStartRunFromNoStartRunOrEnd myItemExtent
                 
                 
     End Select
         
-    iopResult.Item(ResultItemsEnums.StartRun(srStartIndex)) = iopResult.Item(ResultItemsEnums.StartRun(srStartIndex)) + myFirstIndex - 1
-    'iopresult.setokay    
+    'iopResult.Item(ResultItemsEnums.StartRun(srStartIndex)) = iopResult.Item(ResultItemsEnums.StartRun(srStartIndex)) + myFirstIndex - 1
+    Set TryStartRunFromAnyStartRunEnd = Globals.Res
+    
 End Function
 
-Friend Function GetStartRunFromAnyStartRun _
-       ( _
-       ByVal ipStartIndex As Long, _
-       ByVal ipRun As Long, _
-       Optional ByRef iopResult As Result _
-       ) As ArrayList
+Friend Sub DeduceStartRunFromAnyStartRun _
+( _
+    ByVal ipStartIndex As Long, _
+    ByVal ipRun As Long, _
+    ByRef ipItemExtent As ResultExtent _
+)
         
     Dim myStartIndex As Long
     Dim myRun As Long
     If ipStartIndex > 0 And ipRun > 0 Then
             
-        If ipStartIndex + ipRun - 1 <= iopResult.Item(ResultItemsEnums.ItemExtent(ieCount)) Then
+        If ipStartIndex + ipRun - 1 <= ipItemExtent.Count Then
                 
             myRun = ipRun
-            myStartIndex = ipStartIndex
-                
-                
+            myStartIndex = ipStartIndex + ipItemExtent.FirstIndex - 1
+                                
         Else
                 
-            myRun = iopResult.Item(ResultItemsEnums.ItemExtent(ieCount)) - ipStartIndex + 1
+            myRun = ipItemExtent.Count - ipStartIndex + 1
             myStartIndex = ipStartIndex
-            iopResult.MessageEnum = Enums.Message.AsEnum(Id.RunLengthTooLong)
+            Globals.Res.MsgEnum = enums.Message.AsEnum(Msg.RunLengthTooLong)
                 
                 
         End If
@@ -260,45 +217,45 @@ Friend Function GetStartRunFromAnyStartRun _
             
         If ipStartIndex + ipRun + 1 > 0 Then
                 
-            myStartIndex = ipStartIndex + ipRun + 1
+            myStartIndex = ipItemExtent.FirstIndex
             myRun = VBA.Abs(ipRun)
                 
         Else
                 
             myStartIndex = 1
             myRun = ipStartIndex
-            iopResult.MessageEnum = Enums.Message.AsEnum(Id.RunLengthTooLong)
+            Globals.Res.MsgEnum = enums.Message.AsEnum(Msg.RunLengthTooLong)
                 
         End If
             
             
     ElseIf ipStartIndex < 0 And ipRun > 0 Then
             
-        myStartIndex = iopResult.Item(ResultItemsEnums.ItemExtent(ieCount)) + ipStartIndex + 1
-        If myStartIndex + ipRun - 1 <= iopResult.Item(ResultItemsEnums.ItemExtent(ieCount)) Then
+        myStartIndex = ipItemExtent.LastIndex + ipStartIndex + 1
+        If myStartIndex + ipRun - 1 <= ipItemExtent.Count Then
                 
             myRun = ipRun
                 
         Else
                 
-            myRun = iopResult.Item(ResultItemsEnums.ItemExtent(ieCount)) - myStartIndex + 1
-            iopResult.MessageEnum = Enums.Message.AsEnum(Id.RunLengthTooLong)
+            myRun = ipItemExtent.Count - myStartIndex + 1
+            Globals.Res.MsgEnum = enums.Message.AsEnum(Msg.RunLengthTooLong)
                 
                 
         End If
             
     Else                                         ' ipstartindex <0 and ipRun <0 then
             
-        myStartIndex = iopResult.Item(ResultItemsEnums.ItemExtent(ieCount)) + ipStartIndex + 1
-        If myStartIndex + ipRun + 1 > 0 Then
+        myStartIndex = ipItemExtent.LastIndex + ipStartIndex + 1
+        If myStartIndex + Abs(ipRun) + 1 > 0 Then
                 
             myStartIndex = myStartIndex + ipRun + 1
-            myRun = Abs(ipRun)
+            myRun = VBA.Abs(ipRun)
                 
         Else
                 
             myStartIndex = 1
-            myRun = iopResult.Item(ResultItemsEnums.ItemExtent(ieCount)) - myStartIndex + 1
+            myRun = ipItemExtent.Count - myStartIndex + 1
                 
         End If
             
@@ -307,23 +264,23 @@ Friend Function GetStartRunFromAnyStartRun _
         
     ' ' Adjust startindex to align witth the true first index
     ' myStartIndex = myStartIndex - 1 + iopResult.Item(ResultItemsEnums.ItemExtent(IsFirstIndex))
-    Set GetStartRunFromAnyStartRun = Types.Iterable.ToArrayList(myStartIndex, myRun)
+     Globals.Res.Init(Msg.Okay).SetItems myStartIndex, myRun
         
-End Function
+End Sub
 
-Friend Function GetStartRunFromAnyStartEnd _
-       ( _
-       ByVal ipStartIndex As Long, _
-       ByVal ipEndIndex As Long, _
-       Optional ByRef iopResult As Result _
-       ) As ArrayList
+Friend Sub DeduceStartRunFromAnyStartEnd _
+( _
+    ByVal ipStartIndex As Long, _
+    ByVal ipEndIndex As Long, _
+    ByRef ipItemExtent As ResultExtent _
+)
             
     Dim myStartIndex As Long
     Dim myEndIndex As Long
     Dim myRun As Long
             
-    myStartIndex = IIf(ipStartIndex > 0, ipStartIndex, iopResult.Item(ResultItemsEnums.ItemExtent(ieCount)) + ipStartIndex + 1)
-    myEndIndex = IIf(ipEndIndex > 0, ipEndIndex, iopResult.Item(ResultItemsEnums.ItemExtent(ieCount)) + ipEndIndex + 1)
+    myStartIndex = IIf(ipStartIndex > 0, ipStartIndex + ipItemExtent.FirstIndex - 1, ipItemExtent.LastIndex + ipStartIndex + 1)
+    myEndIndex = IIf(ipEndIndex > 0, ipEndIndex + ipItemExtent.FirstIndex - 1, ipItemExtent.LastIndex + ipEndIndex + 1)
             
     If myStartIndex < myEndIndex Then
                 
@@ -338,161 +295,153 @@ Friend Function GetStartRunFromAnyStartEnd _
             
     ' ' Adjust startindex to align witth the true first index
     ' myStartIndex = myStartIndex - 1 + iopResult.Item(ResultItemsEnums.ItemExtent(IsFirstIndex))
-    Set GetStartRunFromAnyStartEnd = Types.Iterable.ToArrayList(myStartIndex, myRun)
+    Globals.Res.Init(Msg.Okay).SetItems myStartIndex, myRun
             
-End Function
+End Sub
 
-Friend Function GetStartRunFromAnyStartOnly _
-       ( _
-       ByVal ipStartIndex As Long, _
-       Optional ByRef iopResult As Result _
-       ) As ArrayList
+Friend Sub DeduceStartRunFromAnyStartOnly _
+( _
+    ByVal ipStartIndex As Long, _
+    ByRef ipItemExtent As ResultExtent _
+)
 
     Dim myStartIndex As Long
     Dim myRun  As Long
     If ipStartIndex > 0 Then
             
-        myStartIndex = ipStartIndex
-        myRun = iopResult.Item(ResultItemsEnums.ItemExtent(ieCount)) - ipStartIndex + 1
+        myStartIndex = ipItemExtent.FirstIndex + ipStartIndex - 1
+        myRun = ipItemExtent.Count - ipStartIndex + 1
             
     Else
         
-        myStartIndex = iopResult.Item(ResultItemsEnums.ItemExtent(ieCount)) + ipStartIndex + 1
+        myStartIndex = ipItemExtent.LastIndex + ipStartIndex + 1
         myRun = VBA.Abs(ipStartIndex)
             
     End If
 
     ' ' Adjust startindex to align witth the true first index
     ' myStartIndex = myStartIndex - 1 + iopResult.Item(ResultItemsEnums.ItemExtent(IsFirstIndex))
-    Set GetStartRunFromAnyStartOnly = Types.Iterable.ToArrayList(myStartIndex, myRun)
+    Globals.Res.Init(Msg.Okay).SetItems myStartIndex, myRun
 
-End Function
+End Sub
 
-Friend Function GetStartRunFromAnyRunOnly(ByVal ipRun As Long, ByRef iopResult As Result) As ArrayList
-        
+Friend Sub DeduceStartRunFromAnyRunOnly(ByVal ipRun As Long, ByRef ipItemExtent As ResultExtent)
+            
     Dim myStartIndex As Long
     Dim myRun As Long
-    If VBA.Abs(ipRun) > iopResult.Item(ResultItemsEnums.ItemExtent(ieCount)) Then
-            
-        myRun = iopResult.Item(ResultItemsEnums.ItemExtent(ieCount))
-        myStartIndex = 1
-
-            
+    
+    If ipRun > 0 Then
+      
+      myStartIndex = ipItemExtent.FirstIndex
+      myRun = ipRun
+      
+      
     Else
             
-        If ipRun < 0 Then
-                
-            myStartIndex = iopResult.Item(ResultItemsEnums.ItemExtent(ieCount)) + ipRun + 1
-            myRun = VBA.Abs(ipRun)
-                
-                
-        Else
-                
-            myStartIndex = 1
-            myRun = ipRun
-                
-                
-        End If
+      myStartIndex = ipItemExtent.LastIndex + ipRun + 1
+      myRun = VBA.Abs(ipRun)
+            
             
     End If
         
     ' ' Adjust startindex to align witth the true first index
     ' myStartIndex = myStartIndex - 1 + iopResult.Item(ResultItemsEnums.ItemExtent(IsFirstIndex))
-    Set GetStartRunFromAnyRunOnly = Types.Iterable.ToArrayList(myStartIndex, myRun)
+    Globals.Res.Init(Msg.Okay).SetItems myStartIndex, myRun
         
-End Function
+End Sub
 
-Friend Function GetStartRunFromAnyEndOnly(ByVal ipEndIndex As Long, ByRef iopResult As Result) As ArrayList
+Friend Sub DeduceStartRunFromAnyEndOnly(ByVal ipEndIndex As Long, ByRef ipItemExtent As ResultExtent)
         
-    'Dim myStartIndex As Long
+    Dim myStartIndex As Long
     Dim myRun As Long
-        
-    'myStartIndex = iopResult.Item(ResultItemsEnums.ItemExtent(IsFirstIndex))
             
-    If ipEndIndex < 0 Then
+    If ipEndIndex > 0 Then
         
-            
-        myRun = iopResult.Item(ResultItemsEnums.ItemExtent(ieCount)) + ipEndIndex + 1
+      myStartIndex = ipItemExtent.FirstIndex
+      myRun = ipEndIndex
+        
             
     Else
-            
-        myRun = ipEndIndex
+      
+      myStartIndex = ipItemExtent.FirstIndex
+      myRun = ipItemExtent.Count + ipEndIndex + 1
             
             
     End If
         
     ' Adjust startindex to align witth the true first index
         
-    Set GetStartRunFromAnyEndOnly = Types.Iterable.ToArrayList(1, myRun)
+    Globals.Res.Init(Msg.Okay).SetItems myStartIndex, myRun
         
-End Function
+End Sub
 
-Friend Function GetStartRunFromNoStartRunOrEnd(ByRef iopExtent As Result) As ArrayList
+Friend Sub DeduceStartRunFromNoStartRunOrEnd(ByRef ipItemExtent As ResultExtent)
         
-    ' Dim myStartIndex As Long
-    ' myStartIndex = iopExtent.Item(ResultItemsEnums.ItemExtent(IsFirstIndex))
+    ' Dim myFirstIndex As Long
+    ' myFirstIndex = ipItemExtent.FirstIndex
         
-    Dim myRun As Long
-    myRun = iopExtent.Item(ResultItemsEnums.ItemExtent(ieCount))
+    ' Dim myRun As Long
+    ' myRun = iopExtent.Item(ResultItemsEnums.ItemExtent(ieCount))
         
     ' Adjust startindex to align witth the true first index
     'myStartIndex = myStartIndex - 1 + iopResult.Item(ResultItemsEnums.ItemExtent(IsFirstIndex))
-    Set GetStartRunFromNoStartRunOrEnd = Types.Iterable.ToArrayList(1, myRun)
+    Globals.Res.SetOkay.SetItems ipItemExtent.FirstIndex, ipItemExtent.Count
 
-End Function
+End Sub
 
 '@Description("Returns the specified subrange in Item(0) of the result")
 Public Function TryRange _
-       ( _
-       ByVal ipIterable As Variant, _
-       ByRef iopResult As Result, _
-       Optional ByVal ipStartIndex As Variant, _
-       Optional ByVal ipRun As Variant, _
-       Optional ByVal ipEndIndex As Variant, _
-       Optional ByVal ipRank As Variant = 1 _
-       ) As Result
+( _
+    ByVal ipIterable As Variant, _
+    Optional ByVal ipStartIndex As Variant, _
+    Optional ByVal ipRun As Variant, _
+    Optional ByVal ipEndIndex As Variant, _
+    Optional ByVal ipRank As Long = Constant.ArrayFirstRank _
+) As Result
+Attribute TryRange.VB_Description = "Returns the specified subrange in Item(0) of the result"
+       'ByRef iopResult As Result, _
 Attribute TryRange.VB_Description = "Returns the specified subrange in Item(0) of the result"
         
-    If iopResult Is Nothing Then Set iopResult = Result.Deb
-       
-    If Types.Iterable.TryExtent(ipIterable, iopResult, ipRank).NotOkay Then
-        
-        Set TryRange = iopResult
-        Exit Function
+    'If iopResult Is Nothing Then Set iopResult = Result.Deb
+    Globals.Res.SetOkay
+    Set TryRange = Globals.Res
     
-        
-    End If
-        
-    ' Preserve the original first index to use later when converting back from start run values
-    Dim myOriginalStartIndex As Long
-    myOriginalStartIndex = iopResult.Item(ResultItemsEnums.ItemExtent(ieFirstIndex))
-        
-    If Ranges.TryStartRunFromAnyStartRunEnd(ipIterable, iopResult, ipStartIndex, ipRun, ipEndIndex, ipRank).NotOkay Then
-        
-        Set TryRange = iopResult
-        Exit Function
+    ' If Types.Iterable.TryExtent(ipIterable, ipRank).IsNotOkay Then Exit Function
         
         
-    End If
+    ' ' Preserve the original first index to use later when converting back from start run values
+    ' Dim myItemExtent As ResultExtent
+    ' Set myItemExtent = Globals.Res.GetResultExtent
         
+    If Ranges.TryStartRunFromAnyStartRunEnd(ipIterable, ipStartIndex, ipRun, ipEndIndex, ipRank).IsNotOkay Then Exit Function
+ 
+        
+    'get startrun
+    Dim myRangeStartRun As ResultStartRun
+    Set myRangeStartRun = Globals.Res.GetResultStartRun
+    
     ' Convert the virtual start run into actual start end
-    Dim myStartIndex As Long
-    myStartIndex = iopResult.Item(ResultItemsEnums.StartRun(srStartIndex)) + myOriginalStartIndex
+    ' Dim myStartIndex As Long
+    ' myStartIndex = myStartRun.StartIndex + myItemExtent.FirstIndex
         
-    Dim myEndIndex As Long
-    myEndIndex = myStartIndex + iopResult.Item(ResultItemsEnums.StartRun(srRunLength)) + myOriginalStartIndex - 1
+    ' Dim myEndIndex As Long
+    ' myEndIndex = myStartIndex + myStartRun.Run + myItemExtent.FirstIndex - 1
         
         
-    Dim myList As Lyst = Lyst.Deb
-    iopResult.Items.Clear
+'    Dim myList As Lyst
+'    Set myList = Lyst.Deb
+   Dim myAL As ArrayList
+   Set myAL = New ArrayList
+   
+   
     Dim myIndex As Long
-    For myIndex = myStartIndex To myEndIndex
-            
-        iopResult.Items.add ipIterable(myIndex)
+    For myIndex = myRangeStartRun.StartIndex To myRangeStartRun.StartIndex + myRangeStartRun.Run - 1
+          
+       myAL.Add ipIterable(myIndex)
             
     Next
-        
-    iopResult.SetOkay
-    Set TryRange = iopResult
+    
+    Set Globals.Res.Items = myAL
+    Set TryRange = Globals.Res.SetOkay
     
 End Function

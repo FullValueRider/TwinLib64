@@ -18,50 +18,67 @@ Option Explicit
 
 Implements IAutoKey
 
+Private Type ReadOnly
+  
+  DefaultFirstUseIndex                      As Long
+  
+End Type
+
+Private r                                   As ReadOnly
+
 Private Type Properties
 
-    FirstIndex                              As Long
+    FirstUseIndex                           As Long
     CurrentIndex                            As Variant
     KeysList                                As Lyst
-    FirstKeyType                            As String
+    FirstUseKeyType                         As String
+    Result                                  As Result
         
 End Type
 
 Private p                                   As Properties
 
-Public Function Deb(Optional ByVal ipKeys As Variant, Optional ByVal ipFirstIndex As Long = 0) As AutoKeyByIndex
+Private Sub Class_Initialise()
+  'If Me Is AutoKeyByIndex Then Exit Sub
+  r.DefaultFirstUseIndex = 1
+End Sub
 
+Public Function Deb(Optional ByRef ipKeys As Lyst, Optional ByVal ipFirstuseIndex As Long = 0) As AutoKeyByIndex
+        
     With New AutoKeyByIndex
         
-        Set Deb = .ReadyToUseInstance(ipKeys, ipFirstIndex)
+        Set Deb = .ReadyToUseInstance(ipKeys, ipFirstuseIndex)
             
     End With
         
 End Function
 
-Public Function ReadyToUseInstance(ByVal ipKeys As Variant, ByVal ipFirstIndex As Long) As AutoKeyByIndex
-
-    Set ReadyToUseInstance = Me
+Public Function ReadyToUseInstance(ByVal ipKeys As Lyst, ByVal ipFirstuseIndex As Long) As AutoKeyByIndex
+  
+    Set p.Result = Globals.Res.SetNotOkay
+    Set ReadyToUseInstance = Nothing
+    'If BailOut.When(Types.Group.IsNotIterable(ipKeys), Msg.InvalidType) Then Exit Function
+    If BailOut.When(ipKeys Is Nothing, Msg.HasNoItems) Then Exit Function
+    'If BailOut.When(ipKeys.HasNoItems, Msg.HasNoItems) Then Exit Function
         
-    If ipFirstIndex < 0 Then
-                
-        Err.Raise _
-        17 + vbObjectError, _
-           TypeName(Me) & ": ReadyToUseInstance", _
-           Fmt.Txt("The Keys Index cannot be less than 0: Found is '{0}'", ipFirstIndex)
-                
-        Exit Function
+    Set p.KeysList = ipKeys
+    
+    If BailOut.When(ipFirstuseIndex > p.KeysList.LastIndex) Then Exit Function
+    If ipFirstuseIndex = 0 Then
+        
+        p.FirstUseIndex = p.KeysList.FirstIndex
+        
+    Else
+        p.FirstUseIndex = ipFirstuseIndex
         
     End If
         
-    p.FirstIndex = ipFirstIndex
     p.CurrentIndex = Empty
-        
-    If Types.Iterable.HasNoItems(ipKeys) Then Exit Function
-        
-    Set p.KeysList = Types.Iterable.ToLyst(ipKeys)
-    p.FirstKeyType = TypeName(p.KeysList.Item(ipFirstIndex))
-        
+    p.FirstUseKeyType = TypeName(p.KeysList.Item(p.FirstUseIndex))
+    'Debug.Print "Assigned first firstuseindex", p.FirstUseIndex, p.CurrentIndex
+    Globals.Res.SetOkay
+    Set ReadyToUseInstance = Me
+    
 End Function
 
 '========1=========2=========3=========4=========5=========6=========7=========8=========9=========A=========B=========C
@@ -69,12 +86,12 @@ End Function
 ' Interface
 '
 '========1=========2=========3=========4=========5=========6=========7=========8=========9=========A=========B=========C
-Private Property Get IAutoKey_FirstKey() As Variant
-    IAutoKey_FirstKey = FirstKey
+Private Property Get IAutoKey_FirstUseKey() As Variant
+    IAutoKey_FirstUseKey = FirstUseKey
 End Property
 
-Private Property Let IAutoKey_FirstKey(ByVal ipValue As Variant)
-    FirstKey = ipValue
+Private Property Let IAutoKey_FirstUseKey(ByVal ipValue As Variant)
+  FirstUseKey = ipValue
 End Property
 
 Private Property Get IAutoKey_CurrentKey() As Variant
@@ -97,12 +114,16 @@ Private Function IAutoKey_Name() As String
     IAutoKey_Name = Name
 End Function
 
-Private Property Get IAutoKey_FirstKeyType() As String
-    IAutoKey_FirstKeyType = p.FirstKeyType
+Private Property Get IAutoKey_FirstUseKeyType() As String
+    IAutoKey_FirstUseKeyType = p.FirstUseKeyType
 End Property
 
 Private Function IAutoKey_GetKeySequence(ByVal ipCount As Long) As Lyst
     Set IAutoKey_GetKeySequence = GetKeySequence(ipCount)
+End Function
+
+Private Function IAutoKey_Res() As Result
+  Set IAutoKey_Res = Res
 End Function
 
 '========1=========2=========3=========4=========5=========6=========7=========8=========9=========A=========B=========C
@@ -110,15 +131,42 @@ End Function
 ' class public members
 '
 '========1=========2=========3=========4=========5=========6=========7=========8=========9=========A=========B=========C
-Public Property Get FirstKey() As Variant
-    FirstKey = p.KeysList.Item(p.FirstIndex)
+'FirstUseKey is an Interface method but in reality
+'should be an 'Long' index, not an actual key
+'@Description("For AutokeyByIndex Returns the Index of the first used key")
+Public Property Get FirstUseKey() As Variant
+Attribute FirstUseKey.VB_Description = "For AutokeyByIndex Returns the Index of the first used key"
+    FirstUseKey = p.FirstUseIndex
+End Property
+'@Description("For AutoKeyByIndex ipvalue is the first key to use, not the index of the first key")
+Public Property Let FirstUseKey(ByVal ipValue As Variant)
+Attribute FirstUseKey.VB_Description = "For AutoKeyByIndex ipvalue is the first key to use, not the index of the first key"
+  
+  'Debug.Print TypeName(ipValue), TypeName(p.KeysList.Item(p.FirstUseIndex))
+  'Debug.Print "Resetting firstuseindex to ", ipValue, p.CurrentIndex
+  
+  
+  If Types.IsSameType(p.KeysList.Item(p.FirstUseIndex), ipValue) Then
+    
+    p.FirstUseIndex = p.KeysList.IndexOf(ipValue)
+    
+    
+  Else
+    
+    p.FirstUseIndex = p.KeysList.FirstIndex
+    
+    
+  End If
+
+  p.FirstUseKeyType = VBA.TypeName(p.KeysList.Item(p.FirstUseIndex))
+  'Debug.Print "Reset firstuseindex to ", ipValue, p.CurrentIndex
 End Property
 
-Public Property Let FirstKey(ByVal ipValue As Variant)
-    p.FirstIndex = p.KeysList.IndexOf(ipValue)
-End Property
 
 Public Property Get CurrentKey() As Variant
+    If VBA.IsEmpty(p.CurrentIndex) Then
+        p.CurrentIndex = p.FirstUseIndex
+    End If
     CurrentKey = p.KeysList.Item(p.CurrentIndex)
 End Property
 
@@ -129,7 +177,7 @@ End Property
 Public Function Clone() As IAutoKey
 
     Dim myAutoKey As AutoKeyByIndex
-    Set myAutoKey = Me.Deb(p.KeysList.ToArray, p.FirstIndex)
+    Set myAutoKey = Me.Deb(p.KeysList.ToArray, p.FirstUseIndex)
         
     myAutoKey.CurrentKey = p.KeysList.Item(p.CurrentIndex)
     'myAutoKey.FirstUse = p.FirstUse
@@ -142,7 +190,7 @@ Public Property Get GetNextKey() As Variant
 
     If VBA.IsEmpty(p.CurrentIndex) Then
         
-        p.CurrentIndex = p.FirstIndex
+        p.CurrentIndex = p.FirstUseIndex
             
     Else
         
@@ -158,35 +206,40 @@ Public Function Name() As String
     Name = VBA.TypeName(Me)
 End Function
 
-Public Property Get FirstKeyType() As String
-    FirstKeyType = p.FirstKeyType
+Public Property Get FirstUseKeyType() As String
+    FirstUseKeyType = p.FirstUseKeyType
 End Property
 
-Public Function SetKeysList(ByVal ipKeysList As Lyst) As AutoKeyByIndex
+' the list must be set by deb so the code below makes no sense
+' Public Function SetKeysList(ByVal ipKeysList As Lyst) As AutoKeyByIndex
         
-    Set p.KeysList = ipKeysList
-    p.FirstKeyType = TypeName(p.KeysList.Item(0))
-    Set SetKeysList = Me
+'     Set p.KeysList = ipKeysList
+'     p.FirstUseKeyType = TypeName(p.KeysList.Item(1))
+'     Set SetKeysList = Me
         
-End Function
+' End Function
 
-Public Function SetFirstIndex(Optional ByVal ipFirstIndex As Long = 0) As AutoKeyByIndex
+' Public Function SetFirstUseIndex(Optional ByVal ipFirstuseIndex As Long = 1) As AutoKeyByIndex
         
-    If ipFirstIndex < 0 Then
-            
-        Err.Raise _
-        17 + vbObjectError, _
-           TypeName(Me) & ": ReadyToUseInstance", _
-           Fmt.Txt("The Keys Index cannot be less than 0: Found is '{0}'", ipFirstIndex)
-            
-        Exit Function
-            
-    End If
+'     If ipFirstuseIndex < p.KeysList.FirstIndex Then
+      
+'       p.FirstUseIndex = p.KeysList.FirstIndex
+      
+'     ElseIf p.FirstUseIndex > p.KeysList.LastIndex Then
+      
+'       p.FirstUseIndex = p.KeysList.LastIndex
+      
+'     Else
+      
+'       p.FirstUseIndex = ipFirstuseIndex
+      
+'     End If
+    
+'     p.FirstUseKeyType = VBA.TypeName(p.KeysList.Item(p.FirstUseIndex))
+    
+'     Set SetFirstUseIndex = Me
         
-    p.FirstIndex = ipFirstIndex
-    Set SetFirstIndex = Me
-        
-End Function
+' End Function
 
 Public Function GetKeySequence(ByVal ipCount As Long) As Lyst
         
@@ -207,6 +260,17 @@ Public Function GetKeySequence(ByVal ipCount As Long) As Lyst
         
 End Function
 
+Public Function Res() As Result
+  Set Res = p.Result
+End Function
+
+' Public Function SetKeysList(ByVal ipKeys As Lyst) As AutoKeyByIndex
+    
+'     Set p.KeysList = ipKeys
+'     Set p.firstusekey = ipkeys.index.p.
+'     Set SetKeysList = Me
+' End Function
+
 '========1=========2=========3=========4=========5=========6=========7=========8=========9=========A=========B=========C
 '
 ' class private members
@@ -214,16 +278,18 @@ End Function
 '========1=========2=========3=========4=========5=========6=========7=========8=========9=========A=========B=========C
 Private Function Inc(ByVal ipKeyIndex As Long) As Long
 
-    If ipKeyIndex >= p.KeysList.Count - 1 Then
+    If ipKeyIndex = p.KeysList.LastIndex Then
         
-        Inc = 0
+        p.CurrentIndex = p.KeysList.FirstIndex
+        
         
     Else
         
-        Inc = p.CurrentIndex + 1
+        p.CurrentIndex = p.CurrentIndex + 1
+        
             
     End If
+    
+    Inc = p.CurrentIndex
 
 End Function
-
-

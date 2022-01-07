@@ -2,7 +2,7 @@ VERSION 1.0 CLASS
 BEGIN
   MultiUse = -1  'True
 END
-Attribute VB_Name = "enumMessages"
+Attribute VB_Name = "eMessage"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
@@ -14,7 +14,7 @@ Option Explicit
 '@Folder("Enums")
 
 
-Public Enum Id
+Public Enum Msg
         
     NotOkay = -1
     Okay = 0
@@ -139,27 +139,38 @@ Public Enum Id
     ' UnableToCreateEmbeddedobject = 31032
     ' ErrorSavingToFile = 31036
     ' ErrorLoadingFromFile = 31037
+    
+    
     'ToDo: Reorganise the enum below to be more coherent
-    Unspecified = CustomErrors.Base
+   TwinLib64Errors = vbobjecterror + 1024
         
 
     'TypeIssues
-    InvalidMethod
-    'NoCountMethod
-    IsNotAListArray
+    IsNotSameType
     IsNotNumber
     IsNotString
-    NotSameType
+    IsNotArray
+    HasNoItems
+    
+    'NoCountMethod
+    
+    
+    
+    
 
     Keys
     Items
+    
+    
     'Class issues
+    InvalidMethod
     UsePredeclaredIdInstance
     InvalidNew
     UseNewInstance
 
     InvalidInstanceCreation
     DisallowedOverwrite
+    
 
     DoubleInitialisation
     NullReference
@@ -169,29 +180,41 @@ Public Enum Id
     InvalidKey
 
     ' Iterable issues
-    ' NotIterableType
     IsNotIterable
     DoesNotIterateByIndex
     InvalidType
     IterableHasNoItems
-    IndexTooLow
-    IndexTooHigh
+    IndexBeforeFirstIndex
+    IndexAfterLastIndex
+    IterableObjectCountIsNotValid
+    NotSameSize
         
     'Array Issues
-    'ArrayNotInitialised
-    ArrayNotInitialised
-    IsNotArray
-    NotTableArray
+    ParamArrayIsEmpty
+    ArrayHasNoItems
+    ArrayLacksRank
+    HasNoRanks
+    IsNotTableArray
+    IsNotListArray
     InvalidArrayMarkup
     InvalidArray
-    InvalidRank
-    ObjectDoesNotSupportRanks
+    RankLessThanArrayFirstRank
+    ItemDoesNotSupportRanks
     UnexpectedItemInParamArray
         
         
     'Parameter issues
     UnexpectedEmpty
+    MissingParameter
     StringIsEmpty
+    ZeroIsInvalidParameter
+    IterableIsEmpty
+    'Result messages
+    ResultOkayInputSelectorIsInvalid
+    
+    'General messages
+    notequal
+    Unspecified
 
     StartIndexWasZeroResetToOne
     StartIndexExceedsItemCount
@@ -200,7 +223,7 @@ Public Enum Id
     RunLengthTooLong
     IndexWillOverrun
     DestinationTooSmall
-    KeyNotFound
+    
     InvalidInsertCountZero
     RunLengthIsZero
 
@@ -208,8 +231,15 @@ Public Enum Id
 
     'Enumeration issues
     ActionNotExecutable
-    NotEnumerationMember
+    msgLacksMember
     DisAllowedEnumerationMember
+    
+    'KvpIsssues
+    AutoKeyIsNotValid
+    KvpSecondParamterIsNotValid
+    KeyNotFound
+    IncrementIsNotValid
+    DecrementIsNotValid
 End Enum
 
 Private Type State
@@ -221,19 +251,19 @@ End Type
 
 Private s                   As State
 
-Private Type ReadOnly
-        
-    Location                As String
-        
-        
-End Type
-
-Private r                  As ReadOnly
+'Private Type ReadOnly
+'
+'    Location                As String
+'
+'
+'End Type
+'
+'Private r                  As ReadOnly
 
 Private Sub Class_Initialise()
         
-    r.Location = "VBALib.Enums."
-    Guard InvalidNew, Types.IsSameInstance(Me, enumMessages), r.Location & "Class_Initialize"
+    'r.Location = "VBALib.Enums."
+    If BailOut.When(Me Is eMessage) Then Exit Sub
     SetupDictionaries
         
 End Sub
@@ -722,38 +752,62 @@ Private Sub SetupDictionaries()
         ' .Add _
         '     ErrorLoadingFromFile, _
         '    "Error loading from file"
-
-        .Add Unspecified, "An unspecified error has occurred"
-        .Add NotSameType, "The types do not match '{0}','{1}"
-        .Add InvalidMethod, "Object '{0}' does not have a '{1}' method"
-        '.Add NoCountMethod, "Object '{0}' has no Count method"
+        
+        '.Add Unspecified, "An unspecified error has occurred"
+        
+        'Type Messages
+        .Add IsNotSameType, "The types do not match '{0}','{1}"
         .Add IsNotNumber, "Expected a number"
         .Add IsNotString, "Expected a string"
+        .Add IsNotArray, "Expecting an array: Found '{0}'"
+        
+        'Class Messages
+        .Add InvalidMethod, "Object '{0}' does not have a '{1}' method"
+        '.Add NoCountMethod, "Object '{0}' has no Count method"
+        
+        
         .Add UnexpectedEmpty, "Unexpected Empty in '{0}'"
+        .Add MissingParameter, "An expected parameter is missing"
         .Add DisallowedOverwrite, "The current instance of '{0}' cannot be overridden by a new instance"
 
-        .Add ArrayNotInitialised, "Uninitialised array '{0}'"
-        .Add IsNotArray, "Expecting an array: Found '{0}'"
+        'Array Messages
+        .Add ParamArrayIsEmpty, "The paramter array was empty"
+        .Add ArrayHasNoItems, "Uninitialised array '{0}'"
+        .Add ArrayLacksRank, "Array does not have Rank {0}"
+        .Add HasNoRanks, "Item has no Ranks"
+        ' Iterables Messages
+        .Add IsNotIterable, "Type '{0}' is not Iterable"
+        .Add DoesNotIterateByIndex, "Type '{0}' does not iterate by Index"
+        .Add IterableHasNoItems, "The iterable {0} does not contain any items"
+        .Add NotSameSize, "The two iterables are not the same size {0}, {1}"
         '.Add InvalidDimensions, "Not a '{0}' dimensional array"
         '.Add NotSingleDimension, "Item '{0}' is not a single dimension array"
-        .Add InvalidRank, "Type '{0}' does not have a rank of '{0}'"
-        .Add ObjectDoesNotSupportRanks, "Object does not support ranks '{0}'"
+        .Add RankLessThanArrayFirstRank, "Type '{0}' does not have a rank of '{0}'"
+        .Add ItemDoesNotSupportRanks, "Object does not support ranks '{0}'"
         .Add Keys, vbNullString
         .Add Items, vbNullString
-        '.Add ArrayNotInitialised, "Array is not initialised"
-
+       .Add IterableObjectCountIsNotValid, "Iterable does not have a valid count"
+        ' AutoKey Messages
         .Add AutoKeyResetNotAllowed, "Second attempty at initialising Autokey"
-
+        .Add AutoKeyIsNotValid, "The provided autokey is not known {0}"
+        
+        ' Dictionary Messages
         .Add InvalidKey, "The specified key Type '{0}' does not mast the Host Kvp Key Type '{1}'"
 
         '.Add NotIterableType, "Type '{0}' is not iterable"
-        .Add IsNotIterable, "Type '{0}' is not Iterable"
-        .Add DoesNotIterateByIndex, "Type '{0}' does not iterate by Index"
+        
+        'Range  Messages
+        
+        
+        .Add RunLengthIsZero, "Invalid Run of 0"
+        .Add DestinationTooSmall, "Cannot copy {0} items to array of {1}"
+        
+        'Fmt, Stringifier messages
         .Add InvalidArrayMarkup, "The Array Markup was invalid"
-        .Add IterableHasNoItems, "The iterable {0} does not contain any items"
+        
         .Add InvalidType, "Type error: expecting {0} found '{1} in '{2}''"
         .Add InvalidArray, "Invalid Array, incorrect number of ranks"
-        .Add RunLengthIsZero, "Invalid Run of 0"
+        
         .Add StartIndexWasZeroResetToOne, "The start index was zero.  Reset to one"
         .Add StartIndexExceedsItemCount, "The start index was more than the last index"
         .Add EndIndexWasZeroResetToOne, "The end index was zero.  Reset to one"
@@ -762,9 +816,9 @@ Private Sub SetupDictionaries()
         '.Add IndexWillOverrun, "Index will exceed size"
         .Add KeyNotFound, "Key of '{0}' was not found"
         .Add InvalidInsertCountZero, "Cannot insert if count is zero"
-        .Add IndexTooLow, "Index less than FirstIndex"
-        .Add IndexTooHigh, "Index morethans LastIndex"
-        .Add DestinationTooSmall, "Cannot copy {0} items to array of {1}"
+        .Add IndexBeforeFirstIndex, "Index less than FirstIndex"
+        .Add IndexAfterLastIndex, "Index morethans LastIndex"
+        
         .Add UsePredeclaredIdInstance, "Method should be invoked from the default/predeclared instance of this class."
         .Add UseNewInstance, "Method should be invoked from a new instance of this class."
         .Add InvalidNew, "New should no be used for with this predecalredIs '{0}'"
@@ -775,9 +829,26 @@ Private Sub SetupDictionaries()
         .Add StringIsEmpty, "String cannot be empty."
 
         .Add ActionNotExecutable, "The enumeration action is not an executable object"
-        .Add NotEnumerationMember, "Not a member of Enumeration '{0}'"
+        .Add msgLacksMember, "Not a member of Enumeration '{0}'"
         .Add DisAllowedEnumerationMember, "Method does not allow enummeration member at index {0}"
         .Add UnexpectedItemInParamArray, "Don't know how to parse Type '{0}'"
+        
+        '
+        
+        ' Parameter messages
+        .Add ZeroIsInvalidParameter, "A value of zero is not valid"
+        .Add IterableIsEmpty, "The parameter array is empty"
+        'Result messages
+        
+        .Add ResultOkayInputSelectorIsInvalid, "The value for the input type for Results.SetOkay is not valid"
+        'kvp issues
+        
+        .Add KvpSecondParamterIsNotValid, "The second parameter could not be used to construct a Kvp"
+        
+        'General Messages
+        .Add notequal, "Not equal"
+        .Add Unspecified, "The type of error was not specified"
+        
     End With
         
 End Sub
@@ -794,14 +865,14 @@ Public Function Actions() As Variant
     Actions = s.Actions.Items
 End Function
 
-Public Function Ord(ByVal ipEnum As Id) As Long
+Public Function Ord(ByVal ipEnum As Msg) As Long
         
-    Dim myItem As Variant
+    Dim myitem As Variant
     Dim myOrd As Long
     myOrd = 1
-    For Each myItem In s.Strings.Keys
+    For Each myitem In s.Strings.Keys
             
-        If myItem = ipEnum Then
+        If myitem = ipEnum Then
                 
             Ord = myOrd
             Exit Function
@@ -816,19 +887,28 @@ Public Function Ord(ByVal ipEnum As Id) As Long
         
 End Function
 
-Public Property Get AsEnum(ByVal ipEnum As Id) As Id
+Public Property Get AsEnum(ByVal ipEnum As Msg) As Msg
     AsEnum = ipEnum
 End Property
 
-Public Property Get ToString(ByVal ipEnum As Id) As String
-    Guard Id.NotEnumerationMember, Enums.Message.IsMember(ipEnum), r.Location & "ToString", Array(r.Location)
-    ToString = s.Strings.Item(ipEnum)
+Public Property Get ToString(ByVal ipEnum As Msg) As String
+    If enums.Message.HoldsMember(ipEnum) Then
+        ToString = s.Strings.Item(ipEnum)
+    Else
+        ToString = vbNullString
+    End If
 End Property
 
-Public Property Get IsMember(ByVal ipValue As Long) As Boolean
+
+Public Function HoldsMember(ByVal ipEnum As Msg) As Boolean
     If s.Strings Is Nothing Then SetupDictionaries
-    IsMember = s.Strings.Exists(ipValue)
-End Property
+    HoldsMember = s.Strings.Exists(ipEnum)
+End Function
+
+Public Function LacksMember(ByVal ipEnum As Msg) As Boolean
+    LacksMember = Not HoldsMember(ipEnum)
+End Function
+
 
 Public Property Get Name() As String
     Name = TypeName(Me)

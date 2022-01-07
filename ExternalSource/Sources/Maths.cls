@@ -13,7 +13,7 @@ Option Explicit
 '@Exposed
 
 Public Function Pi() As Double
-    Pi = 4 * Atn(1)
+    Pi = 4 * VBA.Atn(1)
 End Function
 
 Public Function Tau() As Double
@@ -45,7 +45,7 @@ Public Function ATan2(ByVal ipY As Double, ByVal ipX As Double) As Double
             
     Else
         
-        myTheta = Atn(ipY / ipX)
+        myTheta = VBA.Atn(ipY / ipX)
     
         If (ipX < 0) Then
             
@@ -167,4 +167,27 @@ Public Function IsPrime(ByVal ipNumber As LongLong) As Boolean
     End If
         
 End Function
+'@Description("Ln. Log to base e to provide a more distictive function than of VBA which used Log for log to base e")
+Public Function Ln(ByVal ipX As Double) As Double
+Attribute Ln.VB_Description = "Ln. Log to base e to provide a more distictive function than of VBA which used Log for log to base e"
+  Ln = VBA.Log(ipX)
+End Function
 
+'@Description("Log to base 10.  nb native VBA uses Log to give Log to base e.  See Maths.Ln")
+Public Function Log(ByVal ipX As Double) As Double
+Attribute Log.VB_Description = "Log to base 10.  nb native VBA uses Log to give Log to base e.  See Maths.Ln"
+    Log = Log(ipX) / Log(10#)
+End Function
+
+Public Function SumOfInt(ByVal ipLast As LongLong, Optional ByVal ipfirst As LongLong = 1) As LongLong
+  SumOfInt = ipLast * (ipfirst + ipLast) / 2
+End Function
+
+
+Public Function Max(ByVal ipItem1 As Variant, ByVal ipItem2 As Variant) As Variant
+    Max = IIf(ipItem1 > ipItem2, ipItem1, ipItem2)
+End Function
+
+Public Function Min(ByVal ipItem1 As Variant, ByVal ipItem2 As Variant) As Variant
+    Min = IIf(ipItem1 < ipItem2, ipItem1, ipItem2)
+End Function

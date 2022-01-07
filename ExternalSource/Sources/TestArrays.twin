@@ -1,6 +1,6 @@
 Module TestArrays
-    'Attribute VB_Name = "TestArrays"
     Option Explicit
+    'Attribute VB_Name = "TestArrays"
     'Option Public Module
     ''@IgnoreModule
     '@TestModule
@@ -671,7 +671,7 @@ Module TestArrays
             
             'Arrange:
             Dim myExpected As Long
-            myExpected = 0
+            myExpected = -1
             
             Dim myArray() As Long
             Dim myResult As Long
@@ -738,16 +738,13 @@ Module TestArrays
             Dim myArray() As Long
             'Dim myResult As Boolean
             Dim myResult As Result
-        
-            
-            Dim myResultState As Boolean
             
             
             'Act:
-            myResultState = Arrays.TryExtent(myArray, myResult, 1)
+            Set myResult = Arrays.TryExtent(myArray, 1)
             
             'Assert:
-            Assert.Strict.AreEqual myExpectedStatus, myResultState, "Status"
+            Assert.Strict.AreEqual myExpectedStatus, myResult.Status, "Status"
             'Assert.Strict.AreEqual myExpectedValue, myResult.item(TryLboundResult), "Value"
             
             
@@ -782,16 +779,16 @@ Module TestArrays
             'Dim myResult As Boolean
             Dim myResult As Result
             
-            Dim myResultState As Boolean
+           
             
             
             'Act:
-            myResultState = Arrays.TryExtent(myArray, myResult, 2)
+            Set myResult = Arrays.TryExtent(myArray, 2)
             
             'Assert:
-            Assert.Strict.AreEqual myExpectedStatus, myResultState, "Status"
-            Assert.Strict.AreEqual myExpectedFirstIndex, myResult.Item(ieFirstIndex), "FirstIndex"
-            Assert.Strict.AreEqual myExpectedLastIndex, myResult.Item(ieLastIndex), "LastIndex"
+            Assert.Strict.AreEqual myExpectedStatus, myResult.Status, "Status"
+            Assert.Strict.AreEqual myExpectedFirstIndex, myResult.Item(ResultItemsEnums.ItemExtent(ieFirstIndex)), "FirstIndex"
+            Assert.Strict.AreEqual myExpectedLastIndex, myResult.Item(ResultItemsEnums.ItemExtent(ieLastIndex)), "LastIndex"
             
     TestExit:
             Exit Sub
@@ -875,7 +872,7 @@ Module TestArrays
             'Assert:
             
             Dim myIndex As Long
-            For myIndex = 0 To 4
+            For myIndex = 1 To 5
             
                 Assert.Strict.SequenceEquals myExpectedLyst.Item(myIndex).ToArray, myResult.Item(myIndex).ToArray, CurrentProcedureName
             Next
@@ -919,7 +916,7 @@ Module TestArrays
             'Assert:
         
             Dim myIndex As Long
-            For myIndex = 0 To 3
+            For myIndex = 1 To 4
                 Assert.Strict.SequenceEquals myExpectedLyst.Item(myIndex).ToArray, myResult.Item(myIndex).ToArray, CurrentProcedureName
             Next
             
@@ -978,10 +975,10 @@ Module TestArrays
             Assert.Strict.SequenceEquals myFirstValues.ToArray, myResult.First.ToArray, CurrentProcedureName
         
             Dim myIndex As Long
-            For myIndex = 0 To 4
+            For myIndex = 1 To 5
                 ' Dim myE As
                 ' myE = myRankValues.Item(myIndex).toarray
-                Assert.Strict.SequenceEquals myExpectedLyst.Item(1).Item(myIndex).ToArray, myResult.Item(1).Item(myIndex).ToArray, CurrentProcedureName
+                Assert.Strict.SequenceEquals myExpectedLyst.Item(2).Item(myIndex).ToArray, myResult.Item(2).Item(myIndex).ToArray, CurrentProcedureName
             Next
             
     TestExit:
@@ -1045,8 +1042,8 @@ Module TestArrays
             
             Assert.Strict.SequenceEquals myFirstValues.ToArray, myResult.First.ToArray, CurrentProcedureName
             Dim myIndex As Long
-            For myIndex = 0 To 3
-                Assert.Strict.SequenceEquals myRankValues.Item(myIndex).ToArray, myResult.Item(1).Item(myIndex).ToArray, CurrentProcedureName
+            For myIndex = 1 To 4
+                Assert.Strict.SequenceEquals myRankValues.Item(myIndex).ToArray, myResult.Item(2).Item(myIndex).ToArray, CurrentProcedureName
             Next
             
     TestExit:
@@ -1104,8 +1101,8 @@ Module TestArrays
             'Assert:
             Assert.Strict.SequenceEquals myFirstValues, myResult.First.ToArray, CurrentProcedureName
             Dim myIndex As Long
-            For myIndex = 0 To 4
-                Assert.Strict.SequenceEquals myRankValues.Item(myIndex).ToArray, myResult.Item(1).Item(myIndex).ToArray, CurrentProcedureName
+            For myIndex = 1 To 5
+                Assert.Strict.SequenceEquals myRankValues.Item(myIndex).ToArray, myResult.Item(2).Item(myIndex).ToArray, CurrentProcedureName
             Next
             
     TestExit:
@@ -1164,8 +1161,8 @@ Module TestArrays
             'Assert:
             Assert.Strict.SequenceEquals myFirstValues, myResult.First.ToArray, CurrentProcedureName
             Dim myIndex As Long
-            For myIndex = 0 To 3
-                Assert.Strict.SequenceEquals myRankValues.Item(myIndex).ToArray, myResult.Item(1).Item(myIndex).ToArray, CurrentProcedureName
+            For myIndex = 1 To 4
+                Assert.Strict.SequenceEquals myRankValues.Item(myIndex).ToArray, myResult.Item(2).Item(myIndex).ToArray, CurrentProcedureName
             Next
             
     TestExit:

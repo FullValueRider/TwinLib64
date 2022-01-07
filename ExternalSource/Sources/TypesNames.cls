@@ -146,14 +146,18 @@ Public Property Get OfArrayMarkup() As String
 End Property
 
 Public Property Get OfAutoKeyByNumber() As String
-    OfAutoKeyByNumber = "AutoKeybyNumber"
+    OfAutoKeyByNumber = "AutoKeyByNumber"
 End Property
 
 Public Property Get OfAutoKeybyString() As String
     OfAutoKeybyString = "AutoKeyByString"
 End Property
 
-Public Property Get OfAutoKeyByArray() As String
-    OfAutoKeyByArray = "AotoKeyByArray"
+Public Property Get OfAutoKeyByIndex() As String
+    OfAutoKeyByIndex = "AutoKeyByIndex"
+End Property
+
+Public Property Get OfRoc() As String
+  OfRoc = "ROC"
 End Property
 

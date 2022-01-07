@@ -23,7 +23,7 @@ End Function
 
 Public Function ExecAction(ByVal ipTablearray As Variant) As Lyst
         
-    Guard NotTableArray, Arrays.IsNotTableArray(ipTablearray), "VBALib.TableArrayToColumnLysts.ExecAction", TypeName(Me)
+    If BailOut.When(Arrays.IsNotTableArray(ipTablearray), Msg.IsNotTableArray) Then Exit Function
         
     Dim myFirstRow As Long
     myFirstRow = LBound(ipTablearray, 1)

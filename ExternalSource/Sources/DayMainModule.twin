@@ -1,0 +1,13 @@
+﻿Module twMainModule
+
+    Public Const AoC2021Data As string = "C:\Users\slayc\source\repos\AoC2021\RawData\"
+    
+    Public Sub Main()
+        
+      Dim myDay As Object
+      Set myDay = Day07
+      myDay.Execute
+      
+    End Sub
+	
+End Module

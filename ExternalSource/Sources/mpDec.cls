@@ -42,7 +42,7 @@ End Function
 '@Description("Adds the value in ipArgsArray(0) to each item in the Lyst.  If the host item is not a number the string NAN is returned")
 Private Function IMapper_ExecMapper(ByVal ipHostItem As Variant) As Variant
 Attribute IMapper_ExecMapper.VB_Description = "Adds the value in ipArgsArray(0) to each item in the Lyst.  If the host item is not a number the string NAN is returned"
-    Set IMapper_ExecMapper = ExecMapper(ipHostItem)
+    IMapper_ExecMapper = ExecMapper(ipHostItem)
 End Function
 
 Public Function ExecMapper(ByVal ipHostItem As Variant) As Variant
@@ -54,7 +54,7 @@ Public Function ExecMapper(ByVal ipHostItem As Variant) As Variant
             
     Else
             
-        ExecMapper = ipHostItem + s.Decrement
+        ExecMapper = ipHostItem - s.Decrement
             
             
     End If

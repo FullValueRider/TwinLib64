@@ -18,58 +18,56 @@ Option Explicit
 
 Implements IAutoKey
 
-Private Type Properties
-
-    FirstKey                As Variant
-    CurrentKey              As Variant
-    '    FirstUse                As Boolean
-    FirstKeyType            As String
+Private Type ReadOnly
+  
+  DefaultKey                                  As Long
+  
 End Type
 
-Private p                   As Properties
+Private Type Properties
+
+    FirstUseKey                               As Variant
+    CurrentKey                                As Variant
+    FirstUseKeyType                           As String
+    
+    
+End Type
+
+Private p                                     As Properties
 
 '========1=========2=========3=========4=========5=========6=========7=========8=========9=========A=========B=========C
 '
 ' class admin
 '
 '========1=========2=========3=========4=========5=========6=========7=========8=========9=========A=========B=========C
-Public Function Deb(Optional ByVal ipFirstKey As Variant) As AutoKeyByNumber
 
+
+Public Function Deb(Optional ByVal ipFirstUseKey As Variant = 0&) As AutoKeyByNumber
+    ' Variant is used to allow any number type to be used as a Key
     With New AutoKeyByNumber
             
-        Set Deb = .ReadyToUseInstance(IIf(VBA.IsMissing(ipFirstKey), 0, ipFirstKey))
+        Set Deb = .ReadyToUseInstance(ipFirstUseKey)
 
     End With
         
 End Function
 
-Public Function ReadyToUseInstance(ByVal ipFirstKey As Variant) As AutoKeyByNumber
-
-        
-    If Types.IsObject(ipFirstKey) Then
-        
-        Err.Raise _
-        17 + vbObjectError, _
-           TypeName(Me) & ": ReadyToUseInstance", _
-           Fmt.Txt("The input variable Type must be one of {nl2}{0}'", VBA.Join(Types.Group.Numbers.ToArray, Char.twComma)) 'TypesAid.ShortNumberTypes)
-                
-    End If
-        
-    If Types.Group.IsNotNumber(ipFirstKey) Then
-        
-        ' Autokey wasn't a VBANumericType so that's a whooopsy
-        Err.Raise _
-        17 + vbObjectError, _
-           TypeName(Me) & ": ReadyToUseInstance", _
-           "Unexpected type (not a type defined by Types.SimpleNumberTypes) "
-                
-    End If
-        
-    p.FirstKey = ipFirstKey
-    p.CurrentKey = Empty
-    'p.FirstUse = p.FirstKey = 0
-    p.FirstKeyType = TypeName(p.FirstKey)
-    Set ReadyToUseInstance = Me
+Public Function ReadyToUseInstance(ByVal ipFirstUseKey As Variant) As AutoKeyByNumber
+  
+  'Set Globals.Res = Result.Deb.SetOkay
+      
+  If Types.Group.IsNotNumber(ipFirstUseKey) Then
+      
+     Globals.Res.SetNotOkay Msg.InvalidType
+     Exit Function
+              
+  End If
+      
+  p.FirstUseKey = ipFirstUseKey
+  p.CurrentKey = Empty
+  'p.FirstUse = p.FirstKey = 0
+  p.FirstUseKeyType = TypeName(p.FirstUseKey)
+  Set ReadyToUseInstance = Me
         
 End Function
 
@@ -78,12 +76,12 @@ End Function
 ' Interface
 '
 '========1=========2=========3=========4=========5=========6=========7=========8=========9=========A=========B=========C
-Private Property Get IAutoKey_FirstKey() As Variant
-    IAutoKey_FirstKey = FirstKey
+Private Property Get IAutoKey_FirstUseKey() As Variant
+    IAutoKey_FirstUseKey = FirstUseKey
 End Property
 
-Private Property Let IAutoKey_FirstKey(ByVal ipValue As Variant)
-    FirstKey = ipValue
+Private Property Let IAutoKey_FirstUseKey(ByVal ipValue As Variant)
+    FirstUseKey = ipValue
 End Property
 
 Private Property Get IAutoKey_CurrentKey() As Variant
@@ -94,8 +92,8 @@ Private Property Let IAutoKey_CurrentKey(ByVal ipValue As Variant)
     CurrentKey = ipValue
 End Property
 
-Public Property Get IAutoKey_FirstKeyType() As String
-    IAutoKey_FirstKeyType = p.FirstKeyType
+Public Property Get IAutoKey_FirstUseKeyType() As String
+    IAutoKey_FirstUseKeyType = p.FirstUseKeyType
 End Property
 
 Private Function IAutoKey_Clone() As IAutoKey
@@ -114,18 +112,22 @@ Private Function IAutoKey_GetKeySequence(ByVal ipCount As Long) As Lyst
     Set IAutoKey_GetKeySequence = GetKeySequence(ipCount)
 End Function
 
+Private Function IAutoKey_Res() As Result
+    Set IAutoKey_Res = Res
+End Function
+
 '========1=========2=========3=========4=========5=========6=========7=========8=========9=========A=========B=========C
 '
 ' class body
 '
 '========1=========2=========3=========4=========5=========6=========7=========8=========9=========A=========B=========C
 
-Public Property Get FirstKey() As Variant
-    FirstKey = p.FirstKey
+Public Property Get FirstUseKey() As Variant
+    FirstUseKey = p.FirstUseKey
 End Property
 
-Public Property Let FirstKey(ByVal ipValue As Variant)
-    p.FirstKey = ipValue
+Public Property Let FirstUseKey(ByVal ipValue As Variant)
+    p.FirstUseKey = ipValue
 End Property
 
 Public Property Get CurrentKey() As Variant
@@ -150,7 +152,7 @@ Public Function Clone() As IAutoKey
     ' this will already exist in the Host ordered Dictionary
 
     Dim myAutoKey As AutoKeyByNumber
-    Set myAutoKey = Me.Deb(p.FirstKey)
+    Set myAutoKey = Me.Deb(p.FirstUseKey)
         
     myAutoKey.CurrentKey = p.CurrentKey
     'myAutoKey.FirstUse = p.FirstUse
@@ -167,7 +169,7 @@ Public Property Get GetNextKey() As Variant
 
     If VBA.IsEmpty(p.CurrentKey) Then
         
-        p.CurrentKey = p.FirstKey
+        p.CurrentKey = p.FirstUseKey
             
     Else
         
@@ -183,8 +185,8 @@ Public Function Name() As String
     Name = TypeName(Me)
 End Function
 
-Public Property Get FirstKeyType() As String
-    FirstKeyType = p.FirstKeyType
+Public Property Get FirstUseKeyType() As String
+    FirstUseKeyType = p.FirstUseKeyType
 End Property
 
 Public Function GetKeySequence(ByVal ipCount As Long) As Lyst
@@ -204,6 +206,10 @@ Public Function GetKeySequence(ByVal ipCount As Long) As Lyst
         
     Set GetKeySequence = myList
         
+End Function
+
+Public Function Res() As Result
+  Set Res = Globals.Res
 End Function
 
 '========1=========2=========3=========4=========5=========6=========7=========8=========9=========A=========B=========C

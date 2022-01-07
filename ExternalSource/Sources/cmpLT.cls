@@ -17,7 +17,7 @@ Implements IComparer
 Private Type State
 
     Item                        As Variant
-    Index                       As variant
+    Index                       As Variant
     
 End Type
 
@@ -29,6 +29,7 @@ End Function
 
 Public Function ExecCmp(ByRef ipHostItem As Variant) As Boolean
         
+    '@Ignore IsMissingWithNonArgumentParameter
     If VBA.IsMissing(s.Index) Then
         
         ExecCmp = ipHostItem < s.Item
@@ -37,6 +38,7 @@ Public Function ExecCmp(ByRef ipHostItem As Variant) As Boolean
   
         If Types.IsString(ipHostItem) Then
             
+            '@Ignore UntypedFunctionUsage
             ExecCmp = VBA.Mid(ipHostItem, s.Index, 1) < s.Item
             
         ElseIf Types.Group.IsIterableByIndex(ipHostItem) Then
@@ -73,3 +75,14 @@ Friend Function ReadyToUseInstance(ByVal ipItem As Variant, ByVal ipIndex As Var
     
 End Function
     
+Public Property Get Name() As String
+  Name = TypeName(Me)
+End Property
+
+Private Function IComparer_Item() As Variant
+  IComparer_Item = Item
+End Function
+
+Public Function Item() As Variant
+  Item = s.Item
+End Function

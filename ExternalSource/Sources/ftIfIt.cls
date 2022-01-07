@@ -41,6 +41,7 @@ End Function
 
 '@Description("Adds the value in ipArgsArray(0) to each item in the Lyst.  If the host item is not a number the string NAN is returned")
 Private Function IFilter_ExecFilter(ByRef ipHostItems As Lyst) As Lyst
+Attribute IFilter_ExecFilter.VB_Description = "Adds the value in ipArgsArray(0) to each item in the Lyst.  If the host item is not a number the string NAN is returned"
 
     Set IFilter_ExecFilter = ExecRed(ipHostItems)
 End Function
@@ -50,10 +51,10 @@ Public Function ExecRed(ByVal ipHostItems As Lyst) As Lyst
     Dim myLyst As Lyst
     Set myLyst = Lyst.Deb
         
-   Dim myItem As Variant
-   For Each myItem In ipHostItems
+   Dim myitem As Variant
+   For Each myitem In ipHostItems
    
-        If s.Comparer.ExecCmp(myItem) Then myLyst.Add myItem
+        If s.Comparer.ExecCmp(myitem) Then myLyst.Add myitem
    
    Next
    

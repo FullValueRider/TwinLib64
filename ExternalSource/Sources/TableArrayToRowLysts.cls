@@ -26,7 +26,7 @@ End Function
 
 Public Function ExecAction(ByVal ipTablearray As Variant) As Lyst
         
-    Guard NotTableArray, Arrays.IsNotTableArray(ipTablearray), "VBALib.TableArrayToRowLysts.ExecAction", TypeName(Me)
+    If BailOut.When(Arrays.IsNotTableArray(ipTablearray), Msg.IsNotTableArray) Then Exit Function
         
     Dim myFirstRow As Long
     myFirstRow = LBound(ipTablearray, 1)
@@ -60,7 +60,8 @@ Public Function ExecAction(ByVal ipTablearray As Variant) As Lyst
         myLystOfLyst.AddKnownItemsAsItems myRankLyst.Clone
             
     Next
-        
+    
+    Globals.Res.Init (Msg.Okay)
     Set ExecAction = myLystOfLyst
         
 End Function

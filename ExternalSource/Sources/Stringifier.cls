@@ -20,7 +20,7 @@ Option Explicit
 '========1=========2=========3=========4=========5=========6=========7=========8=========9=========A=========B=========C
 
 Private Const mcMethods                 As String = "ToString,ToJSon,ToJson,JSon,Json,Value,value"
-Private Const mcLocation                As String = "VBALib.Stringifier"
+'Private Const mcLocation                As String = "VBALib.Stringifier"
 
 Public Enum MarkupEnum
 
@@ -121,51 +121,62 @@ End Function
 '@Description("Converts the parameters a single string.")
 Public Function ToString(ParamArray ipArgs() As Variant) As String
 Attribute ToString.VB_Description = "Converts the parameters a single string."
-        
-    ToString = vbNullString
+    
+    ToString = ToStringByIterable(ipArgs)
+    
+End Function
 
-    If Arrays.HasNoItems(ipArgs) Then Exit Function
+Public Function ToStringByIterable(ByVal ipIterable As Variant) As String
+' The difference to ToString is that the single iterable doesn't get treated as an object
         
+    ToStringByIterable = vbNullString
+    Dim myItems As Lyst
+    Set myItems = Lyst.Deb
+    myItems.AddKnownIterableAsItems ipIterable
+    If Globals.Res.IsNotOkay Then Exit Function
+        
+    If myItems.HasNoItems Then Exit Function
+  
     ' Convert each item in ipParamArray to a string representation
-    Dim myArg As Variant
-    Dim MyParamsAsString As Lyst
-    Set MyParamsAsString = Lyst.Deb
+    Dim myitem As Variant
+    Dim myIterableAsString As Lyst
+    Set myIterableAsString = Lyst.Deb
         
-    For Each myArg In ipArgs
+    For Each myitem In ipIterable
                 
         Select Case True
+          
+          Case Types.Group.IsIterable(myitem)
+                  
+            myIterableAsString.AddKnownItemsAsItems StringifyIterable(myitem)
+              
+          
+          Case VBA.IsObject(myitem)
+                
+            myIterableAsString.AddKnownItemsAsItems StringifyNonIterableObject(myitem)
+              
             
-        Case Types.Group.IsPrimitive(myArg)
-                
-            MyParamsAsString.AddKnownItemsAsItems StringifyPrimitive(myArg)
-                    
-                    
-        Case Types.Group.IsAdmin(myArg)
-                
-            MyParamsAsString.AddKnownItemsAsItems StringifyAdmin(myArg)
+          Case Types.Group.IsAdmin(myitem)
+                  
+            myIterableAsString.AddKnownItemsAsItems StringifyAdmin(myitem)
             
-                    
-        Case Types.Group.IsNotIterable(myArg)
-                
-            MyParamsAsString.AddKnownItemsAsItems StringifyNonIterableObject(myArg)
-        
-                    
-        Case Types.Group.IsIterable(myArg)
-                
-            MyParamsAsString.AddKnownItemsAsItems StringifyIterable(myArg)
-                
-                    
-        Case Else
-                
-            'todo: Add error message
-            Debug.Print "Missing error message in ToString"
             
-                    
+          Case Types.Group.IsPrimitive(myitem)
+              
+              myIterableAsString.AddKnownItemsAsItems StringifyPrimitive(myitem)
+              
+ 
+          Case Else
+                  
+              'todo: Add error message for unknown type
+              Debug.Print "Missing error message in ToString"
+              Stop
+                      
         End Select
             
     Next
         
-    ToString = VBA.Join(MyParamsAsString.ToArray, s.ItemSeparator)
+    ToStringByIterable = VBA.Join(myIterableAsString.ToArray, s.ItemSeparator)
         
     ResetMarkup
         
@@ -177,57 +188,55 @@ Friend Function StringifyPrimitive(ByVal ipPrimitive As Variant) As String
         
 End Function
 
+
 Friend Function StringifyAdmin(ByVal ipAdmin As Variant) As String
 
     Select Case True
                 
-    Case VBA.Information.IsEmpty(ipAdmin)
-            
-        StringifyAdmin = Types.Name.OfEmpty
-            
+        Case VBA.Information.IsEmpty(ipAdmin)
                 
-    Case Types.IsNothing(ipAdmin)
-            
-        StringifyAdmin = s.ObjectOpen & "Nothing" & s.ObjectClose
+            StringifyAdmin = Types.Name.OfEmpty
+                
+                    
+        Case Types.IsNothing(ipAdmin)
+                
+            StringifyAdmin = s.ObjectOpen & "Nothing" & s.ObjectClose
 
-                
-    Case Types.IsNull(ipAdmin)
-        
-        StringifyAdmin = Types.Name.OfNull
+                    
+        Case Types.IsNull(ipAdmin)
             
+            StringifyAdmin = Types.Name.OfNull
                 
-    Case Types.IsUnknown(ipAdmin)
-            
-        StringifyAdmin = Types.Name.OfUnknown
+                    
+        Case Types.IsUnknown(ipAdmin)
                 
-                
-    Case VBA.Information.IsError(ipAdmin)
-                
-        StringifyAdmin = _
-                       s.ObjectOpen _
-                     & VBA.Join _
-                       ( _
-                       Array _
-                       ( _
-                       Char.twPlainDQuote & Types.Name.OfError & Char.twPlainDQuote, _
-                       Err.Source, _
-                       CStr(Err.Number), _
-                       Err.Description, _
-                       Err.HelpFile _
-                       ), _
-        s.ItemSeparator _
-        ) _
-      & s.ObjectClose
+            StringifyAdmin = Types.Name.OfUnknown
+                    
+                    
+        Case VBA.Information.IsError(ipAdmin)
+                    
+            StringifyAdmin = _
+                s.ObjectOpen _
+                & VBA.Join _
+                ( _
+                    Array _
+                    ( _
+                        Char.twPlainDQuote & Types.Name.OfError & Char.twPlainDQuote, _
+                        Err.Source, _
+                        CStr(Err.Number), _
+                        Err.Description _
+                    ), _
+                    s.ItemSeparator _
+                ) _
+                & s.ObjectClose
 
-                
     End Select
         
 End Function
 
 Friend Function StringifyIterable(ByRef ipIterable As Variant) As String
 
-    Guard IsNotIterable, Types.Group.IsNotIterable(ipIterable), mcLocation & "pvStringifyIterable"
-    ResetArrayMarkup
+    'ResetArrayMarkup
     StringifyIterable = vbNullString
     Dim myLyst As Lyst
     Set myLyst = Lyst.Deb
@@ -250,27 +259,25 @@ Friend Function StringifyIterable(ByRef ipIterable As Variant) As String
 
     Select Case True
         
-    Case Types.Group.IsIterableItemsByEnum(ipIterable)
-        
-        Set myLyst = GetIterableItemsByEnumAsLystOfStrings(ipIterable)
+        Case Types.Group.IsIterableItemsByEnum(ipIterable)
             
+            Set myLyst = GetIterableItemsByEnumAsLystOfStrings(ipIterable)
                 
-    Case Types.Group.IsIterableKeysByEnum(ipIterable)
-            
-        Set myLyst = GetIterableKeysByEnumAsLystOfStrings(ipIterable)
-            
+                    
+        Case Types.Group.IsIterableKeysByEnum(ipIterable)
                 
-    Case Else
-            
-        VBA.Err.Raise _
-        17 + vbObjectError, _
-           "VBALIB.Stringifier.pvStringifyIterable", _
-           "The Iterable Type '" & TypeName(ipIterable) & "' is not known"
+            Set myLyst = GetIterableKeysByEnumAsLystOfStrings(ipIterable)
+                
+                    
+        Case Else
+                
+           Stop 'ToDo add unknown type
                 
                     
     End Select
         
-    StringifyIterable = myOpen & VBA.Join(myLyst.ToArray, mySeparator) & myClose
+    StringifyIterable = myOpen & myLyst.ToString(mySeparator) & myClose
+    'StringifyIterable = myOpen & VBA.Join(myLyst.ToArray, mySeparator) & myClose
         
 End Function
 
@@ -279,10 +286,10 @@ Friend Function GetIterableItemsByEnumAsLystOfStrings(ByVal ipIterable As Varian
     Dim myLyst As Lyst
     Set myLyst = Lyst.Deb
         
-    Dim myItem As Variant
-    For Each myItem In ipIterable
+    Dim myitem As Variant
+    For Each myitem In ipIterable
         
-        myLyst.AddKnownItemsAsItems ToString(myItem)
+        myLyst.AddKnownItemsAsItems ToString(myitem)
             
     Next
         

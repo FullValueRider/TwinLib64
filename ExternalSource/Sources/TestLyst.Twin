@@ -37,7 +37,7 @@ Module TestLyst
 
     Public Sub LystTests()
 
-            Debug.Print "Testing ", CurrentComponentName vbTab, vbTab, vbTab, vbTab ;
+            Debug.Print "Testing ", CurrentComponentName vbTab, vbTab vbTab, vbTab,
             myPlace = CurrentSourceFile & CurrentComponentName
             Test01_NewLystIsObject
             Test02_NewLystIsLystObject
@@ -47,7 +47,7 @@ Module TestLyst
             Test06_AddByAddAfterDebFiveItems
             Test07_AddRangeStackOfFiveCountIsFive
             Test07a_AssignItemTwoPrimitive
-            Test07b_AssignItemTwoObject
+            Test07b_AssignAndGetItemTwoObject
             Test08_Clear
             Test09_Clone
             Test10_HoldsValueTrue
@@ -68,7 +68,7 @@ Module TestLyst
             Test23_LastIndexOfStartItem4
             Test24_LastIndexOfStartItem1EndItem4
             Test25_RemoveValueOf40
-            Test26_RemoveAtValueOf20FromItem4
+            Test26_RemoveAtItem4
             Test27_RemoveRangeItem3Count4
             Test28_ReverseAll
             Test29_ReverseItem1Count4
@@ -294,21 +294,21 @@ Module TestLyst
             On Error GoTo TestFail
             
             'Arrange:
-            Dim myExpected  As Long
-            myExpected = 300
+            Dim myExpected  As Variant
+            myExpected = Array(10, 300, 30, 40, 50)
         
             '@Ignore IntegerDataType
             Dim myLyst As Lyst
             Set myLyst = Lyst.Deb.Add(10, 20, 30, 40, 50)
             
-            Dim myResult As Long
+            Dim myResult As Variant
             
             'Act:
             myLyst.Item(2) = 300
-            myResult = myLyst.Item(2)
+            myResult = myLyst.ToArray
         
             'Assert:
-            Assert.Exact.AreEqual myExpected, myResult  ' ' , myPlace & CurrentProcedureName
+            Assert.Exact.SequenceEquals myExpected, myResult  ' ' , myPlace & CurrentProcedureName
 
     TestExit:
             Exit Sub
@@ -318,7 +318,7 @@ Module TestLyst
         End Sub
 
         '@TestMethod("Item")
-        Private Sub Test07b_AssignItemTwoObject()
+        Private Sub Test07b_AssignAndGetItemTwoObject()
             On Error GoTo TestFail
             
             'Arrange:
@@ -345,6 +345,33 @@ Module TestLyst
             Resume TestExit
         End Sub
 
+        '@TestMethod("Item")
+        Private Sub Test07cGetItemTwoPrimitive()
+            On Error GoTo TestFail
+            
+            'Arrange:
+            Dim myExpected  As Long
+            myExpected = 300
+        
+            '@Ignore IntegerDataType
+            Dim myLyst As Lyst
+            Set myLyst = Lyst.Deb.Add(10, 20, 30, 40, 50)
+            
+            Dim myResult As Lyst
+            
+            'Act:
+            myLyst.Item(2) = 300
+            Set myResult = myLyst.Item(2)
+        
+            'Assert:
+            Assert.Exact.SequenceEquals myExpected, myResult, CurrentProcedureName
+
+    TestExit:
+            Exit Sub
+    TestFail:
+            Debug.Print CurrentComponentName, CurrentProcedureName, " raised an Error: #" & Err.Number & " - " & Err.Description
+            Resume TestExit
+        End Sub
 
         '@TestMethod("Clear")
         Private Sub Test08_Clear()
@@ -576,19 +603,19 @@ Module TestLyst
             
             'Arrange:
             Dim myExpected  As Variant
-            myExpected = Array(10, 20, 30)
+            myExpected = Array(20, 30, 40, 50)
         
             '@Ignore IntegerDataType
             Dim myLyst As Lyst
             Set myLyst = Lyst.Deb.Add(10, 20, 30, 40, 50)
             
-            Dim myResult(0 To 2) As Variant
+            Dim myResult(0 To 3) As Variant
             
             'Act:
-            myLyst.CopyTo myResult, 1, 3
+            myLyst.CopyTo myResult, 2, 4
         
             'Assert:
-            Assert.Exact.SequenceEquals myExpected, myResult, myPlace & CurrentProcedureName
+            Assert.Strict.SequenceEquals myExpected, myResult, myPlace & CurrentProcedureName
     TestExit:
             Exit Sub
             
@@ -604,7 +631,7 @@ Module TestLyst
             
             'Arrange:
             Dim myExpected  As Variant
-            myExpected = Array(20, 30, 40)
+            myExpected = Array(10, 20, 30)
         
             '@Ignore IntegerDataType
             Dim myLyst As Lyst
@@ -633,7 +660,7 @@ Module TestLyst
             
             'Arrange:
             Dim myExpected  As Long
-            myExpected = 2
+            myExpected = 3
         
             '@Ignore IntegerDataType
             Dim myLyst As Lyst
@@ -663,7 +690,7 @@ Module TestLyst
             
             'Arrange:
             Dim myExpected  As Long
-            myExpected = 2
+            myExpected = 3
         
             '@Ignore IntegerDataType
             Dim myLyst As Lyst
@@ -672,7 +699,7 @@ Module TestLyst
             Dim myResult As Long
             
             'Act:
-            myResult = myLyst.IndexOf(30, 1)
+            myResult = myLyst.IndexOf(30, 2)
         
             'Assert:
             Assert.Exact.AreEqual myExpected, myResult  ' ' , myPlace & CurrentProcedureName
@@ -692,7 +719,7 @@ Module TestLyst
             
             'Arrange:
             Dim myExpected  As Variant
-            myExpected = Array(10, 70, 20, 30, 40, 50)
+            myExpected = Array(10, 20, 70, 30, 40, 50)
         
             '@Ignore IntegerDataType
             Dim myLyst As Lyst
@@ -701,7 +728,7 @@ Module TestLyst
             Dim myResult As Lyst
             
             'Act:
-            Set myResult = myLyst.InsertAt(2, 70)
+            Set myResult = myLyst.InsertAt(3, 70)
         
             'Assert:
             Assert.Exact.SequenceEquals myExpected, myResult.ToArray, CurrentProcedureName
@@ -752,7 +779,7 @@ Module TestLyst
             
             'Arrange:
             Dim myExpected  As Long
-            myExpected = 6
+            myExpected = 7
         
             '@Ignore IntegerDataType
             Dim myLyst As Lyst
@@ -781,7 +808,7 @@ Module TestLyst
             
             'Arrange:
             Dim myExpected  As Long
-            myExpected = 6
+            myExpected = 7
         
             '@Ignore IntegerDataType
             Dim myLyst As Lyst
@@ -863,12 +890,12 @@ Module TestLyst
         End Sub
 
         '@TestMethod("RemoveAt")
-        Private Sub Test26_RemoveAtValueOf20FromItem4()
+        Private Sub Test26_RemoveAtItem4()
             On Error GoTo TestFail
             
             'Arrange:
             Dim myExpected  As Lyst
-            Set myExpected = Lyst.Deb.Add(10, 20, 30, 40, 40, 40, 50)
+            Set myExpected = Lyst.Deb.Add(10, 20, 30, 20, 40, 40, 50)
         
             '@Ignore IntegerDataType
             Dim myLyst As Lyst

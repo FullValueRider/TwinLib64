@@ -20,22 +20,22 @@ End Function
 Public Function Actions() As Variant
 End Function
 
-Public Function Ord(ByVal ipResultCode As Id) As Long
+Public Function Ord(ByVal ipMessageEnum As Msg) As Long
 End Function
 
-Public Property Get AsEnum(ByVal ipResultCode As Id) As Id
+Public Property Get AsEnum(ByValipMessageEnum As Msg) As Msg
 End Property
 
-Public Function CanExec(ByVal ipResultCode As Id) As Boolean
+Public Function CanExec(ByVal ipMessageEnum As Msg) As Boolean
 End Function
 
-Public Property Get ToString(ByVal ipResultCode As Id) As String
+Public Property Get ToString(ByVal ipMessageEnum As Msg) As String
 End Property
 
-Public Property Get Exec(ByVal ipResultCode As Id, ByVal ipTablearray As Variant) As Object
+Public Property Get Exec(ByVal ipMessageEnum As Msg, ByVal ipTablearray As Variant) As Object
 End Property
 
-Public Property Get IsMember(ByVal ipValue As Long) As Boolean
+Public Property Get IsMember(ByVal ipMessageEnum As Long) As Boolean
 End Property
 
 Public Property Get Name() As String

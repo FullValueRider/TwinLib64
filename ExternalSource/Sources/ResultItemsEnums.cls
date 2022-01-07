@@ -7,16 +7,20 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = True
-Attribute VB_Description = "This module holds enumerations that give the indexing for the items lyst in different Result objects"
+Attribute VB_Description = "This module holds enumerations that give the indexing for the items lyst in a Result objects"
+Option Explicit
 '@Exposed
 '@PredeclaredId
-Option Explicit
 '@Folder("VBALib")
-'@ModuleDescription("This module holds enumerations that give the indexing for the items lyst in different Result objects")
+'@ModuleDescription("This module holds enumerations that give the indexing for the items lyst in a Result objects")
 
-'We'd prefer to not use prefixes but unfortunately these are required in VBA
+' We'd prefer enums to not use prefixes but unfortunately these are required in VBA
+' to prevent name clashes between enums members.
+' Also need to remeber that Items is an Arraylist as the Lyst class cannot
+' be used to to neverending recursion
 Public Enum ItemExtent
-
+' item 0 is the parameter count
+   
     ieFirstIndex = 0
     ieLbound = 0
     ieLastIndex = 1
@@ -27,17 +31,22 @@ End Enum
 
 Public Enum StartRun
         
-    srStartIndex = 0
+    srStartindex = 0
     srRunLength = 1
         
 End Enum
 
-Public Enum ParseParamArray
+Public Enum ParsedVariant
         
-    ppCount = 0
-    ppItems = 1
-    ppKeys = 2
+    pvItems = 0
+    pvKeys = 1
         
+End Enum
+
+Public Enum SameSize
+    ssRefItem = 0
+    ssTestItem = 1
+    
 End Enum
 
 ' Funtions below allow intellisense for the enums above
@@ -49,6 +58,11 @@ Public Function StartRun(ByVal ipStartRun As StartRun) As StartRun
     StartRun = ipStartRun
 End Function
 
-Public Function ParseParamArray(ByVal ipParseParamArray As ParseParamArray) As ParseParamArray
-    ParseParamArray = ipParseParamArray
+Public Function ParsedVariant(ByVal ipParseResult As ParsedVariant) As ParsedVariant
+    ParsedVariant = ipParseResult
+End Function
+
+
+Public Function SameSize(ByVal ipSameSizeEnum As SameSize) As SameSize
+    SameSize = ipSameSizeEnum
 End Function

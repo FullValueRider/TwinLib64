@@ -31,7 +31,7 @@ End Type
 
 Private p               As Properties
 
-Public Function Deb(ByVal ipKVPairOrKey As Variant, Optional ByVal ipItem As Variant) As KVPair
+Public Function Deb(Optional ByVal ipKVPairOrKey As Variant = Empty, Optional ByVal ipItem As Variant = Empty) As KVPair
         
         
     With New KVPair

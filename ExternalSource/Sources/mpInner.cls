@@ -36,7 +36,7 @@ Public Function ExecMapper(ByVal ipHostItem As Variant) As Variant
         
     Case "Kvp", "Lyst"
             
-        ExecMapper = ipHostItem.Map(s.Mapper)
+        ExecMapper = ipHostItem.MapIt(s.Mapper)
                 
             
     Case Else

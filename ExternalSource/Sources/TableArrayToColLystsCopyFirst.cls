@@ -24,6 +24,7 @@ End Function
 
 Public Function ExecAction(ByVal ipTablearray As Variant) As Lyst
         
+    If BailOut.When(Arrays.IsNotTableArray(ipTablearray), Msg.IsNotTableArray) Then Exit Function
     Dim myLystOfRankLysts As Lyst
     Set myLystOfRankLysts = TableArrayToColumnLysts.ExecAction(ipTablearray)
         
@@ -33,11 +34,11 @@ Public Function ExecAction(ByVal ipTablearray As Variant) As Lyst
     Dim myRankLysts As Lyst
     Set myRankLysts = Lyst.Deb
         
-    Dim myItem As Variant
-    For Each myItem In myLystOfRankLysts
+    Dim myitem As Variant
+    For Each myitem In myLystOfRankLysts
             
         Dim myInnerLyst As Lyst
-        Set myInnerLyst = myItem
+        Set myInnerLyst = myitem
         myRankFirstItemsLyst.AddKnownItemsAsItems myInnerLyst.First
         myRankLysts.AddKnownItemsAsItems myInnerLyst
             

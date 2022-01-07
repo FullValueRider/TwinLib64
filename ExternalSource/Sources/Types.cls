@@ -19,21 +19,21 @@ Attribute VB_Exposed = True
 Option Explicit
 
         
-Private Type InternalConstants
-        
-    Location                                    As String
-        
-End Type
-
-Private i                                       As InternalConstants
+'Private Type InternalConstants
+'
+'    Location                                    As String
+'
+'End Type
+'
+'Private i                                       As InternalConstants
 
 Public Sub Class_Initialize()
         
-    If VBA.Len(i.Location) = 0 Then
+    ' If VBA.Len(i.Location) = 0 Then
             
-        i.Location = "VBALib.Types."
+    '     i.Location = "VBALib.Types."
             
-    End If
+    ' End If
         
     'Guard InvalidNew, Me.IsNotSameInstance(Me, Types), i.Location & "Class_Initialize"
         
@@ -62,66 +62,108 @@ End Property
 '
 '========1=========2=========3=========4=========5=========6=========7=========8=========9=========A=========B=========C
 
-Public Function TryExtent(ByVal ipItem As Variant, Optional iopResult As Result, Optional ipRank As Long = 1&) As Result
-
-    If iopResult Is Nothing Then Set iopResult = Result.Deb
-    Set TryExtent = iopResult
+Public Function TryExtent(ByVal ipItem As Variant, Optional ipRank As Long = 1&) As Result
+    
+    Set TryExtent = Globals.Res.SetNotOkay
         
     Select Case True
-            
-    Case Types.IsString(ipItem)
-            
-        If ipRank <> 1 Then
-                    
-            iopResult.MessageEnum = Enums.Message.AsEnum(Id.InvalidRank)
-            Exit Function
-                    
-        End If
+        
+        ' string is not an iterable but it is allowed to get the 'extent' of the string
+        Case Types.IsString(ipItem):
                 
-                
-        If Strs.TryExtent(ipItem, iopResult).NotOkay Then Exit Function
-                    
-                    
-    Case Types.Group.IsIterable(ipItem)
+            Strs.TryExtent ipItem, ipRank
             
-        If Types.Iterable.TryExtent(ipItem, iopResult, ipRank).NotOkay Then Exit Function
-                    
-                    
-    Case Else
             
-        iopResult.MessageEnum = Enums.Message.AsEnum(Id.InvalidType)
+        Case Types.Group.IsNotIterable(ipItem)
+        
+            Globals.Res.SetNotOkay enums.Message.AsEnum(Msg.IsNotIterable)
+            
                 
+        Case VBA.IsArray(ipItem)
+        
+            Arrays.TryExtent ipItem, ipRank
+                        
+                        
+        Case Types.Group.IsIterableObject(ipItem)
+                
+            Types.Iterable.TryExtent ipItem, ipRank
+                        
+                        
+        Case Else
+                
+            Globals.Res.SetNotOkay enums.Message.AsEnum(Msg.InvalidType)
+            
+                    
     End Select
     
-    Set TryExtent = iopResult
+    Set TryExtent = Globals.Res
     
+End Function
+
+Public Function HasItems(ParamArray ipArgArray() As Variant) As Boolean
+    HasItems = HasItemsByFPA(CVar(ipArgArray))
+End Function
+ 
+ Public Function HasNoItems(ParamArray ipArgArray() As Variant) As Boolean
+    HasNoItems = Not HasItemsByFPA(CVar(ipArgArray))
+End Function
+
+Friend Function HasItemsByFPA(ByVal ipArgArray As Variant) As Result
+    
+    Set HasItemsByFPA = Globals.Res
+    If BailOut.When(Arrays.HasNoItems(ipArgArray), Msg.ArrayHasNoItems) Then Exit Function
+    
+    Dim myargs As Variant
+    If Arrays.IsNotValid(ipArgArray) Then
+        
+        If Parser.ParseVariantWithOneItem(ipArgArray).IsNotOkay Then Exit Function
+        Set myargs = Globals.Res.Item(ResultItemsEnums.ParsedVariant(pvItems))
+        
+        
+    Else
+        
+        myargs = ipArgArray
+        
+    End If
+    
+    Dim myitem As Variant
+    For Each myitem In myargs
+        
+        If BailOut.When(Types.Group.IsNotIterable(myitem), Msg.IsNotIterable) Then Exit Function
+        If BailOut.When(Types.Iterable.HasNoItems(myitem), Msg.HasNoItems) Then Exit Function
+        
+    Next
+    
+    Set HasItemsByFPA = Globals.Res.Init(Msg.Okay)
+        
 End Function
 
 '@Description("Returns true if the list of parameters are all arrays))
-Public Function IsArray(ParamArray ipArgs() As Variant) As Boolean
-    IsArray = pvIsArrayByCVar(CVar(ipArgs))
+Public Function IsArray(ParamArray ipArgArray() As Variant) As Boolean
+    IsArray = IsArrayByFPA(CVar(ipArgArray))
 End Function
 
 '@Description("Returns True if none of the list of parameters is an array)")
-Public Function IsNotArray(ParamArray ipArgs() As Variant) As Boolean
+Public Function IsNotArray(ParamArray ipArgArray() As Variant) As Boolean
 Attribute IsNotArray.VB_Description = "Returns True if none of the list of parameters is an array)"
-    IsNotArray = Not pvIsArrayByCVar(CVar(ipArgs))
+    IsNotArray = Not IsArrayByFPA(CVar(ipArgArray))
 End Function
 
-Public Function pvIsArrayByCVar(ByVal ipArgs As Variant) As Boolean
+Friend Function IsArrayByFPA(ByVal ipArgArray As Variant) As Boolean
         
-    pvIsArrayByCVar = False
-    If Arrays.HasNoItems(ipArgs) Then Exit Function
+    IsArrayByFPA = False
+    If BailOut.When(Arrays.IsNotValid(ipArgArray), Msg.ParamArrayIsEmpty) Then Exit Function
         
-                
     Dim myArg As Variant
-    For Each myArg In ipArgs
+    For Each myArg In ipArgArray
         
-        If Arrays.HasNoItems(myArg) Then Exit Function
+        If Not VBA.IsArray(myArg) Then Exit Function
+        'If UBound(myArg) < LBound(myArg) Then Exit Function
             
     Next
-        
-    pvIsArrayByCVar = True
+    
+    Globals.Res.Init (Msg.Okay)
+    IsArrayByFPA = True
         
 End Function
 
@@ -180,7 +222,7 @@ Attribute HasItemMethod.VB_Description = "Returns True if an object has an Item 
     Set HasItemMethod = myResult
     If Not VBA.IsObject(ipItem) Then
         
-        myResult.MessageEnum = InvalidType
+        myResult.MsgEnum = InvalidType
         Exit Function
             
     End If
@@ -199,9 +241,9 @@ Attribute HasItemMethod.VB_Description = "Returns True if an object has an Item 
     ' Using Array is the simplest way of recieving an object without an isobject test.
     ' The assignment below is to get the error number only and tests if the item method exists
     '@Ignore VariableNotUsed
-    Dim myItem As Variant
+    Dim myitem As Variant
     '@Ignore AssignmentNotUsed
-    myItem = Array(ipItem.Item(ipItem.Count - 1))
+    myitem = Array(ipItem.Item(ipItem.Count - 1))
     Dim myErrNo As Long
     myErrNo = Err.Number
         
@@ -218,50 +260,52 @@ Attribute LacksItemMethod.VB_Description = "Returns True if the object does not 
 End Function
 
 '@Description("Returns True if any parameter is empty or is ismissing")
-Public Function IsMissing(ParamArray ipArgs() As Variant) As Boolean
+Public Function IsMissing(ParamArray ipArgArray() As Variant) As Boolean
 Attribute IsMissing.VB_Description = "Returns True if any parameter is empty or is ismissing"
-    IsMissing = pvIsMissingByCVar(CVar(ipArgs))
+    IsMissing = pvIsMissingByFPA(CVar(ipArgArray))
 End Function
 
 '@Description"Returns True if all parameters are not empty and are not missing")
-Public Function IsNotMissing(ParamArray ipArgs() As Variant) As Boolean
-    IsNotMissing = Not pvIsMissingByCVar(ipArgs)
+Public Function IsNotMissing(ParamArray ipArgArray() As Variant) As Boolean
+    IsNotMissing = Not pvIsMissingByFPA(ipArgArray)
 End Function
 
-Public Function pvIsMissingByCVar(ByVal ipArgs As Variant) As Boolean
+Public Function pvIsMissingByFPA(ByVal ipArgArray As Variant) As Boolean
 
-    pvIsMissingByCVar = True
-    If VBA.IsMissing(ipArgs) Then Exit Function
-    If Arrays.HasNoItems(ipArgs) Then Exit Function
+    pvIsMissingByFPA = True
+    '@Ignore IsMissingOnInappropriateArgument
+    If VBA.IsMissing(ipArgArray) Then Exit Function
+    If Arrays.IsNotValid(ipArgArray) Then Exit Function
         
     Dim myArg As Variant
-    For Each myArg In ipArgs
+    For Each myArg In ipArgArray
         
+        '@Ignore IsMissingWithNonArgumentParameter
         If VBA.IsMissing(myArg) Then Exit Function
             
     Next
         
-    pvIsMissingByCVar = False
+    pvIsMissingByFPA = False
         
 End Function
 
-Public Function IsEmpty(ParamArray ipArgs() As Variant) As Boolean
-    IsEmpty = pvIsEmptyByCVar(CVar(ipArgs))
+Public Function IsEmpty(ParamArray ipArgArray() As Variant) As Boolean
+    IsEmpty = pvIsEmptyByFPA(CVar(ipArgArray))
 End Function
 
-Public Function IsNotEmpty(ParamArray ipArgs() As Variant) As Boolean
-    IsNotEmpty = Not pvIsEmptyByCVar(CVar(ipArgs))
+Public Function IsNotEmpty(ParamArray ipArgArray() As Variant) As Boolean
+    IsNotEmpty = Not pvIsEmptyByFPA(CVar(ipArgArray))
 End Function
 
-Public Function pvIsEmptyByCVar(ByRef ipArgs As Variant) As Boolean
+Public Function pvIsEmptyByFPA(ByRef ipArgArray As Variant) As Boolean
 
-    pvIsEmptyByCVar = False
-    If VBA.IsEmpty(ipArgs) Then Exit Function
+    pvIsEmptyByFPA = False
+    If VBA.IsEmpty(ipArgArray) Then Exit Function
     '@Ignore IsMissingOnInappropriateArgument
-    If VBA.IsMissing(ipArgs) Then Exit Function
+    If VBA.IsMissing(ipArgArray) Then Exit Function
                 
     Dim myArg As Variant
-    For Each myArg In ipArgs
+    For Each myArg In ipArgArray
         
         If Me.Group.IsIterable(myArg) Then
             
@@ -275,7 +319,7 @@ Public Function pvIsEmptyByCVar(ByRef ipArgs As Variant) As Boolean
         
     Next
         
-    pvIsEmptyByCVar = True
+    pvIsEmptyByFPA = True
         
 End Function
 
@@ -284,82 +328,82 @@ End Function
 ' Tests using groups of types
 '
 '========1=========2=========3=========4=========5=========6=========7=========8=========9=========A=========B=========C
-Public Function IsSameType(ByVal ipRequiredType As Variant, ParamArray ipArgs() As Variant) As Boolean
-    IsSameType = pvIsSameTypeByCVAr(ipRequiredType, ipArgs)
+Public Function IsSameType(ByVal ipRequiredType As Variant, ParamArray ipArgArray() As Variant) As Boolean
+    IsSameType = pvIsSameTypeByFPA(ipRequiredType, ipArgArray)
 End Function
 
-Public Function IsNotSameType(ByVal ipRequiredType As Variant, ParamArray ipArgs() As Variant) As Boolean
-    IsNotSameType = Not pvIsSameTypeByCVAr(ipRequiredType, ipArgs)
+Public Function IsNotSameType(ByVal ipRequiredType As Variant, ParamArray ipArgArray() As Variant) As Boolean
+    IsNotSameType = Not pvIsSameTypeByFPA(ipRequiredType, ipArgArray)
 End Function
 
-Public Function pvIsSameTypeByCVAr(ByVal ipRequiredType As Variant, ByVal ipArgs As Variant) As Boolean
+Public Function pvIsSameTypeByFPA(ByVal ipRequiredType As Variant, ByVal ipArgArray As Variant) As Boolean
 
-    pvIsSameTypeByCVAr = False
-    If Arrays.HasNoItems(ipArgs) Then Exit Function
+    pvIsSameTypeByFPA = False
+    If Arrays.HasNoItems(ipArgArray) Then Exit Function
                 
     Dim myRequiredType As String
     myRequiredType = TypeName(ipRequiredType)
-    Dim myItem As Variant
-    For Each myItem In ipArgs
+    Dim myitem As Variant
+    For Each myitem In ipArgArray
         ' cannot use vartype as this cannot distinguish object types
             
-        If InStr(myRequiredType, TypeName(myItem)) = 0 Then Exit Function
+        If InStr(myRequiredType, TypeName(myitem)) = 0 Then Exit Function
             
     Next
         
-    pvIsSameTypeByCVAr = True
+    pvIsSameTypeByFPA = True
         
 End Function
 
-Public Function IsObject(ParamArray ipArgs() As Variant) As Boolean
-    IsObject = pvIsObjectByCVar(CVar(ipArgs))
+Public Function IsObject(ParamArray ipArgArray() As Variant) As Boolean
+    IsObject = pvIsObjectByFPA(CVar(ipArgArray))
 End Function
 
-Public Function IsNotObject(ParamArray ipArgs() As Variant) As Boolean
-    IsNotObject = Not pvIsObjectByCVar(CVar(ipArgs))
+Public Function IsNotObject(ParamArray ipArgArray() As Variant) As Boolean
+    IsNotObject = Not pvIsObjectByFPA(CVar(ipArgArray))
 End Function
 
-Public Function pvIsObjectByCVar(ByVal ipArgs As Variant) As Boolean
+Public Function pvIsObjectByFPA(ByVal ipArgArray As Variant) As Boolean
         
-    pvIsObjectByCVar = False
-    If VBA.IsEmpty(ipArgs) Then Exit Function
+    pvIsObjectByFPA = False
+    If VBA.IsEmpty(ipArgArray) Then Exit Function
     '@Ignore IsMissingOnInappropriateArgument
-    If VBA.IsMissing(ipArgs) Then Exit Function
+    If VBA.IsMissing(ipArgArray) Then Exit Function
                 
     Dim myArg As Variant
-    For Each myArg In ipArgs
+    For Each myArg In ipArgArray
         
         If Not VBA.IsObject(myArg) Then Exit Function
             
     Next
         
-    pvIsObjectByCVar = True
+    pvIsObjectByFPA = True
         
 End Function
 
-Public Function IsObjectArray(ParamArray ipArgs() As Variant) As Boolean
-    IsObjectArray = pvIsObjectArrayByCVar(CVar(ipArgs))
+Public Function IsObjectArray(ParamArray ipArgArray() As Variant) As Boolean
+    IsObjectArray = pvIsObjectArrayByFPA(CVar(ipArgArray))
 End Function
 
-Public Function IsNotObjectArray(ParamArray ipArgs() As Variant) As Boolean
-    IsNotObjectArray = Not pvIsObjectArrayByCVar(CVar(ipArgs))
+Public Function IsNotObjectArray(ParamArray ipArgArray() As Variant) As Boolean
+    IsNotObjectArray = Not pvIsObjectArrayByFPA(CVar(ipArgArray))
 End Function
 
-Public Function pvIsObjectArrayByCVar(ByVal ipArgs As Variant) As Boolean
+Public Function pvIsObjectArrayByFPA(ByVal ipArgArray As Variant) As Boolean
         
-    pvIsObjectArrayByCVar = False
-    If VBA.IsEmpty(ipArgs) Then Exit Function
+    pvIsObjectArrayByFPA = False
+    If VBA.IsEmpty(ipArgArray) Then Exit Function
     '@Ignore IsMissingOnInappropriateArgument
-    If VBA.IsMissing(ipArgs) Then Exit Function
+    If VBA.IsMissing(ipArgArray) Then Exit Function
                 
     Dim myArg As Variant
-    For Each myArg In ipArgs
+    For Each myArg In ipArgArray
             
         If InStr(Me.Name.AsArray.OfObject, TypeName(myArg)) = 0 Then Exit Function
                 
     Next
         
-    pvIsObjectArrayByCVar = True
+    pvIsObjectArrayByFPA = True
         
 End Function
 
@@ -384,34 +428,35 @@ End Function
 '
 '========1=========2=========3=========4=========5=========6=========7=========8=========9=========A=========B=========C
 '@Description("Returns true if the types of all the values in the parameter list are found in the Types string")
-Public Function IsTypeByName(ByVal ipTypesasStringOrIterable As Variant, ParamArray ipArgs() As Variant) As Boolean
+Public Function IsTypeByName(ByVal ipTypesasStringOrIterable As Variant, ParamArray ipArgArray() As Variant) As Boolean
 Attribute IsTypeByName.VB_Description = "Returns true if the types of all the values in the parameter list are found in the Types string"
-    IsTypeByName = pvIsTypeByNameByCVar(ipTypesasStringOrIterable, ipArgs)
+    IsTypeByName = pvIsTypeByNameByFPA(ipTypesasStringOrIterable, ipArgArray)
 End Function
 
-Public Function IsNotTypeByName(ByVal ipTypesasStringOrIterable As Variant, ParamArray ipArgs() As Variant) As Boolean
-    IsNotTypeByName = Not IsTypeByName(ipTypesasStringOrIterable, ipArgs)
+Public Function IsNotTypeByName(ByVal ipTypesasStringOrIterable As Variant, ParamArray ipArgArray() As Variant) As Boolean
+    IsNotTypeByName = Not IsTypeByName(ipTypesasStringOrIterable, ipArgArray)
 End Function
 
-Private Function IsTypeByNameByCVar(ByVal ipTypes As String, ParamArray ipArgs() As Variant) As Boolean
-    IsTypeByNameByCVar = Not pvIsTypeByNameByCVar(ipTypes, ipArgs)
+Private Function IsTypeByNameByFPA(ByVal ipTypes As String, ParamArray ipArgArray() As Variant) As Boolean
+    IsTypeByNameByFPA = Not pvIsTypeByNameByFPA(ipTypes, ipArgArray)
 End Function
 
-Public Function pvIsTypeByNameByCVar(ByVal ipTypesasStringOrIterable As Variant, ByVal ipArgs As Variant) As Boolean
+Public Function pvIsTypeByNameByFPA(ByVal ipTypesasStringOrIterable As Variant, ByVal ipArgArray As Variant) As Boolean
         
-    pvIsTypeByNameByCVar = False
-    If Arrays.HasNoItems(ipArgs) Then Exit Function
+    pvIsTypeByNameByFPA = False
+    If Arrays.IsNotValid(ipArgArray) Then Exit Function
         
     Dim myIterable As Variant
     If VBA.VarType(ipTypesasStringOrIterable) = vbString Then
                 
-        Set myIterable = Lyst.Deb.AddRange(VBA.Split(ipTypesasStringOrIterable, Char.twComma))
+        Set myIterable = Types.Iterable.ToArrayList(VBA.Split(ipTypesasStringOrIterable, Char.twComma))
             
             
     ElseIf Me.Group.IsIterableItemsByEnum(ipTypesasStringOrIterable) Then
             
-        Set myIterable = ipTypesasStringOrIterable
+        Set myIterable = Types.Iterable.ToArrayList(ipTypesasStringOrIterable)
             
+        
     Else
             
         Exit Function
@@ -419,337 +464,337 @@ Public Function pvIsTypeByNameByCVar(ByVal ipTypesasStringOrIterable As Variant,
     End If
         
 
-    Dim myItem As Variant
-    For Each myItem In ipArgs
+    Dim myitem As Variant
+    For Each myitem In ipArgArray
             
-        If myIterable.LacksItem(TypeName(myItem)) Then Exit Function
+        If Not myIterable.Contains(TypeName(myitem)) Then Exit Function
         
     Next
         
-    pvIsTypeByNameByCVar = True
+    pvIsTypeByNameByFPA = True
         
 End Function
 
 '@Description("Returns true is all the values in the Parameter array have the VarType ipVarType, Cannot differentiate between objects")
-Public Function IsVarType(ByVal ipVarType As VbVarType, ParamArray ipArgs() As Variant) As Boolean
+Public Function IsVarType(ByVal ipVarType As VbVarType, ParamArray ipArgArray() As Variant) As Boolean
 Attribute IsVarType.VB_Description = "Returns true is all the values in the Parameter array have the VarType ipVarType, Cannot differentiate between objects"
-    IsVarType = pvIsVarTypeByCVar(ipVarType, ipArgs)
+    IsVarType = pvIsVarTypeByFPA(ipVarType, ipArgArray)
 End Function
 
-Public Function IsNotVarType(ByVal ipVarType As VbVarType, ParamArray ipArgs() As Variant) As Boolean
-    IsNotVarType = Not pvIsVarTypeByCVar(ipVarType, ipArgs)
+Public Function IsNotVarType(ByVal ipVarType As VbVarType, ParamArray ipArgArray() As Variant) As Boolean
+    IsNotVarType = Not pvIsVarTypeByFPA(ipVarType, ipArgArray)
 End Function
 
-Public Function pvIsVarTypeByCVar(ByVal ipVarType As VbVarType, ByVal ipArgs As Variant) As Boolean
+Public Function pvIsVarTypeByFPA(ByVal ipVarType As VbVarType, ByVal ipArgArray As Variant) As Boolean
 
-    'ipArgs is derived from CVar(ParamArray) and consequently will always be an array
-    pvIsVarTypeByCVar = False
-    If VBA.IsEmpty(ipArgs) Then Exit Function
+    'ipArgArray is derived from CVar(ParamArray) and consequently will always be an array
+    pvIsVarTypeByFPA = False
+    If VBA.IsEmpty(ipArgArray) Then Exit Function
     '@Ignore IsMissingOnInappropriateArgument
-    If VBA.IsMissing(ipArgs) Then Exit Function
+    If VBA.IsMissing(ipArgArray) Then Exit Function
                 
-    Dim myItem As Variant
-    For Each myItem In ipArgs
+    Dim myitem As Variant
+    For Each myitem In ipArgArray
         
-        If Not VBA.VarType(myItem) = ipVarType Then Exit Function
+        If Not VBA.VarType(myitem) = ipVarType Then Exit Function
             
     Next
         
-    pvIsVarTypeByCVar = True
+    pvIsVarTypeByFPA = True
 
 End Function
 
-Public Function IsBoolean(ParamArray ipArgs() As Variant) As Boolean
-    IsBoolean = pvIsTypeByNameByCVar(Me.Name.OfBoolean, ipArgs)
+Public Function IsBoolean(ParamArray ipArgArray() As Variant) As Boolean
+    IsBoolean = pvIsTypeByNameByFPA(Me.Name.OfBoolean, ipArgArray)
 End Function
 
-Public Function IsNotBoolean(ParamArray ipArgs() As Variant) As Boolean
-    IsNotBoolean = Not pvIsTypeByNameByCVar(Me.Name.OfBoolean, ipArgs)
+Public Function IsNotBoolean(ParamArray ipArgArray() As Variant) As Boolean
+    IsNotBoolean = Not pvIsTypeByNameByFPA(Me.Name.OfBoolean, ipArgArray)
 End Function
 
-Public Function IsBooleanArray(ParamArray ipArgs() As Variant) As Boolean
-    IsBooleanArray = pvIsTypeByNameByCVar(Me.Name.AsArray.OfBoolean, ipArgs)
+Public Function IsBooleanArray(ParamArray ipArgArray() As Variant) As Boolean
+    IsBooleanArray = pvIsTypeByNameByFPA(Me.Name.AsArray.OfBoolean, ipArgArray)
 End Function
 
-Public Function IsNotBooleanArray(ParamArray ipArgs() As Variant) As Boolean
-    IsNotBooleanArray = Not pvIsTypeByNameByCVar(Me.Name.AsArray.OfBoolean, ipArgs)
+Public Function IsNotBooleanArray(ParamArray ipArgArray() As Variant) As Boolean
+    IsNotBooleanArray = Not pvIsTypeByNameByFPA(Me.Name.AsArray.OfBoolean, ipArgArray)
 End Function
 
-Public Function IsByte(ParamArray ipArgs() As Variant) As Boolean
-    IsByte = pvIsTypeByNameByCVar(Me.Name.OfByte, ipArgs)
+Public Function IsByte(ParamArray ipArgArray() As Variant) As Boolean
+    IsByte = pvIsTypeByNameByFPA(Me.Name.OfByte, ipArgArray)
 End Function
 
-Public Function IsNotByte(ParamArray ipArgs() As Variant) As Boolean
-    IsNotByte = Not pvIsTypeByNameByCVar(Me.Name.OfByte, ipArgs)
+Public Function IsNotByte(ParamArray ipArgArray() As Variant) As Boolean
+    IsNotByte = Not pvIsTypeByNameByFPA(Me.Name.OfByte, ipArgArray)
 End Function
 
-Public Function IsByteArray(ParamArray ipArgs() As Variant) As Boolean
-    IsByteArray = pvIsTypeByNameByCVar(Me.Name.AsArray.OfByte, ipArgs)
+Public Function IsByteArray(ParamArray ipArgArray() As Variant) As Boolean
+    IsByteArray = pvIsTypeByNameByFPA(Me.Name.AsArray.OfByte, ipArgArray)
 End Function
 
-Public Function IsNotByteArray(ParamArray ipArgs() As Variant) As Boolean
-    IsNotByteArray = Not pvIsTypeByNameByCVar(Me.Name.AsArray.OfByte, ipArgs)
+Public Function IsNotByteArray(ParamArray ipArgArray() As Variant) As Boolean
+    IsNotByteArray = Not pvIsTypeByNameByFPA(Me.Name.AsArray.OfByte, ipArgArray)
 End Function
 
-Public Function IsCurrency(ParamArray ipArgs() As Variant) As Boolean
-    IsCurrency = pvIsTypeByNameByCVar(Me.Name.OfCurrency, ipArgs)
+Public Function IsCurrency(ParamArray ipArgArray() As Variant) As Boolean
+    IsCurrency = pvIsTypeByNameByFPA(Me.Name.OfCurrency, ipArgArray)
 End Function
 
-Public Function IsNotCurrency(ParamArray ipArgs() As Variant) As Boolean
-    IsNotCurrency = Not pvIsTypeByNameByCVar(Me.Name.OfCurrency, ipArgs)
+Public Function IsNotCurrency(ParamArray ipArgArray() As Variant) As Boolean
+    IsNotCurrency = Not pvIsTypeByNameByFPA(Me.Name.OfCurrency, ipArgArray)
 End Function
 
-Public Function IsCurrencyArray(ParamArray ipArgs() As Variant) As Boolean
-    IsCurrencyArray = pvIsTypeByNameByCVar(Me.Name.AsArray.OfCurrency, ipArgs)
+Public Function IsCurrencyArray(ParamArray ipArgArray() As Variant) As Boolean
+    IsCurrencyArray = pvIsTypeByNameByFPA(Me.Name.AsArray.OfCurrency, ipArgArray)
 End Function
 
-Public Function IsNotCurrencyArray(ParamArray ipArgs() As Variant) As Boolean
-    IsNotCurrencyArray = Not pvIsTypeByNameByCVar(Me.Name.AsArray.OfCurrency, ipArgs)
+Public Function IsNotCurrencyArray(ParamArray ipArgArray() As Variant) As Boolean
+    IsNotCurrencyArray = Not pvIsTypeByNameByFPA(Me.Name.AsArray.OfCurrency, ipArgArray)
 End Function
 
-'Public Function IsDataObject(ParamArray ipArgs() As Variant) As Boolean
-'    IsDataObject = pvIsTypeByNameByCVar(Types.Name.OfCurrency, ipArgs)
+'Public Function IsDataObject(ParamArray ipArgArray() As Variant) As Boolean
+'    IsDataObject = pvIsTypeByNameByFPA(Types.Name.OfCurrency, ipArgArray)
 'End Function
 '
-'Public Function IsNotDataObject(ParamArray ipArgs() As Variant) As Boolean
-'    IsNotDataObject = Not IsVarTypeByCVar(CVar(ipArgs), vbDataObject)
+'Public Function IsNotDataObject(ParamArray ipArgArray() As Variant) As Boolean
+'    IsNotDataObject = Not IsVarTypeByFPA(CVar(ipArgArray), vbDataObject)
 'End Function
 '
-'Public Function IsDataObjectArray(ParamArray ipArgs() As Variant) As Boolean
-'    IsDataObjectArray = IsVarTypeByCVar(CVar(ipArgs), vbDataObject + vbArray)
+'Public Function IsDataObjectArray(ParamArray ipArgArray() As Variant) As Boolean
+'    IsDataObjectArray = IsVarTypeByFPA(CVar(ipArgArray), vbDataObject + vbArray)
 'End Function
 '
-'Public Function IsNotDataObjectArray(ParamArray ipArgs() As Variant) As Boolean
-'    IsNotDataObjectArray = Not IsVarTypeByCVar(CVar(ipArgs), vbDataObject + vbArray)
+'Public Function IsNotDataObjectArray(ParamArray ipArgArray() As Variant) As Boolean
+'    IsNotDataObjectArray = Not IsVarTypeByFPA(CVar(ipArgArray), vbDataObject + vbArray)
 'End Function
 
 
 
-Public Function IsDate(ParamArray ipArgs() As Variant) As Boolean
-    IsDate = pvIsTypeByNameByCVar(Me.Name.OfDate, ipArgs)
+Public Function IsDate(ParamArray ipArgArray() As Variant) As Boolean
+    IsDate = pvIsTypeByNameByFPA(Me.Name.OfDate, ipArgArray)
 End Function
 
-Public Function IsNotDate(ParamArray ipArgs() As Variant) As Boolean
-    IsNotDate = Not pvIsTypeByNameByCVar(Me.Name.OfDate, ipArgs)
+Public Function IsNotDate(ParamArray ipArgArray() As Variant) As Boolean
+    IsNotDate = Not pvIsTypeByNameByFPA(Me.Name.OfDate, ipArgArray)
 End Function
 
-Public Function IsDateArray(ParamArray ipArgs() As Variant) As Boolean
-    IsDateArray = pvIsTypeByNameByCVar(Me.Name.AsArray.OfDate, ipArgs)
+Public Function IsDateArray(ParamArray ipArgArray() As Variant) As Boolean
+    IsDateArray = pvIsTypeByNameByFPA(Me.Name.AsArray.OfDate, ipArgArray)
 End Function
 
-Public Function IsNotDateArray(ParamArray ipArgs() As Variant) As Boolean
-    IsNotDateArray = Not pvIsTypeByNameByCVar(Me.Name.AsArray.OfDate, ipArgs)
+Public Function IsNotDateArray(ParamArray ipArgArray() As Variant) As Boolean
+    IsNotDateArray = Not pvIsTypeByNameByFPA(Me.Name.AsArray.OfDate, ipArgArray)
 End Function
 
-Public Function IsDecimal(ParamArray ipArgs() As Variant) As Boolean
-    IsDecimal = pvIsTypeByNameByCVar(Me.Name.OfDecimal, ipArgs)
+Public Function IsDecimal(ParamArray ipArgArray() As Variant) As Boolean
+    IsDecimal = pvIsTypeByNameByFPA(Me.Name.OfDecimal, ipArgArray)
 End Function
 
-Public Function IsNotDecimal(ParamArray ipArgs() As Variant) As Boolean
-    IsNotDecimal = Not pvIsTypeByNameByCVar(Me.Name.OfDecimal, ipArgs)
+Public Function IsNotDecimal(ParamArray ipArgArray() As Variant) As Boolean
+    IsNotDecimal = Not pvIsTypeByNameByFPA(Me.Name.OfDecimal, ipArgArray)
 End Function
 
-Public Function IsDecimalArray(ParamArray ipArgs() As Variant) As Boolean
-    IsDecimalArray = pvIsTypeByNameByCVar(Me.Name.AsArray.OfDecimal, ipArgs)
+Public Function IsDecimalArray(ParamArray ipArgArray() As Variant) As Boolean
+    IsDecimalArray = pvIsTypeByNameByFPA(Me.Name.AsArray.OfDecimal, ipArgArray)
 End Function
 
-Public Function IsNotDecimalArray(ParamArray ipArgs() As Variant) As Boolean
-    IsNotDecimalArray = Not pvIsTypeByNameByCVar(Me.Name.AsArray.OfDecimal, ipArgs)
+Public Function IsNotDecimalArray(ParamArray ipArgArray() As Variant) As Boolean
+    IsNotDecimalArray = Not pvIsTypeByNameByFPA(Me.Name.AsArray.OfDecimal, ipArgArray)
 End Function
 
-Public Function IsDouble(ParamArray ipArgs() As Variant) As Boolean
-    IsDouble = pvIsTypeByNameByCVar(Me.Name.OfDouble, ipArgs)
+Public Function IsDouble(ParamArray ipArgArray() As Variant) As Boolean
+    IsDouble = pvIsTypeByNameByFPA(Me.Name.OfDouble, ipArgArray)
 End Function
 
-Public Function IsNotDouble(ParamArray ipArgs() As Variant) As Boolean
-    IsNotDouble = Not pvIsTypeByNameByCVar(Me.Name.OfDouble, ipArgs)
+Public Function IsNotDouble(ParamArray ipArgArray() As Variant) As Boolean
+    IsNotDouble = Not pvIsTypeByNameByFPA(Me.Name.OfDouble, ipArgArray)
 End Function
 
-Public Function IsDoubleArray(ParamArray ipArgs() As Variant) As Boolean
-    IsDoubleArray = pvIsTypeByNameByCVar(Me.Name.AsArray.OfDouble, ipArgs)
+Public Function IsDoubleArray(ParamArray ipArgArray() As Variant) As Boolean
+    IsDoubleArray = pvIsTypeByNameByFPA(Me.Name.AsArray.OfDouble, ipArgArray)
 End Function
 
-Public Function IsNotDoubleArray(ParamArray ipArgs() As Variant) As Boolean
-    IsNotDoubleArray = Not pvIsTypeByNameByCVar(Me.Name.AsArray.OfDouble, ipArgs)
+Public Function IsNotDoubleArray(ParamArray ipArgArray() As Variant) As Boolean
+    IsNotDoubleArray = Not pvIsTypeByNameByFPA(Me.Name.AsArray.OfDouble, ipArgArray)
 End Function
 
-Public Function IsError(ParamArray ipArgs() As Variant) As Boolean
-    IsError = pvIsTypeByNameByCVar(Me.Name.OfError, ipArgs)
+Public Function IsError(ParamArray ipArgArray() As Variant) As Boolean
+    IsError = pvIsTypeByNameByFPA(Me.Name.OfError, ipArgArray)
 End Function
 
-Public Function IsNotError(ParamArray ipArgs() As Variant) As Boolean
-    IsNotError = Not pvIsTypeByNameByCVar(Me.Name.OfError, ipArgs)
+Public Function IsNotError(ParamArray ipArgArray() As Variant) As Boolean
+    IsNotError = Not pvIsTypeByNameByFPA(Me.Name.OfError, ipArgArray)
 End Function
 
-Public Function IsErrorArray(ParamArray ipArgs() As Variant) As Boolean
-    IsErrorArray = pvIsTypeByNameByCVar(Me.Name.AsArray.OfError, ipArgs)
+Public Function IsErrorArray(ParamArray ipArgArray() As Variant) As Boolean
+    IsErrorArray = pvIsTypeByNameByFPA(Me.Name.AsArray.OfError, ipArgArray)
 End Function
 
-Public Function IsNotErrorArray(ParamArray ipArgs() As Variant) As Boolean
-    IsNotErrorArray = Not pvIsTypeByNameByCVar(Me.Name.AsArray.OfError, ipArgs)
+Public Function IsNotErrorArray(ParamArray ipArgArray() As Variant) As Boolean
+    IsNotErrorArray = Not pvIsTypeByNameByFPA(Me.Name.AsArray.OfError, ipArgArray)
 End Function
 
-Public Function IsNothing(ParamArray ipArgs() As Variant) As Boolean
-    IsNothing = pvIsTypeByNameByCVar(Me.Name.OfNothing, ipArgs)
+Public Function IsNothing(ParamArray ipArgArray() As Variant) As Boolean
+    IsNothing = pvIsTypeByNameByFPA(Me.Name.OfNothing, ipArgArray)
 End Function
 
-Public Function IsNotNothing(ParamArray ipArgs() As Variant) As Boolean
-    IsNotNothing = Not pvIsTypeByNameByCVar(Me.Name.OfNothing, ipArgs)
+Public Function IsNotNothing(ParamArray ipArgArray() As Variant) As Boolean
+    IsNotNothing = Not pvIsTypeByNameByFPA(Me.Name.OfNothing, ipArgArray)
 End Function
 
-Public Function IsNothingArray(ParamArray ipArgs() As Variant) As Boolean
-    IsNothingArray = pvIsTypeByNameByCVar(Me.Name.AsArray.OfNothing, ipArgs)
+Public Function IsNothingArray(ParamArray ipArgArray() As Variant) As Boolean
+    IsNothingArray = pvIsTypeByNameByFPA(Me.Name.AsArray.OfNothing, ipArgArray)
 End Function
 
-Public Function IsNotNothingArray(ParamArray ipArgs() As Variant) As Boolean
-    IsNotNothingArray = Not pvIsTypeByNameByCVar(Me.Name.AsArray.OfNothing, ipArgs)
+Public Function IsNotNothingArray(ParamArray ipArgArray() As Variant) As Boolean
+    IsNotNothingArray = Not pvIsTypeByNameByFPA(Me.Name.AsArray.OfNothing, ipArgArray)
 End Function
 
-Public Function IsNull(ParamArray ipArgs() As Variant) As Boolean
-    IsNull = pvIsTypeByNameByCVar(Me.Name.OfNull, ipArgs)
+Public Function IsNull(ParamArray ipArgArray() As Variant) As Boolean
+    IsNull = pvIsTypeByNameByFPA(Me.Name.OfNull, ipArgArray)
 End Function
 
-Public Function IsNotNull(ParamArray ipArgs() As Variant) As Boolean
-    IsNotNull = Not pvIsTypeByNameByCVar(Me.Name.OfNull, ipArgs)
+Public Function IsNotNull(ParamArray ipArgArray() As Variant) As Boolean
+    IsNotNull = Not pvIsTypeByNameByFPA(Me.Name.OfNull, ipArgArray)
 End Function
 
-Public Function IsNullArray(ParamArray ipArgs() As Variant) As Boolean
-    IsNullArray = pvIsTypeByNameByCVar(Me.Name.AsArray.OfNull, ipArgs)
+Public Function IsNullArray(ParamArray ipArgArray() As Variant) As Boolean
+    IsNullArray = pvIsTypeByNameByFPA(Me.Name.AsArray.OfNull, ipArgArray)
 End Function
 
-Public Function IsNotNullArray(ParamArray ipArgs() As Variant) As Boolean
-    IsNotNullArray = Not pvIsTypeByNameByCVar(Me.Name.AsArray.OfNull, ipArgs)
+Public Function IsNotNullArray(ParamArray ipArgArray() As Variant) As Boolean
+    IsNotNullArray = Not pvIsTypeByNameByFPA(Me.Name.AsArray.OfNull, ipArgArray)
 End Function
 
-Public Function IsInteger(ParamArray ipArgs() As Variant) As Boolean
-    IsInteger = pvIsTypeByNameByCVar(Me.Name.OfInteger, ipArgs)
+Public Function IsInteger(ParamArray ipArgArray() As Variant) As Boolean
+    IsInteger = pvIsTypeByNameByFPA(Me.Name.OfInteger, ipArgArray)
 End Function
 
-Public Function IsNotInteger(ParamArray ipArgs() As Variant) As Boolean
-    IsNotInteger = Not pvIsTypeByNameByCVar(Me.Name.OfInteger, ipArgs)
+Public Function IsNotInteger(ParamArray ipArgArray() As Variant) As Boolean
+    IsNotInteger = Not pvIsTypeByNameByFPA(Me.Name.OfInteger, ipArgArray)
 End Function
 
-Public Function IsIntegerArray(ParamArray ipArgs() As Variant) As Boolean
-    IsIntegerArray = pvIsTypeByNameByCVar(Me.Name.AsArray.OfInteger, ipArgs)
+Public Function IsIntegerArray(ParamArray ipArgArray() As Variant) As Boolean
+    IsIntegerArray = pvIsTypeByNameByFPA(Me.Name.AsArray.OfInteger, ipArgArray)
 End Function
 
-Public Function IsNotIntegerArray(ParamArray ipArgs() As Variant) As Boolean
-    IsNotIntegerArray = Not pvIsTypeByNameByCVar(Me.Name.AsArray.OfInteger, ipArgs)
+Public Function IsNotIntegerArray(ParamArray ipArgArray() As Variant) As Boolean
+    IsNotIntegerArray = Not pvIsTypeByNameByFPA(Me.Name.AsArray.OfInteger, ipArgArray)
 End Function
 
-Public Function IsLong(ParamArray ipArgs() As Variant) As Boolean
-    IsLong = pvIsTypeByNameByCVar(Me.Name.OfLong, ipArgs)
+Public Function IsLong(ParamArray ipArgArray() As Variant) As Boolean
+    IsLong = pvIsTypeByNameByFPA(Me.Name.OfLong, ipArgArray)
 End Function
 
-Public Function IsNotLong(ParamArray ipArgs() As Variant) As Boolean
-    IsNotLong = Not pvIsTypeByNameByCVar(Me.Name.OfLong, ipArgs)
+Public Function IsNotLong(ParamArray ipArgArray() As Variant) As Boolean
+    IsNotLong = Not pvIsTypeByNameByFPA(Me.Name.OfLong, ipArgArray)
 End Function
 
-Public Function IsLongArray(ParamArray ipArgs() As Variant) As Boolean
-    IsLongArray = pvIsTypeByNameByCVar(Me.Name.AsArray.OfLong, ipArgs)
+Public Function IsLongArray(ParamArray ipArgArray() As Variant) As Boolean
+    IsLongArray = pvIsTypeByNameByFPA(Me.Name.AsArray.OfLong, ipArgArray)
 End Function
 
-Public Function IsNotLongArray(ParamArray ipArgs() As Variant) As Boolean
-    IsNotLongArray = Not pvIsTypeByNameByCVar(Me.Name.AsArray.OfLong, ipArgs)
+Public Function IsNotLongArray(ParamArray ipArgArray() As Variant) As Boolean
+    IsNotLongArray = Not pvIsTypeByNameByFPA(Me.Name.AsArray.OfLong, ipArgArray)
 End Function
 
-Public Function IsLongLong(ParamArray ipArgs() As Variant) As Boolean
-    IsLongLong = pvIsTypeByNameByCVar(Me.Name.OfLongLong, ipArgs)
+Public Function IsLongLong(ParamArray ipArgArray() As Variant) As Boolean
+    IsLongLong = pvIsTypeByNameByFPA(Me.Name.OfLongLong, ipArgArray)
 End Function
 
-Public Function IsNotLongLong(ParamArray ipArgs() As Variant) As Boolean
-    IsNotLongLong = Not pvIsTypeByNameByCVar(Me.Name.OfLongLong, ipArgs)
+Public Function IsNotLongLong(ParamArray ipArgArray() As Variant) As Boolean
+    IsNotLongLong = Not pvIsTypeByNameByFPA(Me.Name.OfLongLong, ipArgArray)
 End Function
 
-Public Function IsLongLongArray(ParamArray ipArgs() As Variant) As Boolean
-    IsLongLongArray = pvIsTypeByNameByCVar(Me.Name.AsArray.OfLongLong, ipArgs)
+Public Function IsLongLongArray(ParamArray ipArgArray() As Variant) As Boolean
+    IsLongLongArray = pvIsTypeByNameByFPA(Me.Name.AsArray.OfLongLong, ipArgArray)
 End Function
 
-Public Function IsNotLongLongArray(ParamArray ipArgs() As Variant) As Boolean
-    IsNotLongLongArray = Not pvIsTypeByNameByCVar(Me.Name.AsArray.OfLongLong, ipArgs)
+Public Function IsNotLongLongArray(ParamArray ipArgArray() As Variant) As Boolean
+    IsNotLongLongArray = Not pvIsTypeByNameByFPA(Me.Name.AsArray.OfLongLong, ipArgArray)
 End Function
 
 '@Description(" True if the object type is object.  Which is different to asking if a variable is an object")
-Public Function IsObjectObject(ParamArray ipArgs() As Variant) As Boolean
+Public Function IsObjectObject(ParamArray ipArgArray() As Variant) As Boolean
 Attribute IsObjectObject.VB_Description = " True if the object type is object.  Which is different to asking if a variable is an object"
-    IsObjectObject = pvIsTypeByNameByCVar(Me.Name.OfObject, ipArgs)
+    IsObjectObject = pvIsTypeByNameByFPA(Me.Name.OfObject, ipArgArray)
 End Function
 
-Public Function IsNotObjectObject(ParamArray ipArgs() As Variant) As Boolean
-    IsNotObjectObject = Not pvIsTypeByNameByCVar(Me.Name.OfObject, ipArgs)
+Public Function IsNotObjectObject(ParamArray ipArgArray() As Variant) As Boolean
+    IsNotObjectObject = Not pvIsTypeByNameByFPA(Me.Name.OfObject, ipArgArray)
 End Function
 
-Public Function IsObjectObjectArray(ParamArray ipArgs() As Variant) As Boolean
-    IsObjectObjectArray = pvIsTypeByNameByCVar(Me.Name.AsArray.OfObject, ipArgs)
+Public Function IsObjectObjectArray(ParamArray ipArgArray() As Variant) As Boolean
+    IsObjectObjectArray = pvIsTypeByNameByFPA(Me.Name.AsArray.OfObject, ipArgArray)
 End Function
 
-Public Function IsNotArrayOfObjectObjects(ParamArray ipArgs() As Variant) As Boolean
-    IsNotArrayOfObjectObjects = Not pvIsTypeByNameByCVar(Me.Name.AsArray.OfObject, ipArgs)
+Public Function IsNotArrayOfObjectObjects(ParamArray ipArgArray() As Variant) As Boolean
+    IsNotArrayOfObjectObjects = Not pvIsTypeByNameByFPA(Me.Name.AsArray.OfObject, ipArgArray)
 End Function
 
-Public Function IsSingle(ParamArray ipArgs() As Variant) As Boolean
-    IsSingle = pvIsTypeByNameByCVar(Me.Name.OfSingle, ipArgs)
+Public Function IsSingle(ParamArray ipArgArray() As Variant) As Boolean
+    IsSingle = pvIsTypeByNameByFPA(Me.Name.OfSingle, ipArgArray)
 End Function
 
-Public Function IsNotSingle(ParamArray ipArgs() As Variant) As Boolean
-    IsNotSingle = Not pvIsTypeByNameByCVar(Me.Name.OfSingle, ipArgs)
+Public Function IsNotSingle(ParamArray ipArgArray() As Variant) As Boolean
+    IsNotSingle = Not pvIsTypeByNameByFPA(Me.Name.OfSingle, ipArgArray)
 End Function
 
-Public Function IsSingleArray(ParamArray ipArgs() As Variant) As Boolean
-    IsSingleArray = pvIsTypeByNameByCVar(Me.Name.AsArray.OfSingle, ipArgs)
+Public Function IsSingleArray(ParamArray ipArgArray() As Variant) As Boolean
+    IsSingleArray = pvIsTypeByNameByFPA(Me.Name.AsArray.OfSingle, ipArgArray)
 End Function
 
-Public Function IsNotSingleArray(ParamArray ipArgs() As Variant) As Boolean
-    IsNotSingleArray = Not pvIsTypeByNameByCVar(Me.Name.AsArray.OfSingle, ipArgs)
+Public Function IsNotSingleArray(ParamArray ipArgArray() As Variant) As Boolean
+    IsNotSingleArray = Not pvIsTypeByNameByFPA(Me.Name.AsArray.OfSingle, ipArgArray)
 End Function
 
-Public Function IsString(ParamArray ipArgs() As Variant) As Boolean
-    IsString = pvIsTypeByNameByCVar(Me.Name.OfString, ipArgs)
+Public Function IsString(ParamArray ipArgArray() As Variant) As Boolean
+    IsString = pvIsTypeByNameByFPA(Me.Name.OfString, ipArgArray)
 End Function
 
-Public Function IsNotString(ParamArray ipArgs() As Variant) As Boolean
-    IsNotString = Not pvIsTypeByNameByCVar(Me.Name.OfString, ipArgs)
+Public Function IsNotString(ParamArray ipArgArray() As Variant) As Boolean
+    IsNotString = Not pvIsTypeByNameByFPA(Me.Name.OfString, ipArgArray)
 End Function
 
-Public Function IsStringArray(ParamArray ipArgs() As Variant) As Boolean
-    IsStringArray = pvIsTypeByNameByCVar(Me.Name.AsArray.OfString, ipArgs)
+Public Function IsStringArray(ParamArray ipArgArray() As Variant) As Boolean
+    IsStringArray = pvIsTypeByNameByFPA(Me.Name.AsArray.OfString, ipArgArray)
 End Function
 
-Public Function IsNotStringArray(ParamArray ipArgs() As Variant) As Boolean
-    IsNotStringArray = Not pvIsTypeByNameByCVar(Me.Name.AsArray.OfString, ipArgs)
+Public Function IsNotStringArray(ParamArray ipArgArray() As Variant) As Boolean
+    IsNotStringArray = Not pvIsTypeByNameByFPA(Me.Name.AsArray.OfString, ipArgArray)
 End Function
 
-Public Function IsUnknown(ParamArray ipArgs() As Variant) As Boolean
-    IsUnknown = pvIsTypeByNameByCVar(Me.Name.OfUnknown, ipArgs)
+Public Function IsUnknown(ParamArray ipArgArray() As Variant) As Boolean
+    IsUnknown = pvIsTypeByNameByFPA(Me.Name.OfUnknown, ipArgArray)
 End Function
 
-Public Function IsNotUnknown(ParamArray ipArgs() As Variant) As Boolean
-    IsNotUnknown = Not pvIsTypeByNameByCVar(Me.Name.OfUnknown, ipArgs)
+Public Function IsNotUnknown(ParamArray ipArgArray() As Variant) As Boolean
+    IsNotUnknown = Not pvIsTypeByNameByFPA(Me.Name.OfUnknown, ipArgArray)
 End Function
 
-Public Function IsUnknownArray(ParamArray ipArgs() As Variant) As Boolean
-    IsUnknownArray = pvIsTypeByNameByCVar(Me.Name.AsArray.OfUnknown, ipArgs)
+Public Function IsUnknownArray(ParamArray ipArgArray() As Variant) As Boolean
+    IsUnknownArray = pvIsTypeByNameByFPA(Me.Name.AsArray.OfUnknown, ipArgArray)
 End Function
 
-Public Function IsNotUnknownArray(ParamArray ipArgs() As Variant) As Boolean
-    IsNotUnknownArray = Not pvIsTypeByNameByCVar(Me.Name.AsArray.OfUnknown, ipArgs)
+Public Function IsNotUnknownArray(ParamArray ipArgArray() As Variant) As Boolean
+    IsNotUnknownArray = Not pvIsTypeByNameByFPA(Me.Name.AsArray.OfUnknown, ipArgArray)
 End Function
 
 ' Its not possible to test for a variable being a variant in vba
-Public Function IsVariantArray(ParamArray ipArgs() As Variant) As Boolean
-    IsVariantArray = pvIsTypeByNameByCVar(Me.Name.AsArray.ofVariant, ipArgs)
+Public Function IsVariantArray(ParamArray ipArgArray() As Variant) As Boolean
+    IsVariantArray = pvIsTypeByNameByFPA(Me.Name.AsArray.ofVariant, ipArgArray)
 End Function
 
-Public Function IsNotVariantArray(ParamArray ipArgs() As Variant) As Boolean
-    IsNotVariantArray = Not pvIsTypeByNameByCVar(Me.Name.AsArray.ofVariant, ipArgs)
+Public Function IsNotVariantArray(ParamArray ipArgArray() As Variant) As Boolean
+    IsNotVariantArray = Not pvIsTypeByNameByFPA(Me.Name.AsArray.ofVariant, ipArgArray)
 End Function
 
-Public Function IsKVPair(ParamArray ipArgs() As Variant) As Boolean
-    IsKVPair = pvIsTypeByNameByCVar(Me.Name.OfKVPair, ipArgs)
+Public Function IsKVPair(ParamArray ipArgArray() As Variant) As Boolean
+    IsKVPair = pvIsTypeByNameByFPA(Me.Name.OfKVPair, ipArgArray)
 End Function
 
-Public Function IsNotKVPair(ParamArray ipArgs() As Variant) As Boolean
-    IsNotKVPair = Not pvIsTypeByNameByCVar(Me.Name.OfKVPair, ipArgs)
+Public Function IsNotKVPair(ParamArray ipArgArray() As Variant) As Boolean
+    IsNotKVPair = Not pvIsTypeByNameByFPA(Me.Name.OfKVPair, ipArgArray)
 End Function
 
 '========1=========2=========3=========4=========5=========6=========7=========8=========9=========A=========B=========C
@@ -759,61 +804,63 @@ End Function
 '========1=========2=========3=========4=========5=========6=========7=========8=========9=========A=========B=========C
 Public Function ToVarTypePrimitive(ByVal ipType As VbVarType, ByVal ipValue As Variant) As Variant
 
-    Guard InvalidType, Me.Group.IsNotPrimitive, i.Location & "ToVarType", Array("Primitive", TypeName(ipValue), "ipValue")
+    Globals.Res.Init (Msg.Okay)
+    If BailOut.When(Types.Group.IsNotPrimitive(ipValue), Msg.InvalidType) Then Exit Function ' ToDo: Msg.IsNotPrimitive
             
     Dim myResult As Variant
     'With Types.Name
         
     Select Case ipType
             
-    Case vbBoolean
-                
-        myResult = VBA.CBool(ipValue)
+        Case vbBoolean
                     
-    Case vbByte
-                
-        myResult = VBA.CByte(ipValue)
-                
-    Case vbCurrency
-                
-        myResult = VBA.CCur(ipValue)
-                
-    Case vbDate
-                
-        myResult = VBA.CDate(ipValue)
+            myResult = VBA.CBool(ipValue)
+                        
+        Case vbByte
                     
-    Case vbDouble
-                
-        myResult = VBA.CDbl(ipValue)
-            
-    Case vbDecimal
-                
-        myResult = VBA.CDec(ipValue)
-                
-    Case vbInteger
-                
-        myResult = VBA.CInt(ipValue)
-                
-    Case vbLong
-                
-        myResult = VBA.CLng(ipValue)
-                
-    Case vbLongLong
-                
-        myResult = VBA.CLngLng(ipValue)
-                            
-    Case vbSingle
-                
-        myResult = VBA.CSng(ipValue)
+            myResult = VBA.CByte(ipValue)
                     
-    Case vbString
+        Case vbCurrency
+                    
+            myResult = VBA.CCur(ipValue)
+                    
+        Case vbDate
+                    
+            myResult = VBA.CDate(ipValue)
+                        
+        Case vbDouble
+                    
+            myResult = VBA.CDbl(ipValue)
                 
-        myResult = VBA.CStr(ipValue)
+        Case vbDecimal
+                    
+            myResult = VBA.CDec(ipValue)
+                    
+        Case vbInteger
+                    
+            myResult = VBA.CInt(ipValue)
+                    
+        Case vbLong
+                    
+            myResult = VBA.CLng(ipValue)
+                    
+        Case vbLongLong
+                    
+            myResult = VBA.CLngLng(ipValue)
+                                
+        Case vbSingle
+                    
+            myResult = VBA.CSng(ipValue)
+                        
+        Case vbString
+                    
+            myResult = VBA.CStr(ipValue)
                     
     End Select
             
     ' End With
-        
+      
+    Globals.Res.Init(Msg.Okay).SetItems (myResult)
     ToVarTypePrimitive = myResult
         
 End Function
