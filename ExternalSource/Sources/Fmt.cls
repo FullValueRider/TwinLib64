@@ -316,7 +316,7 @@ Friend Function pvConvertVariableFieldsToStringRepresentations _
 Attribute pvConvertVariableFieldsToStringRepresentations.VB_Description = "Replace each ocurrence of '{<number>}' with the corresponding stringified item from the parameters list"
 
     Dim myIndex                         As Variant
-    Dim myargs                     As Variant
+    Dim myargs                          As Variant
     Dim myReturn                        As String
 
     myargs = ipArgs

@@ -267,28 +267,30 @@ Attribute Dequeue.VB_Description = "Returns values taken sequentially from the L
     Set Dequeue = myLyst
     
     If ipCount = 0 Then Exit Function
-    If Ranges.TryStartRunFromAnyStartRunEnd(Me, ipRun:=ipCount).IsNotOkay Then Exit Function
+    'If Ranges.TryStartRunFromAnyStartRunEnd(Me, ipRun:=ipCount).IsNotOkay Then Exit Function
     
     'next 4 lines for readability
-    Dim myStartIndex As Long
-    myStartIndex = Globals.Res.Item(ResultItemsEnums.StartRun(srStartindex))
+    ' Dim myStartIndex As Long
+    ' myStartIndex = Globals.Res.Item(ResultItemsEnums.StartRun(srStartindex))
     
-    Dim myCount As Long
-    myCount = Globals.Res.Item(ResultItemsEnums.StartRun(srRunLength))
+    ' Dim myCount As Long
+    ' myCount = Globals.Res.Item(ResultItemsEnums.StartRun(srRunLength))
     
     If ipCount > 0 Then
     
-        Set myLyst = GetRange(myStartIndex, myCount)
-      
+        Set myLyst = GetRange(1, ipCount)
+        s.Host.RemoveRange 1, ipCount
       
     Else
       
-        Set myLyst.Host = GetRange(myStartIndex + 1, myCount).Reverse
-      
+        Set myLyst.Host = GetRange(LastIndex - VBA.Abs(ipCount) + 1, VBA.Abs(ipCount)).Reverse
+        s.Host.RemoveRange LastIndex - VBA.Abs(ipCount) + 1 - 1, VBA.Abs(ipCount)
       
     End If
-    s.Host.RemoveRange myStartIndex, myCount
+    's.Host.RemoveRange myStartIndex, myCount
         
+    Set Dequeue = myLyst
+    
 End Function
 
 '@Description("Alternative syntax for AddRange")

@@ -13,35 +13,35 @@ Option Explicit
 '@Exposed
 '@Interface
 
-Public Function Clone() As IAutoKey
+Friend Function Clone() As IAutoKey
 End Function
 
 Public Property Get CurrentKey() As Variant
 End Property
 
-Public Property Let CurrentKey(ByVal Value As Variant)
+Friend Property Let CurrentKey(ByVal Value As Variant)
 End Property
 
-Public Property Get FirstUseKey() As Variant
-End Property
+Public Function GetFirstUseKey() As Variant
+End Function
 
-Public Property Let FirstUseKey(ByVal ipValue As Variant)
-End Property
+' Public Function setFirstUseKey(ByVal ipValue As Variant)
+' End Function
 
 Public Property Get FirstUseKeyType() As String
 End Property
 
-Public Function GetKeySequence(ByVal ipCount As Long) As Lyst
+Public Function NextKeys(ByVal ipCount As Long) As Lyst
 End Function
 
-Public Function GetNextKey() As Variant
+Public Function NextKey() As Variant
 End Function
 
 Public Function Name() As String
 End Function
 
-Public Function Res() As Result
-End Function
+' Public Function Res() As Result
+' End Function
 
 
 

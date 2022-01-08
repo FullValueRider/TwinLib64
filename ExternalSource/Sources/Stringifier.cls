@@ -133,7 +133,7 @@ Public Function ToStringByIterable(ByVal ipIterable As Variant) As String
     Dim myItems As Lyst
     Set myItems = Lyst.Deb
     myItems.AddKnownIterableAsItems ipIterable
-    If Globals.Res.IsNotOkay Then Exit Function
+    'If Globals.Res.IsNotOkay Then Exit Function
         
     If myItems.HasNoItems Then Exit Function
   

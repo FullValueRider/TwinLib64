@@ -1300,13 +1300,13 @@ TestFail:
         
         'Act:
         Dim myKeys As Variant
-        Debug.Print
+        'Debug.Print
         For Each myKeys In myExpectedKeys
         
             Dim myItems As Variant
             For Each myItems In myExpectedItems
                 
-                Debug.Print TypeName(myKeys), TypeName(myItems)
+                'Debug.Print TypeName(myKeys), TypeName(myItems)
                 Dim myKvp As Kvp
                 Set myKvp = Kvp.Deb
                 
@@ -2811,7 +2811,8 @@ TestFail:
         
         
         myResult = myKvp.GetKeys.ToArray
-        MyResultRow1values = myKvp.Item(8&).Items
+      
+        MyResultRow1values = myKvp.Item(8&).ToArray
         'Assert.Strict.
         Assert.Strict.SequenceEquals myExpectedKeys, myResult  ' ' , myPlace & CurrentProcedureName & ":Keys"
         Assert.Strict.SequenceEquals MyExpectedRow1values, MyResultRow1values ' ' , myPlace & CurrentProcedureName & ":First"
@@ -3435,7 +3436,9 @@ TestFail:
         
         'Arrange:
         Dim myKvp As Kvp
-        Set myKvp = Kvp.Deb.SetAutoKeyToAutoKeyByIndex(Types.Iterable.ToLyst(100, 200, 300, 400, 500, 600, 700)).Add(Array(1, 2, 3, 4))
+        Set myKvp = Kvp.Deb
+        myKvp.SetAutoKeyToAutoKeyByIndex(Array(100, 200, 300, 400, 500, 600, 700))
+        myKvp.Add(Array(1, 2, 3, 4))
 
         
         Dim myExpectedKeys As Variant
@@ -3448,7 +3451,7 @@ TestFail:
         Dim myResult As Variant
         'Act:
         myKvp.Enqueue 5
-        myResult = myKvp.GetKeys.ToArray
+        myResult = myKvp.KeysRef.ToArray
         myResultValues = myKvp.ItemsRef.ToArray
         
         'Assert.Strict.
@@ -3510,7 +3513,9 @@ TestFail:
         Set myResult = myKvp.Dequeue
         
         'Assert.Strict.
-        Assert.Strict.AreEqual myExpected, myResult.GetFirst.ToString  ', CurrentProcedureName
+        Debug.Print myResult.GetFirst.ToString(Char.twComma)
+        Debug.Print myResult.GetFirst.ToString(Char.twComma)
+        Assert.Strict.AreEqual myExpected, myResult.GetFirst.ToString(Char.twComma)  ', CurrentProcedureName
         
 TestExit:
         Exit Sub

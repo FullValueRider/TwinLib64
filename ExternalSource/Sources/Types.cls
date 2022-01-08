@@ -61,7 +61,7 @@ End Property
 '  Class Intellisense forwarding
 '
 '========1=========2=========3=========4=========5=========6=========7=========8=========9=========A=========B=========C
-
+'@Description("Global.Res.Items is populated with the first index,lastindex and count if ipItem is an iterable")
 Public Function TryExtent(ByVal ipItem As Variant, Optional ipRank As Long = 1&) As Result
     
     Set TryExtent = Globals.Res.SetNotOkay

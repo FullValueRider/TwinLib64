@@ -167,7 +167,7 @@ Public Enum Msg
     UsePredeclaredIdInstance
     InvalidNew
     UseNewInstance
-
+    HasNoInstance
     InvalidInstanceCreation
     DisallowedOverwrite
     
@@ -215,6 +215,7 @@ Public Enum Msg
     'General messages
     notequal
     Unspecified
+   
 
     StartIndexWasZeroResetToOne
     StartIndexExceedsItemCount
@@ -226,7 +227,7 @@ Public Enum Msg
     
     InvalidInsertCountZero
     RunLengthIsZero
-
+    CountCannotBeLessThanOne
 
 
     'Enumeration issues
@@ -764,7 +765,7 @@ Private Sub SetupDictionaries()
         'Class Messages
         .Add InvalidMethod, "Object '{0}' does not have a '{1}' method"
         '.Add NoCountMethod, "Object '{0}' has no Count method"
-        
+        .Add HasNoInstance, "The object has no instance"
         
         .Add UnexpectedEmpty, "Unexpected Empty in '{0}'"
         .Add MissingParameter, "An expected parameter is missing"
@@ -848,7 +849,7 @@ Private Sub SetupDictionaries()
         'General Messages
         .Add notequal, "Not equal"
         .Add Unspecified, "The type of error was not specified"
-        
+        .CountCannotBeLessThanOne , "Count cannot be zero"
     End With
         
 End Sub

@@ -489,10 +489,14 @@ Attribute Dequeue.VB_Description = "Returns a Kvp removed items.  Items are remo
     Dim myIndex As Long
     For myIndex = 1 To ipCount
         
-        myKvp.Add p.Keys.Dequeue.Item(0), p.Items.Dequeue.Item(0)
+        Dim myKey As Variant
+        Set myKey = p.Keys.Dequeue
+        Dim myItem As Variant
+        Set myItem = p.Items.Dequeue
+        myKvp.Add p.Keys.Dequeue.First, p.Items.Dequeue.First
         
     Next
-    
+    Set Dequeue = myKvp
 End Function
 
 
@@ -770,7 +774,7 @@ Attribute GetFirst.VB_Description = "Returns a KVPair of the Key and Item at Ind
         
     Else
         
-        Set GetFirst = KVPair.Deb(p.Keys.Item(0), p.Items.Item(0))
+        Set GetFirst = KVPair.Deb(p.Keys.Item(1), p.Items.Item(1))
         
     End If
     
@@ -1556,42 +1560,26 @@ Public Function SetAutoKeyToAutoKeyByIndex(ByVal ipKeysIterable As Variant, Opti
     
     Set SetAutoKeyToAutoKeyByIndex = Me
     
-    If BailOut.When(Not s.FirstUse, Msg.AutoKeyResetNotAllowed) Then Exit Function
+    'If BailOut.When(Not s.FirstUse, Msg.AutoKeyResetNotAllowed) Then Exit Function
     If BailOut.When(Types.Group.IsNotIterable(ipKeysIterable), Msg.IsNotIterable) Then Exit Function
-    If BailOut.When(Types.Iterable.HasNoItems(ipKeysIterable), HasNoItems) Then Exit Function
-
-
-    Dim myLyst As Lyst
-    Set myLyst = Types.Iterable.ToLyst(ipKeysIterable)
+    If BailOut.When(Types.Iterable.HasNoItems(ipKeysIterable), Msg.HasNoItems) Then Exit Function
     
-    'Dim myResult As Result
-    'Guard GuardClause.IndexLessThanFirstIndex, VBA.IsEmpty(Types.Iterable.TryExtent(ipKeysIterable, myResult).Item(Extent.IsFirstIndex)), myPlace
-    Dim myKeysFirstIndex As Long
-    If Types.Iterable.TryExtent(ipKeysIterable).IsNotOkay Then Exit Function
-    myKeysFirstIndex = Globals.Res.Item(ResultItemsEnums.ItemExtent(ieFirstIndex))
-    ' Normalise ipStartIndex for use when ipKeysIterable is converted to an ArrayList
-    ' An arraylist is required to get access to the 'IndexOf' method
-    ' ipStartIndex is the first index to use with ipKeysIterable and is not necessarily
-    ' the first item in the iterable
+
+    Dim myIterableFirstIndex As Long
+    If Types.TryExtent(ipKeysIterable).IsNotOkay Then Exit Function
+    myIterableFirstIndex = Globals.Res.Item(ResultItemsEnums.ItemExtent(ieFirstIndex))
+   
+    
+    
+    Dim mykeys As Lyst
+    Set mykeys = Lyst.Deb.AddKnownIterableAsItems(ipKeysIterable)
     
     Dim myStartIndex As Long
-    Select Case True
-            
-        Case Types.Group.IsNotNumber(ipStartIndex)
-        
-            ' case where a value has been provided rather than an index
-            ' only valid for when ipFirstIndex is not a number
-            
-            myStartIndex = myLyst.IndexOf(ipStartIndex) - myKeysFirstIndex + 1
-            
-        Case Else
-        
-            myStartIndex = ipStartIndex - myKeysFirstIndex ' + 1
-        
-    End Select
-    
-    Set p.AutoKey = AutoKeyByIndex.Deb(myLyst, myStartIndex)
+    myStartIndex = IIf(VBA.IsMissing(ipStartIndex), myIterableFirstIndex, ipStartIndex) + mykeys.FirstIndex
+   
+    Set p.AutoKey = AutoKeyByIndex.Deb(mykeys, myStartIndex)
     s.FirstUse = False
+    'p.AutoKey.CurrentKey = Empty
     Set SetAutoKeyToAutoKeyByIndex = Me
         
         
@@ -1669,7 +1657,7 @@ Friend Sub InputWhenFPAHasOneItem(ByVal ipInputAction As Long, ByVal ipItem As V
     Set myParsed = Globals.Res.GetResultParsedVariant
     
     Dim myKeys As Lyst
-    Set myKeys = p.AutoKey.GetKeySequence(myParsed.GetItems.Count)
+    Set myKeys = p.AutoKey.NextKeys(myParsed.GetItems.Count)
         
     If ipInputAction = KvpAdmin.inputisadd Then
     
@@ -1726,7 +1714,7 @@ Friend Sub IputWhenFPAIsListOfItems(ByVal ipInsertAt As Long, ByVal ipList As Va
     If BailOut.When(VBA.Abs(ipInsertAt) > myCount, Msg.IndexAfterLastIndex) Then Exit Sub
         
     Dim myKeys As Lyst
-    Set myKeys = p.AutoKey.GetKeySequence(myCount)
+    Set myKeys = p.AutoKey.NextKeys(myCount)
     
     If ipInsertAt = KvpAdmin.inputisadd Then
           
@@ -2136,7 +2124,7 @@ Attribute AdjustbyKey.VB_Description = "Common code for IncByKey and DecByKey"
         
     ElseIf Types.Group.IsIterable(ipKeys) Then
     
-        Set myKeys = p.Keys
+        Set myKeys = Lyst.Deb.AddKnownIterableAsItems(ipKeys)
         
     Else
     
@@ -2183,7 +2171,7 @@ Friend Function GetAutoKeySequence(ByVal ipCount As Long) As Lyst
     Dim myCount As Long
     For myCount = 1 To ipCount
     
-        myLyst.Add p.AutoKey.GetNextKey
+        myLyst.Add p.AutoKey.NextKey
         
     Next
     
