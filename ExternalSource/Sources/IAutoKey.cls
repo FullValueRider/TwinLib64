@@ -25,8 +25,8 @@ End Property
 Public Function GetFirstUseKey() As Variant
 End Function
 
-' Public Function setFirstUseKey(ByVal ipValue As Variant)
-' End Function
+Public Function SetFirstUseKey(ByVal ipValue As Variant) As IAutoKey
+End Function
 
 Public Property Get FirstUseKeyType() As String
 End Property

@@ -59,7 +59,7 @@ End Function
 Public Function ReadyToUseInstance(ByVal ipFirstUseKey As Variant) As AutoKeyByNumber
   
     Globals.Res.SetNotOkay
-    Set ReadyToUseInstance = Nothing
+    Set ReadyToUseInstance = Me
     
     SetFirstUseKey ipFirstUseKey
     If Globals.Res.IsNotOkay Then Exit Function
@@ -78,9 +78,9 @@ Private Property Get IAutoKey_GetFirstUseKey() As Variant
     IAutoKey_GetFirstUseKey = GetFirstUseKey
 End Property
 
-' Private Property Let IAutoKey_SetFirstUseKey(ByVal ipValue As Variant)
-'     FirstUseKey = ipValue
-' End Property
+Friend Function IAutoKey_SetFirstUseKey(ByVal ipValue As Variant) As IAutoKey
+    SetFirstUseKey ipValue
+End Function
 
 Private Property Get IAutoKey_CurrentKey() As Variant
     IAutoKey_CurrentKey = CurrentKey
@@ -120,7 +120,7 @@ Public Function GetFirstUseKey() As Variant
     GetFirstUseKey = p.FirstUseKey
 End Function
 
-Public Function SetFirstUseKey(ByVal ipValue As Variant) As AutoKeyByNumber
+Friend Function SetFirstUseKey(ByVal ipValue As Variant) As IAutoKey
     
     Set SetFirstUseKey = Me
     If BailOut.When(VBA.IsEmpty(ipValue), Msg.UnexpectedEmpty) Then Exit Function
@@ -190,7 +190,7 @@ Public Function NextKeys(ByVal ipCount As Long) As Lyst
     Dim myCounter As Long
     For myCounter = 1 To ipCount
             
-        myList.Add NextKeys
+        myList.Add NextKey
             
     Next
         
@@ -207,5 +207,3 @@ End Function
 Private Function Inc(ByVal ipKey As Variant) As Variant
     Inc = ipKey + 1
 End Function
-
-

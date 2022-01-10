@@ -155,7 +155,7 @@ Public Property Get IterableByIndexTypes() As String
                        & Types.Name.OfArrayList & Char.twComma _
                        & Types.Name.OfLyst & Char.twComma _
                        & Types.Name.OfCollection & Char.twComma _
-                       & Types.Name.OfRoc & Char.twComma _
+                       & Types.Name.OfROL & Char.twComma _
                        & IterablePrimitiveTypes
     'Debug.Print IterableByIndexTypes
 End Property

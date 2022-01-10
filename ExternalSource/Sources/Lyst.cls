@@ -194,13 +194,23 @@ End Function
 Friend Function AddKnownIterableAsItems(ByVal ipIterable As Variant) As Lyst
 Attribute AddKnownIterableAsItems.VB_Description = "Implements add for a single item produced by ParseParamArrayToLyst<test> thus does not retest via ParseParaArray... thereby avoiding an infinite recursion"
 
-    Dim myitem As Variant
-    For Each myitem In ipIterable
-            
-        s.Host.Add myitem
-            
-            
-    Next
+
+    If Types.Group.IsNotIterable(ipIterable) Then
+        
+        s.Host.add ipIterable
+        
+    Else
+        
+    
+        Dim myitem As Variant
+        For Each myitem In ipIterable
+                
+            s.Host.Add myitem
+                
+                
+        Next
+        
+    End If
         
     Set AddKnownIterableAsItems = Me
         

@@ -38,7 +38,9 @@ Private Sub Class_Initialise()
 End Sub
 
 '@Description("Takes an iterable of the keys that are valid for this Kvp and the index of the first Key to use.  The Index is specified in 1 based indexing irrespective of the ipKeys iterable firsat/last index. A negative index is allowed.")
-Public Function Deb(Optional ByRef ipKeys As Lyst, Optional ByVal ipFirstUseIndex As Variant = DefaultFirstUseIndex) As AutoKeyByIndex
+Public Function Deb(Optional ByRef ipKeys As Lyst, Optional ByVal ipFirstUseIndex As Variant) As AutoKeyByIndex
+    
+    If BailOut.When(VBA.IsMissing(ipKeys), Msg.UnexpectedEmpty) Then Exit Function
         
     With New AutoKeyByIndex
         
@@ -52,16 +54,23 @@ End Function
 Public Function ReadyToUseInstance(ByVal ipKeys As Variant, ByVal ipFirstuseIndex As Variant) As AutoKeyByIndex
   
     Globals.Res.SetNotOkay
-    Set ReadyToUseInstance = Nothing
+    Set ReadyToUseInstance = Me
     
-    If Types.IsNotMissing(ipKeys) Then
+    SetKeysList ipKeys
+    If Globals.Res.IsNotOkay Then Exit Function
         
-        SetKeysList ipKeys
-        If Globals.Res.IsNotOkay Then Exit Function
-            
+    If VBA.IsMissing(ipFirstuseIndex) Then
+        
+        SetFirstUseIndex p.KeysList.FirstIndex
+        
+        
+    Else
+        
+        SetFirstUseIndex ipFirstuseIndex
+        
+        
     End If
-        
-    SetFirstUseIndex ipFirstuseIndex
+    
     If Globals.Res.IsNotOkay Then Exit Function
         
     Globals.Res.SetOkay
@@ -78,9 +87,9 @@ Private Property Get IAutoKey_GetFirstUseKey() As Variant
     IAutoKey_GetFirstUseKey = GetFirstUseKey
 End Property
 
-' Private Property Let IAutoKey_SetFirstUseKey(ByVal ipValue As Variant)
-'   SetFirstUseKey ipValue
-' End Property
+Private Function IAutoKey_SetFirstUseKey(ByVal ipValue As Variant) As IAutoKey
+  SetFirstUseKey ipValue
+End Function
 
 Private Property Get IAutoKey_CurrentKey() As Variant
     IAutoKey_CurrentKey = CurrentKey
@@ -152,7 +161,7 @@ Attribute FirstUseKey.VB_Description = "For AutoKeyByIndex, takes the Index of t
 End Function
         
         
-Public Function SetFirstUseIndex(ByVal ipIndex As Long) As AutoKeyByIndex
+Friend Function SetFirstUseIndex(ByVal ipIndex As Long) As AutoKeyByIndex
     
     Set SetFirstUseIndex = Me
     If BailOut.When(p.KeysList Is Nothing, Msg.HasNoInstance) Then Exit Function

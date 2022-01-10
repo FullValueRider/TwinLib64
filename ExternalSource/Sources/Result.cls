@@ -236,16 +236,47 @@ End Function
 Public Function SetItems(ParamArray ipResultItems() As Variant) As Result
 Attribute SetItems.VB_Description = "Sets the values of p.ResultItems "
 
+    p.ResultItems.clear
+    Set SetItems = Me
     
-    Dim myResultItems As Lyst
-    Set myResultItems = Lyst.Deb
+    If BailOut.When(Arrays.IsNotValid(ipResultItems), Msg.UnexpectedEmpty) Then Exit Function
     
-    If Arrays.IsNotValid(ipResultItems) Then Exit Function
+    ' If Arrays.HasOneItem(ipResultItems) Then
         
-    myResultItems.AddKnownIterableAsItems ipResultItems ' should this be addknowniterable as items
+    '     If Types.Group.IsIterable(ipResultItems(0)) Then
+            
+    '         p.ResultItems.add ipResultItems(0)
+            
+    '     Else
+            
+    '        p.ResultItems.add ipResultItems
+            
+    '     End If
+ 
+    ' Else
+        
+    Dim myItem As Variant
+    For Each myItem In ipResultItems
+        
+      '  If Types.Group.IsNotIterable(myItem) Then
+            
+        '    p.ResultItems.add Array(myItem)
+            
+            
+      '  Else
+    
+            p.ResultItems.add myItem
+            
+        
+       ' End If
+    
+    Next
+            
+ '   End If
+    
+    'myResultItems.AddKnownIterableAsItems ipResultItems ' should this be addknowniterable as items
     'If myResultItems.HasNoItems Then Exit Function
     
-    Set p.ResultItems = myResultItems.Host
     Set SetItems = Me
             
 End Function

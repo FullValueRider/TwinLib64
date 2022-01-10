@@ -543,8 +543,11 @@ Attribute ToLyst.VB_Description = "Converts input to Lyst. If ipArgArray is one 
         End If
             
         If Parser.ParseVariantWithOneItem(ipArgArray(0)).IsNotOkay Then Exit Function
+            
+        Dim myParsed As ResultParsedVariant
+        Set myParsed = Globals.Res.GetResultParsedVariant
                 
-        Set ToLyst = myLyst.AddKnownIterableAsItems(Globals.Res.Item(ResultItemsEnums.ParsedVariant(pvItems)))
+        Set ToLyst = myLyst.AddKnownIterableAsItems(myParsed.GetItems)
         
         
     Else

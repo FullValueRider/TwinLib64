@@ -56,11 +56,21 @@ Private Sub Class_Initialise()
 
 End Sub
 
-Public Function Deb(Optional ByVal ipFirstUseKey As String, Optional ByVal ipKeyCharList As String) As AutoKeyByString
+Public Function Deb(Optional ByVal ipFirstUseKey As String, Optional ByVal ipallowedkeychars As String) As AutoKeyByString
 
+    If VBA.Len(ipFirstUseKey) = 0 Then
+        
+        ipFirstUseKey = DefaultFirstUseKey
+        
+    End If
+    
+    If VBA.Len(ipallowedkeychars) = 0 Then
+        ipallowedkeychars = Strs.AlphanumChars
+    End If
+        
     With New AutoKeyByString
         
-        Set Deb = .ReadyToUseInstance(ipFirstUseKey, ipKeyCharList) ' Why is ipKeyCharsequence a null string
+        Set Deb = .ReadyToUseInstance(ipFirstUseKey, ipallowedkeychars) ' Why is ipKeyCharsequence a null string
             
     End With
         
@@ -72,9 +82,8 @@ Public Function ReadyToUseInstance(ByVal ipFirstUseKey As String, ByVal ipKeyCha
     Globals.Res.SetNotOkay
     Set ReadyToUseInstance = Nothing
     
-    setFirstUseKey ipFirstUseKey
+    SetFirstUseKey ipFirstUseKey
     If Globals.Res.IsNotOkay Then Exit Function
-        
    
     SetKeyAllowedChars ROL.Deb(ipKeyCharList)
     If Globals.Res.IsNotOkay Then Exit Function
@@ -93,9 +102,9 @@ Private Function IAutoKey_GetFirstUseKey() As Variant
     IAutoKey_GetFirstUseKey = GetFirstUseKey
 End Function
 
-' Private Property Let IAutoKey_FirstUseKey(ByVal ipValue As Variant)
-'     FirstUseKey = ipValue
-' End Property
+Private Function IAutoKey_SetFirstUseKey(ByVal ipValue As Variant) As IAutoKey
+    SetFirstUseKey ipValue
+End Function
 
 Private Property Get IAutoKey_CurrentKey() As Variant
     IAutoKey_CurrentKey = CurrentKey
@@ -135,8 +144,9 @@ Public Function GetFirstUseKey() As Variant
     GetFirstUseKey = p.FirstUseKey
 End Function
 
-Public Function setFirstUseKey(ByVal ipValue As Variant) As AutoKeyByString
-    Set setFirstUseKey = Me
+Friend Function SetFirstUseKey(ByVal ipValue As Variant) As AutoKeyByString
+    
+    Set SetFirstUseKey = Me
     
     If BailOut.When(VBA.IsEmpty(ipValue), Msg.UnexpectedEmpty) Then Exit Function
 
@@ -145,7 +155,7 @@ Public Function setFirstUseKey(ByVal ipValue As Variant) As AutoKeyByString
     p.CurrentKey = Empty
     
     Globals.Res.SetOkay
-    Set setFirstUseKey = Me
+    Set SetFirstUseKey = Me
     
 End Function
 
@@ -163,7 +173,7 @@ End Function
 
 Friend Function SetKeyAllowedChars(ByVal ipValue As ROL) As AutoKeyByString
     Globals.Res.SetNotOkay
-    SetKeyAllowedChars = Nothing
+    Set SetKeyAllowedChars = Nothing
     
     If BailOut.When(ipValue Is Nothing, Msg.HasNoInstance) Then Exit Function
     If BailOut.When(ipValue.HasNoItems, Msg.HasNoItems) Then Exit Function

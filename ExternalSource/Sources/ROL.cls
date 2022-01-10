@@ -49,7 +49,7 @@ Friend Function ReadyToUseInstance(ByVal ipIterable As Variant) As ROL
     
     Set s.Items = ipIterable
     
-If Types.IsTypeByName(Array(Types.Name.OfLyst, Types.names.ofrol), ipIterable) Then
+If Types.IsTypeByName(Array(Types.Name.OfLyst, Types.Name.OfROL), ipIterable) Then
     Set s.Items = ipIterable.toarraylist
 End If
     
