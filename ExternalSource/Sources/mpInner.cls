@@ -4,7 +4,7 @@ BEGIN
 END
 Attribute VB_Name = "mpInner"
 Attribute VB_GlobalNameSpace = False
-Attribute VB_Creatable = False
+Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = True
 Option Explicit
@@ -34,14 +34,14 @@ Public Function ExecMapper(ByVal ipHostItem As Variant) As Variant
     myTypeName = TypeName(ipHostItem)
     Select Case myTypeName
         
-    Case "Kvp", "Lyst"
-            
-        ExecMapper = ipHostItem.MapIt(s.Mapper)
+        Case "Kvp", "Lyst"
                 
+            ExecMapper = ipHostItem.MapIt(mpInner.Deb(s.Mapper))
+                    
+                
+        Case Else
             
-    Case Else
-        
-        ExecMapper = ipHostItem
+            ExecMapper = s.Mapper.ExecMapper(ipHostItem)
         
             
     End Select

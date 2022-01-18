@@ -2,9 +2,9 @@ VERSION 1.0 CLASS
 BEGIN
   MultiUse = -1  'True
 END
-Attribute VB_Name = "ftIfIt"
+Attribute VB_Name = "FilterIt"
 Attribute VB_GlobalNameSpace = False
-Attribute VB_Creatable = False
+Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = True
 Option Explicit
@@ -22,9 +22,9 @@ End Type
 
 Private s                           As State
 
-Public Function Deb(ByRef ipComparer As IComparer) As ftIfIt
+Public Function Deb(ByRef ipComparer As IComparer) As FilterIt
         
-    With New ftIfIt
+    With New FilterIt
         
         Set Deb = .ReadyToUseInstance(ipComparer)
             
@@ -32,7 +32,7 @@ Public Function Deb(ByRef ipComparer As IComparer) As ftIfIt
         
 End Function
 
-Friend Function ReadyToUseInstance(ByRef ipComparer As IComparer) As ftIfIt
+Friend Function ReadyToUseInstance(ByRef ipComparer As IComparer) As FilterIt
         
     Set s.Comparer = ipComparer
     Set ReadyToUseInstance = Me

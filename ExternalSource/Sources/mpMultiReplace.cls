@@ -4,7 +4,7 @@ BEGIN
 END
 Attribute VB_Name = "mpMultiReplace"
 Attribute VB_GlobalNameSpace = False
-Attribute VB_Creatable = False
+Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = True
 Option Explicit
@@ -36,7 +36,7 @@ Public Function ExecMap(ByVal ipHostItem As Variant) As Variant
 End Function
 
 '@Description("Takes a jagged array of find/replacepairs")
-Public Function Deb(ByRef ipFindReplaceItems As Variant) As mpMultiReplace
+Public Function Deb(ParamArray ipFindReplaceItems() As Variant) As mpMultiReplace
 Attribute Deb.VB_Description = "Takes a jagged array of find/replacepairs"
 
     With New mpMultiReplace

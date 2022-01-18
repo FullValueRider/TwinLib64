@@ -4,7 +4,7 @@ BEGIN
 END
 Attribute VB_Name = "Types"
 Attribute VB_GlobalNameSpace = False
-Attribute VB_Creatable = False
+Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = True
 
@@ -152,7 +152,7 @@ End Function
 Friend Function IsArrayByFPA(ByVal ipArgArray As Variant) As Boolean
         
     IsArrayByFPA = False
-    If BailOut.When(Arrays.IsNotValid(ipArgArray), Msg.ParamArrayIsEmpty) Then Exit Function
+    If BailOut.When(Arrays.IsNotValid(ipArgArray), Msg.ParamArrayIsNotValid) Then Exit Function
         
     Dim myArg As Variant
     For Each myArg In ipArgArray
@@ -444,29 +444,22 @@ End Function
 Public Function pvIsTypeByNameByFPA(ByVal ipTypesasStringOrIterable As Variant, ByVal ipArgArray As Variant) As Boolean
         
     pvIsTypeByNameByFPA = False
-    If Arrays.IsNotValid(ipArgArray) Then Exit Function
+    If BailOut.When(Arrays.IsNotValid(ipArgArray), Msg.ParamArrayIsNotValid) Then Exit Function
         
     Dim myIterable As Variant
     If VBA.VarType(ipTypesasStringOrIterable) = vbString Then
-                
+        
         Set myIterable = Types.Iterable.ToArrayList(VBA.Split(ipTypesasStringOrIterable, Char.twComma))
             
-            
-    ElseIf Me.Group.IsIterableItemsByEnum(ipTypesasStringOrIterable) Then
-            
-        Set myIterable = Types.Iterable.ToArrayList(ipTypesasStringOrIterable)
-            
-        
     Else
-            
-        Exit Function
-                
-    End If
-        
 
+        Set myIterable = Types.Iterable.ToArrayList(ipTypesasStringOrIterable)
+    
+    End If
+    
     Dim myitem As Variant
     For Each myitem In ipArgArray
-            
+        'Debug.Print TypeName(myitem)
         If Not myIterable.Contains(TypeName(myitem)) Then Exit Function
         
     Next

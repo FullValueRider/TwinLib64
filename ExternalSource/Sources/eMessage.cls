@@ -4,7 +4,7 @@ BEGIN
 END
 Attribute VB_Name = "eMessage"
 Attribute VB_GlobalNameSpace = False
-Attribute VB_Creatable = False
+Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = True
 Option Explicit
@@ -190,7 +190,7 @@ Public Enum Msg
     NotSameSize
         
     'Array Issues
-    ParamArrayIsEmpty
+    ParamArrayIsNotValid
     ArrayHasNoItems
     ArrayLacksRank
     HasNoRanks
@@ -772,7 +772,7 @@ Private Sub SetupDictionaries()
         .Add DisallowedOverwrite, "The current instance of '{0}' cannot be overridden by a new instance"
 
         'Array Messages
-        .Add ParamArrayIsEmpty, "The paramter array was empty"
+        .Add ParamArrayIsNotValid, "The paramter array was empty"
         .Add ArrayHasNoItems, "Uninitialised array '{0}'"
         .Add ArrayLacksRank, "Array does not have Rank {0}"
         .Add HasNoRanks, "Item has no Ranks"
@@ -849,7 +849,7 @@ Private Sub SetupDictionaries()
         'General Messages
         .Add notequal, "Not equal"
         .Add Unspecified, "The type of error was not specified"
-        .CountCannotBeLessThanOne , "Count cannot be zero"
+        .Add CountCannotBeLessThanOne, "Count cannot be zero"
     End With
         
 End Sub

@@ -4,7 +4,7 @@ BEGIN
 END
 Attribute VB_Name = "Kvp"
 Attribute VB_GlobalNameSpace = False
-Attribute VB_Creatable = False
+Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = True
 Attribute VB_Description = "Kvp is a flexible Key/Value pair dictionary targeted at VB/VBA. It facilitates data input, direct content manipulation of items and keys, and indirect manipulation of data via Map and Comparer objects"
@@ -82,6 +82,8 @@ Private s                               As State
 '
 '========1=========2=========3=========4=========5=========6=========7=========8=========9=========A=========B=========C
 Private Sub Class_Initialize()
+    Set p.Keys = Lyst.Deb
+    Set p.Items = Lyst.Deb
 End Sub
 
 '@Description("Returns a new instnce of a Kvp Class")
@@ -109,10 +111,8 @@ Attribute Deb.VB_Description = "Returns a new instnce of a Kvp Class"
 End Function
 
 
-Friend Function ReadyToUseInstance() As Kvp
+Public Function ReadyToUseInstance() As Kvp
 
-    Set p.Keys = Lyst.Deb
-    Set p.Items = Lyst.Deb
     Set p.AutoKey = Nothing
     s.FirstUse = True
 
@@ -121,7 +121,7 @@ Friend Function ReadyToUseInstance() As Kvp
 End Function
 
 
-Friend Function ReadyToUseClone(ByVal ipKvp As Kvp) As Kvp
+Public Function ReadyToUseClone(ByVal ipKvp As Kvp) As Kvp
     
     Set p.Keys = ipKvp.KeysRef.Clone
     Set p.Items = ipKvp.ItemsRef.Clone
@@ -260,7 +260,7 @@ Private Function InsertByKey(ByVal ipArgArray As Variant, ByRef ipKey As Variant
     Set InsertByKey = Me
     Globals.Res.SetNotOkay
     
-    If BailOut.When(Arrays.IsNotValid(ipArgArray), Msg.ParamArrayIsEmpty) Then Exit Function
+    If BailOut.When(Arrays.IsNotValid(ipArgArray), Msg.ParamArrayIsNotValid) Then Exit Function
         
         
     If VBA.IsEmpty(ipKey) Then Exit Function
@@ -688,6 +688,26 @@ Attribute Count.VB_Description = "Returns the number of key/item pairs in the Kv
 End Function
 
 
+    
+'@Description("Returns the number of Items in the Lyst for which the comparer is true)")
+Public Function CountIt(ByRef ipComparer As IComparer) As Long
+Attribute CountIt.VB_Description = "Returns the number of Items in the Lyst instance equal to ipValue)"
+  
+    Dim myCounter As Long
+    myCounter = 0
+    Dim myitem As Variant
+    For Each myitem In p.Items
+
+        If ipComparer.ExecCmp(myitem) Then myCounter = myCounter + 1
+        
+            
+    Next
+
+    CountIt = myCounter
+  
+End Function
+
+
 '@Description("Returns a copy of the Kvp. If Items are objects then a shallow copy is made unless the object supports a clone Method.")
 Public Function Clone() As Kvp
 Attribute Clone.VB_Description = "Returns a copy of the Kvp. If Items are objects then a shallow copy is made unless the object supports a clone Method."
@@ -698,7 +718,7 @@ End Function
 
 
 '@Description("Decrements the Items  at the given Keys by the specified amount if the Items are Numbers")
-Public Function Dec(Optional ByVal ipKeys As Variant = Empty, Optional ByVal ipDecrement As Variant = Constant.DefaultDec) As Kvp
+Public Function Dec(Optional ByVal ipKeys As Variant = Empty, Optional ByVal ipDecrement As Variant = Preset.DefaultDec) As Kvp
 Attribute Dec.VB_Description = "Decrements the Items  at the given Keys by the specified amount if the Items are Numbers"
 
     Globals.Res.Init (Msg.Okay)
@@ -936,9 +956,9 @@ Attribute HoldsKey.VB_Description = "Returns True if the value is a Key of the K
 End Function
 
 '@Description("Returns True if the value is an Item of the Kvp")
-Public Function HoldsValue(ByVal ipValue As Variant) As Boolean
-Attribute HoldsValue.VB_Description = "Returns True if the value is an Item of the Kvp"
-    HoldsValue = p.Items.HoldsItem(ipValue)
+Public Function HoldsItem(ByVal ipValue As Variant) As Boolean
+Attribute HoldsItem.VB_Description = "Returns True if the value is an Item of the Kvp"
+    HoldsItem = p.Items.HoldsItem(ipValue)
 End Function
 
 '@Description("Increments the Items  at the given Keys by the specified amount if the Items are Numbers")
@@ -1232,8 +1252,8 @@ Public Function LacksKey(ByVal ipKey As Variant) As Boolean
 End Function
 
 
-Public Function LacksValue(ByVal ipValue As Variant) As Boolean
-    LacksValue = Not HoldsValue(ipValue)
+Public Function LacksItem(ByVal ipValue As Variant) As Boolean
+    LacksItem = Not HoldsItem(ipValue)
 End Function
 
 
@@ -1339,13 +1359,25 @@ Public Function MirrorFirstValues(Optional ByVal ipOrganiseby As KvpAdmin = KvpA
     
 End Function
 
+' '@Enumerator
+' Friend Function NewEnum() As Variant
+'     Attribute NewEnum.VB_UserMemId = -4
+'     Dim KeysEnumerator As IUnknown
+'     Set KeysEnumerator = p.Keys.Host.GetEnumerator(0, p.Keys.Count - 1)
+    
+'     Dim ItemsENumerator as IUNknown
+'     Set ItemsEnumerator = p.Items.Host.GetEnumerator(0, p.Items.Count - 1)
+    
+'     Set NewEnum = cvar(kvpair.deb(cvar(KeysEnumerator),cvar(Itemsenumerator)))
+    
+' End Function
 
 '@Enumerator
-Private Function NewEnum() As IUnknown
+Friend Function NewEnum() As IUnknown
     Attribute NewEnum.VB_UserMemId = -4
     Dim enumerator As IUnknown
     '@Ignore DefaultMemberRequired
-    Set enumerator = p.Keys.Host.GetEnumerator(0, p.Keys.Count - 1)
+    Set enumerator = p.Keys.Host.GetEnumerator(0, p.Keys.Count)
     Set NewEnum = enumerator
     
 End Function
@@ -1390,10 +1422,10 @@ End Function
 'End Function
 
 '@Description("Returns the string 'Kvp'")
-Public Function Name() As String
+Public Property Get Name() As String
 Attribute Name.VB_Description = "Returns the string 'Kvp'"
-    Name = TypeName(Me)
-End Function
+    Name = "Kvp"
+End Property
 
 '@Description("Returns a Kvp of maximum and minimum values.  Keys are the max and min value, associated with the keys is a Kvp of Index vs Key for each value corresponding to the parent key.")
 Public Function NumMaxMin() As Kvp

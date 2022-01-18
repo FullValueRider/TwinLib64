@@ -4,7 +4,7 @@ BEGIN
 END
 Attribute VB_Name = "TypesIterables"
 Attribute VB_GlobalNameSpace = False
-Attribute VB_Creatable = False
+Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = True
 Option Explicit
@@ -14,22 +14,18 @@ Option Explicit
 
 
 Private Sub Class_Initialize()
-    'ExitWhen InvalidNew, Types.IsNotSameInstance(Me, TypesIterables), r.Location & "New"
-   
-    
 End Sub
 
 '@Description("Returns the firstindex,lastindex and count in Items.  If the iterable has no items status is false.")
 Public Function TryExtent _
 ( _
-ByVal ipIterable As Variant, _
-Optional ByVal ipRank As Long = Constant.ArrayFirstRank _
+    ByVal ipIterable As Variant, _
+    Optional ByVal ipRank As Long = Preset.ArrayFirstRank _
 ) As Result
 Attribute TryExtent.VB_Description = "Returns the firstindex,lastindex and count in Items.  If the iterable has no items status is false."
     
     'Items should be accessed using Item(ResultItemsEnums.ItemExtent(enum))
     Set TryExtent = Globals.Res.SetNotOkay
- '   If ExitWhen.RankLessThanOne(ipRank) Then Exit Function
     If BailOut.When(Types.Group.IsNotIterable(ipIterable), Msg.IsNotIterable) Then Exit Function
         
     Select Case True
@@ -40,9 +36,7 @@ Attribute TryExtent.VB_Description = "Returns the firstindex,lastindex and count
                 
 
         Case VBA.IsArray(ipIterable)
-                
-           'If BailOut.When(Arrays.IsNotValid(ipIterable, ipRank), Msg.ArrayLacksRank) Then Exit Function
-                
+            ' Does not yet deal with dimensions of more than one.  
             Arrays.TryExtent ipIterable, ipRank
             
 
@@ -51,11 +45,10 @@ Attribute TryExtent.VB_Description = "Returns the firstindex,lastindex and count
                     
             If BailOut.When(Types.Iterable.HasNoItems(ipIterable), Msg.IterableHasNoItems) Then Exit Function
             If BailOut.When(ipRank <> 1, Msg.ItemDoesNotSupportRanks) Then Exit Function
-            'Globals.Res.Init(Msg.Okay).SetItems(Array(Empty, Empty, ipIterable.Count))
             
             If Types.Group.IsIterableByMethod(ipIterable) Then
                 
-                Globals.Res.SetOkay.SetItems Empty, Empty, ipIterable.Count
+                Globals.Res.SetOkay(Msg.DoesNotIterateByIndex).SetItems Empty, Empty, ipIterable.Count
                 
             ElseIf Types.Group.IsIterableOneBased(ipIterable) Then
                     
@@ -81,7 +74,7 @@ Set TryExtent = Globals.Res
 End Function
 
 '@Description("Returns the number of items in a valid array or iterable object. An unitialised array returns -1. A collection object returns -1 if nothing and 0 if unpoulated0")")
-Public Function Count(ByVal ipIterable As Variant, Optional ByVal ipRank As Long = Constant.ArrayFirstRank) As Long
+Public Function Count(ByVal ipIterable As Variant, Optional ByVal ipRank As Long = Preset.ArrayFirstRank) As Long
 
     Count = -1
     
@@ -462,60 +455,61 @@ Public Function ToArrayList(ParamArray ipArgArray() As Variant) As ArrayList
 
     Dim myAL As ArrayList
     Set myAL = New ArrayList
-    Set ToArrayList = myAL
-    If VBA.IsMissing(ipArgArray) Then Exit Function
-    If VBA.IsEmpty(ipArgArray) Then Exit Function
+    Set ToArrayList = Nothing
         
-    Dim myInterim As ArrayList
-    Set myInterim = New ArrayList
+    If Arrays.IsNotValid(ipArgArray) Then Exit Function
         
-    Select Case True
+    'Dim myResult As Result
+    Dim myItem As Variant
+    If Arrays.HasOneItem(ipArgArray) Then
             
-      Case Arrays.IsNotSingleItem(ipArgArray)
-              
-          myInterim.Add CVar(ipArgArray)
-          
-          
-      Case Types.Group.IsNotIterable(ipArgArray(0))
-              
-          myInterim.Add CVar(ipArgArray)
-                  
-                  
-      Case Arrays.IsTableArray(ipArgArray(0))
-                      
-          myInterim.Add Arrays.ToLystOfRanksAsLyst(ipArgArray(0), RankIsRowFirstItemActionIsNoAction)
-                      
-                  
-      Case Arrays.IsMDArray(ipArgArray(0))
-                      
-          myInterim.Add ipArgArray(0)
-                          
-              
-      Case Types.Group.IsIterableItemsByEnum(ipArgArray(0))
-              
-          myInterim.Add ipArgArray(0)
-                  
-                  
-      Case Types.Group.IsIterableKeysByEnum(ipArgArray(0))
-              
-          myInterim.Add ipArgArray(0).Items
-          'myInterim.Add ipArgArray(0).Keys
-              
-              
-      Case Else
-              
-          Globals.Res.SetNotOkay Msg.UnexpectedItemInParamArray
-          Exit Function
+        If Types.Name.OfArrayList = TypeName(ipArgArray(0)) Then
+            
+            ' quick win if ipargsarray(0) is already an ArrayList
+            Set myAL = ipArgArray(0)
+            
+
+        ElseIf Types.Group.IsIterableItemsByEnum(ipArgArray(0)) Then
+            
+            Dim myVar As Variant
+            If VBA.IsObject(ipArgArray(0)) Then
+                Set myVar = ipArgArray(0)
                 
+            Else
+                
+                myVar = ipArgArray(0)
+                
+            End If
             
-    End Select
+            For Each myItem In myVar
+                
+                myAL.add myItem
+                
+            Next
+            
+        ElseIf Types.Group.IsIterableKeysByEnum(ipArgArray(0)) Then
+            
+            For Each myItem In ipArgArray(0).items
+                
+                myAL.add myItem
+                
+            Next
+            
+        Else
+            
+            myAL.add ipArgArray(0)
+            
+        End If
         
-    Dim myitem As Variant
-    For Each myitem In myInterim.Item(0)
-            
-        myAL.Add myitem
-            
-    Next
+    Else
+
+        For Each myItem In ipArgArray
+                
+            myAL.Add myItem
+                
+        Next
+        
+    End If
               
     Set ToArrayList = myAL
     

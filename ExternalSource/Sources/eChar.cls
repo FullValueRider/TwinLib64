@@ -142,7 +142,7 @@ Private s                   As State
 Private Sub Class_Initialise()
         
     'r.Location = "VBALib.Enums."
-    If BailOut.When(Me Is eChar) Then Exit Sub
+    'If BailOut.When(Me Is eChar) Then Exit Sub
     SetupDictionaries
         
 End Sub

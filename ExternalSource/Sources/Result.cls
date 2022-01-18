@@ -4,7 +4,7 @@ BEGIN
 END
 Attribute VB_Name = "Result"
 Attribute VB_GlobalNameSpace = False
-Attribute VB_Creatable = False
+Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = True
 Option Explicit
@@ -51,7 +51,7 @@ Private Sub Class_Initialize()
   
     '/If Me Is Result Then
         
-        p.Status = Constant.ResultStatusOkay
+        p.Status = Preset.ResultStatusOkay
         p.MsgId = Msg.Okay
         Set p.ResultItems = New ArrayList
         
@@ -287,7 +287,7 @@ Attribute SetOkay.VB_Description = "Sets Status and Messageenum"
         
     If p.MsgId = Msg.NotOkay Or p.MsgId = Msg.Okay Then p.MsgId = ipMessageEnum
     
-    p.Status = Constant.ResultStatusOkay
+    p.Status = Preset.ResultStatusOkay
     Set SetOkay = Me
     
 End Function
@@ -298,7 +298,7 @@ Attribute SetNotOkay.VB_Description = "Sets Status and Messageenum"
         
 If p.MsgId = Msg.NotOkay Or p.MsgId = Msg.Okay Then p.MsgId = ipMessageEnum
     
-    p.Status = Constant.ResultStatusNotOkay
+    p.Status = Preset.ResultStatusNotOkay
     Set SetNotOkay = Me
     
 End Function
@@ -312,12 +312,12 @@ Attribute Init.VB_Description = "Sets the Result to the 'NotOkay' or 'Failed' Re
         Case Msg.Okay
         
             p.MsgId = Msg.Okay
-            p.Status = Constant.ResultStatusOkay
+            p.Status = Preset.ResultStatusOkay
         
         Case Msg.NotOkay
         
             p.MsgId = Msg.NotOkay
-            p.Status = Constant.ResultStatusNotOkay
+            p.Status = Preset.ResultStatusNotOkay
         
     End Select
    

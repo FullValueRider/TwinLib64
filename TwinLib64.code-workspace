@@ -5,16 +5,16 @@
                 "uri": "twinbasic-builds:/___BUILDS/"
             },
             {
-                "name": "PROJECT: TwinLib64v3",
-                "uri": "twinbasic:/TwinLib64v3/"
+                "name": "PROJECT: TwinLib64",
+                "uri": "twinbasic:/TwinLib64/"
             }
         ] , 
 		"settings": {
-			"window.title": "${dirty}TwinLib64v3${separator}twinBASIC",
+			"window.title": "${dirty}TwinLib64${separator}twinBASIC",
 				"files.associations" : {
                     "/___BUILDS/*": "twinbasicBuildConfig",
-                    "/*/*": "twinbasicProjectConfig",
-                    "/___BUILDS/win64": "twinbasicBuildConfigACTIVE"
+                    "/___BUILDS/win64": "twinbasicBuildConfigACTIVE",
+                    "/*/Settings": "twinbasicProjectConfig"
                 }, 
 				"files.defaultLanguage" : "twinbasic",
 					"editor.trimAutoWhitespace" : false,
@@ -53,6 +53,7 @@
                             "twinbasic.hasSetDebugConsoleHistorySuggestionsOff": true,
                             "explorer.compactFolders": false,
                             "twinbasic.hasCheckedCompactFolders": true,
+                            "editor.formatOnType": true,
                             "twinbasic.hasCheckedFormatOnType": true,
                             "debug.saveBeforeStart": "none",
                             "twinbasic.hasCheckedSaveBeforeStart": true,

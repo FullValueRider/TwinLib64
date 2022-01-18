@@ -4523,7 +4523,7 @@ TestFail:
         Dim myResult As Boolean
         
         'Act:
-        myResult = myKvp.HoldsValue(300)
+        myResult = myKvp.HoldsItem(300)
         
         'Assert.Strict.
         Assert.Strict.IsTrue myResult  ', CurrentProcedureName
@@ -4547,7 +4547,7 @@ TestFail:
         Dim myResult As Boolean
         
         'Act:
-        myResult = myKvp.HoldsValue(12)
+        myResult = myKvp.HoldsItem(12)
         
         'Assert.Strict.
         Assert.Strict.IsFalse myResult  ', CurrentProcedureName
@@ -4571,7 +4571,7 @@ TestFail:
         Dim myResult As Boolean
         
         'Act:
-        myResult = myKvp.HoldsValue(300)
+        myResult = myKvp.HoldsItem(300)
         
         'Assert.Strict.
         Assert.Strict.IsTrue myResult  ', CurrentProcedureName
@@ -4595,7 +4595,7 @@ TestFail:
         Dim myResult As Boolean
         
         'Act:
-        myResult = myKvp.HoldsValue("aaac")
+        myResult = myKvp.HoldsItem("aaac")
         
         'Assert.Strict.
         Assert.Strict.IsFalse myResult  ', CurrentProcedureName
@@ -4619,7 +4619,7 @@ TestFail:
         Dim myResult As Boolean
         
         'Act:
-        myResult = myKvp.HoldsValue(300)
+        myResult = myKvp.HoldsItem(300)
         
         'Assert.Strict.
         Assert.Strict.IsTrue myResult  ', CurrentProcedureName
@@ -4643,7 +4643,7 @@ TestFail:
         Dim myResult As Boolean
         
         'Act:
-        myResult = myKvp.HoldsValue("Three")
+        myResult = myKvp.HoldsItem("Three")
         
         'Assert.Strict.
         Assert.Strict.IsFalse myResult  ', CurrentProcedureName
@@ -6947,7 +6947,7 @@ TestFail:
         Dim myResult As Boolean
         
         'Act:
-        myResult = myKvp.LacksValue(300)
+        myResult = myKvp.LacksItem(300)
         
         'Assert.Strict.
         Assert.Strict.IsFalse myResult  ', CurrentProcedureName
@@ -6971,7 +6971,7 @@ TestFail:
         Dim myResult As Boolean
         
         'Act:
-        myResult = myKvp.LacksValue(12)
+        myResult = myKvp.LacksItem(12)
         
         'Assert.Strict.
         Assert.Strict.IsTrue myResult  ', CurrentProcedureName
@@ -6995,7 +6995,7 @@ TestFail:
         Dim myResult As Boolean
         
         'Act:
-        myResult = myKvp.LacksValue(300)
+        myResult = myKvp.LacksItem(300)
         
         'Assert.Strict.
         Assert.Strict.AreEqual False, myResult  ', CurrentProcedureName
@@ -7019,7 +7019,7 @@ TestFail:
         Dim myResult As Boolean
         
         'Act:
-        myResult = myKvp.LacksValue("aaac")
+        myResult = myKvp.LacksItem("aaac")
         
         'Assert.Strict.
         Assert.Strict.IsTrue myResult  ', CurrentProcedureName
@@ -7043,7 +7043,7 @@ TestFail:
         Dim myResult As Boolean
         
         'Act:
-        myResult = myKvp.LacksValue(300)
+        myResult = myKvp.LacksItem(300)
         
         'Assert.Strict.
         Assert.Strict.AreEqual False, myResult  ', CurrentProcedureName
@@ -7067,7 +7067,7 @@ TestFail:
         Dim myResult As Boolean
         
         'Act:
-        myResult = myKvp.LacksValue("Three")
+        myResult = myKvp.LacksItem("Three")
         
         'Assert.Strict.
         Assert.Strict.AreEqual True, myResult  ', CurrentProcedureName

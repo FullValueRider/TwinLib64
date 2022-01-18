@@ -4,7 +4,7 @@ BEGIN
 END
 Attribute VB_Name = "Arrays"
 Attribute VB_GlobalNameSpace = False
-Attribute VB_Creatable = False
+Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = True
 Option Explicit
@@ -131,7 +131,7 @@ Public Function GetMoveCoordinates(ByVal ipType As ArrayDirections) As Scripting
 
 End Function
 
-Public Function HasNoBounds(ByRef ipArray As Variant, Optional ByVal ipRank As Long = Constant.ArrayFirstRank) As Boolean
+Public Function HasNoBounds(ByRef ipArray As Variant, Optional ByVal ipRank As Long = Preset.ArrayFirstRank) As Boolean
     
     HasNoBounds = True
     If ipRank < 0 Then Exit Function
@@ -152,11 +152,11 @@ Public Function HasNoBounds(ByRef ipArray As Variant, Optional ByVal ipRank As L
     
 End Function
 
-Public Function RankHasNoItems(ByVal ipArray As Variant, Optional ByVal ipRank As Long = Constant.ArrayFirstRank) As Boolean
+Public Function RankHasNoItems(ByVal ipArray As Variant, Optional ByVal ipRank As Long = Preset.ArrayFirstRank) As Boolean
     RankHasNoItems = Count(ipArray, ipRank) < 1
 End Function
 
-Public Function RankHasItems(ByVal ipArray As Variant, Optional ByVal ipRank As Long = Constant.ArrayFirstRank) As Boolean
+Public Function RankHasItems(ByVal ipArray As Variant, Optional ByVal ipRank As Long = Preset.ArrayFirstRank) As Boolean
     RankHasItems = Not RankHasNoItems(ipArray, ipRank)
 End Function
 
@@ -247,7 +247,7 @@ Attribute Ranks.VB_Description = "Returns the number of dimensions of an array. 
 End Function
 
 
-Public Function HasRank(ByRef ipArray As Variant, Optional ByVal ipRank As Long = Constant.ArrayFirstRank) As Boolean
+Public Function HasRank(ByRef ipArray As Variant, Optional ByVal ipRank As Long = Preset.ArrayFirstRank) As Boolean
 
     HasRank = Globals.Res.SetNotOkay.Status
     If BailOut.When(Arrays.IsNotValid(ipArray), Msg.ArrayLacksRank) Then Exit Function
@@ -260,7 +260,7 @@ Public Function HasRank(ByRef ipArray As Variant, Optional ByVal ipRank As Long 
     
 End Function
 
-Public Function LacksRank(ByRef ipArray As Variant, Optional ByVal ipRank As Long = Constant.ArrayFirstRank) As Boolean
+Public Function LacksRank(ByRef ipArray As Variant, Optional ByVal ipRank As Long = Preset.ArrayFirstRank) As Boolean
     LacksRank = Not HasRank(ipArray, ipRank)
 End Function
 
@@ -289,7 +289,7 @@ Friend Function HasRanksByIterable(ByVal ipArgArray As Variant) As Boolean
 End Function
 
 '@Description("Returns the number of items in an Array Rank or -1 the rank didn't exist/item not an array. Global result enabled")
-Public Function Count(ByRef ipArray As Variant, Optional ByVal ipRank As Long = Constant.ArrayFirstRank) As Long
+Public Function Count(ByRef ipArray As Variant, Optional ByVal ipRank As Long = Preset.ArrayFirstRank) As Long
 Attribute Count.VB_Description = "Returns the number of items in an Array Rank or -1 the rank didn't exist/item not an array. Global result enabled"
         
     Count = -1
@@ -339,7 +339,7 @@ Public Function HasOneItem(ByVal ipArray As Variant) As Boolean
     HasOneItem = (UBound(ipArray) - LBound(ipArray) + 1) = 1
 End Function
 
-'Public Function HasOneItem(ByVal ipArray As Variant, Optional ByVal ipRank As Long = constant.ArrayFirstRank) As Boolean
+'Public Function HasOneItem(ByVal ipArray As Variant, Optional ByVal ipRank As Long = preset.ArrayFirstRank) As Boolean
         
     '      HasOneItem = Count(ipArray, ipRank) = 1
         
@@ -494,11 +494,11 @@ Public Function IsNotValid(ByVal ipArray As Variant) As Boolean
 End Function
 '
 
-Public Function TryExtent(ByRef ipArray As Variant, Optional ByVal ipRank As Long = Constant.ArrayFirstRank) As Result
+Public Function TryExtent(ByRef ipArray As Variant, Optional ByVal ipRank As Long = Preset.ArrayFirstRank) As Result
         
     Set TryExtent = Globals.Res.SetNotOkay
     If BailOut.When(Arrays.IsNotValid(ipArray), Msg.HasNoItems) Then Exit Function
-    If BailOut.When(Ranks(ipArray) < Constant.ArrayFirstRank, Msg.RankLessThanArrayFirstRank) Then Exit Function
+    If BailOut.When(Ranks(ipArray) < Preset.ArrayFirstRank, Msg.RankLessThanArrayFirstRank) Then Exit Function
     If BailOut.When(Arrays.LacksRank(ipArray, ipRank), Msg.ArrayLacksRank) Then Exit Function
     'If BailOut.When(Arrays.HasNoItems(ipArray), Msg.ArrayHasNoItems) Then Exit Function ' also detects empty variant
    

@@ -4,7 +4,7 @@ BEGIN
 END
 Attribute VB_Name = "mpToType"
 Attribute VB_GlobalNameSpace = False
-Attribute VB_Creatable = False
+Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = True
 Option Explicit
@@ -24,11 +24,12 @@ Public Enum ToType
   ToInteger = vbInteger
   ToLong = vbLong
   ToLongLong = vbLongLong
-  ToLongPtr
+  ToLongPtr = ToLongLong
   ToSingle = vbSingle
   ToString = vbString
   ToHexStr
   ToOctStr
+  ToBinStr
   
 End Enum
 
@@ -69,7 +70,7 @@ End Function
 '@Description("Converts tthe items in the Lyst to Long Integers.  If the input item cannot be converted the string "NaN" is returned")
 Public Function ExecMapper(ByVal ipHostItem As Variant) As Variant
         
-  Select Case s.Conversion
+ Select Case s.Conversion
     
     Case ToHexStr: ExecMapper = Hex$(ipHostItem)
     Case ToOctStr: ExecMapper = Oct$(ipHostItem)

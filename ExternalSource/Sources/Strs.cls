@@ -4,7 +4,7 @@ BEGIN
 END
 Attribute VB_Name = "Strs"
 Attribute VB_GlobalNameSpace = False
-Attribute VB_Creatable = False
+Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = True
 Option Explicit
@@ -352,19 +352,27 @@ End Function
 
 
 
-
+'@dewcription("Takes an array of find/replace pairs  an repeat replaces each pair.  Default for ipFindReplaceItems is Array(array(" ",vbnullstring))")
 Public Function MultiReplacer(ByVal ipHost As String, Optional ByVal ipFindReplaceItems As Variant) As String
     
     MultiReplacer = ipHost
-    If VBA.Len(ipHost) = 0 Then Exit Function
+    If BailOut.When(VBA.Len(ipHost) = 0, Msg.StringIsEmpty) Then Exit Function
 
     'Dim myFindReplaceItems As Variant
-    If VBA.IsMissing(ipFindReplaceItems) Or Arrays.HasNoItems(ipFindReplaceItems) Then ipFindReplaceItems = Array(Char.twSpace, vbNullString)
+    If VBA.IsMissing(ipFindReplaceItems) Then
         
-    Dim myitem As Variant
-    For Each myitem In ipFindReplaceItems
+        ipFindReplaceItems = Array(Array(Char.twSpace, vbNullString))
         
-        ipHost = RepeatReplacer(ipHost, myitem(0), myitem(1))
+    ElseIf Arrays.HasNoItems(ipFindReplaceItems) Then
+        
+        ipFindReplaceItems = Array(Array(Char.twSpace, vbNullString))
+        
+    End If
+        
+    Dim myFindReplaceArray As Variant
+    For Each myFindReplaceArray In ipFindReplaceItems
+        
+        ipHost = RepeatReplacer(ipHost, myFindReplaceArray(0), myFindReplaceArray(1))
         
     Next
     

@@ -4,7 +4,7 @@ BEGIN
 END
 Attribute VB_Name = "Ranges"
 Attribute VB_GlobalNameSpace = False
-Attribute VB_Creatable = False
+Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = True
 Option Explicit
@@ -22,7 +22,7 @@ Public Function GetSeries(ByVal ipStart As Variant, ByVal ipCount As Long, Optio
     If Types.Group.IsNotNumber(ipStart, ipCount, ipStep) Then Exit Function
         
     Dim myitem As Variant
-    For myitem = 1 To ipCount
+    For myitem = 1 To ipCount Step 1
         
         myLyst.Host.Add ipStart
         ipStart = ipStart + ipStep
@@ -55,7 +55,7 @@ Friend Function TryStartRunFromAnyStartRunEnd _
     Optional ByVal ipStartIndex As Variant, _
     Optional ByVal ipRun As Variant, _
     Optional ByVal ipEndIndex As Variant, _
-    Optional ByVal ipRank As Long = Constant.ArrayFirstRank _
+    Optional ByVal ipRank As Long = Preset.ArrayFirstRank _
 ) As Result
 Attribute TryStartRunFromAnyStartRunEnd.VB_Description = "Takes any iterable or string. The startindex and endindex should be specified using a 1 based index. The result.items lyst returns the startindex based on the actual indexing used by the iterable"
 ' Optional ByRef iopResult As Result, _
@@ -396,7 +396,7 @@ Public Function TryRange _
     Optional ByVal ipStartIndex As Variant, _
     Optional ByVal ipRun As Variant, _
     Optional ByVal ipEndIndex As Variant, _
-    Optional ByVal ipRank As Long = Constant.ArrayFirstRank _
+    Optional ByVal ipRank As Long = Preset.ArrayFirstRank _
 ) As Result
 Attribute TryRange.VB_Description = "Returns the specified subrange in Item(0) of the result"
        'ByRef iopResult As Result, _

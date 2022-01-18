@@ -1022,7 +1022,7 @@ Module TestLyst
             Dim myResult As Lyst
             
             'Act:
-            Set myResult = myLyst.SetRange(1, Array(50, 50, 50, 50))
+            Set myResult = myLyst.SetRange(2, Array(50, 50, 50, 50))
         
             'Assert:
             Assert.Exact.SequenceEquals myExpected.ToArray, myResult.ToArray, myPlace & CurrentProcedureName
