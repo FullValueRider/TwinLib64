@@ -4,7 +4,7 @@ BEGIN
 END
 Attribute VB_Name = "mpMath"
 Attribute VB_GlobalNameSpace = False
-Attribute VB_Creatable = True
+Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = True
 Option Explicit
@@ -28,7 +28,7 @@ Public Enum Fx
   Ln
   Log
   Rnd
-'  SumOfInt
+  TriangularNumber
   Power
   Round
   vbSgn
@@ -41,6 +41,7 @@ End Enum
 
 Private Type State
   
+  '@Ignore KeywordsUsedAsMember
   Function                      As Fx
   OptionalParam                 As Variant
   
@@ -95,7 +96,7 @@ Public Function ExecMapper(ByVal ipHostItem As Variant) As Variant
     Case Factorial: ExecMapper = Maths.Factorial(ipHostItem)
     Case Ln: ExecMapper = Maths.Ln(ipHostItem)
     Case Log: ExecMapper = Maths.Log(ipHostItem)
-   ' Case SumOfInt: ExecMapper = Maths.SumOfInt(ipHostItem, s.OptionalParam)
+    Case TriangularNumber: ExecMapper = Maths.TriangularNumber(ipHostItem, 1)
     
     
   End Select

@@ -4,7 +4,7 @@ BEGIN
 END
 Attribute VB_Name = "Ranges"
 Attribute VB_GlobalNameSpace = False
-Attribute VB_Creatable = True
+Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = True
 Option Explicit
@@ -22,7 +22,7 @@ Public Function GetSeries(ByVal ipStart As Variant, ByVal ipCount As Long, Optio
     If Types.Group.IsNotNumber(ipStart, ipCount, ipStep) Then Exit Function
         
     Dim myitem As Variant
-    For myitem = 1 To ipCount Step 1
+    For myitem = 1 To ipCount
         
         myLyst.Host.Add ipStart
         ipStart = ipStart + ipStep

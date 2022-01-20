@@ -4,7 +4,7 @@ BEGIN
 END
 Attribute VB_Name = "Arrays"
 Attribute VB_GlobalNameSpace = False
-Attribute VB_Creatable = True
+Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = True
 Option Explicit
@@ -48,6 +48,7 @@ Public Enum RankOrientation
         
 End Enum
 
+'@Ignore EmptyMethod
 Private Sub Class_Initialize()
         
     ' If VBA.Len(r.Location) = 0 Then

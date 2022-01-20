@@ -4,7 +4,7 @@ BEGIN
 END
 Attribute VB_Name = "mpToType"
 Attribute VB_GlobalNameSpace = False
-Attribute VB_Creatable = True
+Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = True
 Option Explicit
@@ -43,6 +43,7 @@ End Type
 Private s                         As State
 
 'TwinBasic requirement
+'@Ignore EmptyMethod
 Private Sub Class_Initialize()
 End Sub
 

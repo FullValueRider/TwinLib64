@@ -4,7 +4,7 @@ BEGIN
 END
 Attribute VB_Name = "AutoKeyByString"
 Attribute VB_GlobalNameSpace = False
-Attribute VB_Creatable = True
+Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = True
 '========1=========2=========3=========4=========5=========6=========7=========8=========9=========A=========B=========C
@@ -49,6 +49,7 @@ End Type
 
 Private p                                   As Properties
 
+'@Ignore EmptyMethod
 Private Sub Class_Initialise()
 
 '    r.DefaultFirstUseKey = "0000"
@@ -56,7 +57,7 @@ Private Sub Class_Initialise()
 
 End Sub
 
-Public Function Deb(Optional ByVal ipFirstUseKey As String, Optional ByVal ipallowedkeychars As String) As AutoKeyByString
+Public Function Deb(Optional ByVal ipFirstUseKey As String, Optional ByVal ipAllowedKeyChars As String) As AutoKeyByString
 
     If VBA.Len(ipFirstUseKey) = 0 Then
         
@@ -64,13 +65,13 @@ Public Function Deb(Optional ByVal ipFirstUseKey As String, Optional ByVal ipall
         
     End If
     
-    If VBA.Len(ipallowedkeychars) = 0 Then
-        ipallowedkeychars = Strs.AlphanumChars
+    If VBA.Len(ipAllowedKeyChars) = 0 Then
+        ipAllowedKeyChars = Strs.AlphanumChars
     End If
         
     With New AutoKeyByString
         
-        Set Deb = .ReadyToUseInstance(ipFirstUseKey, ipallowedkeychars) ' Why is ipKeyCharsequence a null string
+        Set Deb = .ReadyToUseInstance(ipFirstUseKey, ipAllowedKeyChars) ' Why is ipKeyCharsequence a null string
             
     End With
         
@@ -103,16 +104,16 @@ Private Function IAutoKey_GetFirstUseKey() As Variant
 End Function
 
 Private Function IAutoKey_SetFirstUseKey(ByVal ipValue As Variant) As IAutoKey
-    SetFirstUseKey ipValue
+    Set IAutoKey_SetFirstUseKey = SetFirstUseKey(ipValue)
 End Function
 
-Private Property Get IAutoKey_CurrentKey() As Variant
-    IAutoKey_CurrentKey = CurrentKey
-End Property
+Private Function IAutoKey_GetCurrentKey() As Variant
+    IAutoKey_GetCurrentKey = GetCurrentKey
+End Function
 
-Friend Property Let IAutoKey_CurrentKey(ByVal ipValue As Variant)
-    CurrentKey = ipValue
-End Property
+Friend Function IAutoKey_SetCurrentKey(ByVal ipValue As Variant) As IAutoKey
+    IAutoKey_SetCurrentKey = SetCurrentKey(ipValue)
+End Function
 
 Private Function IAutoKey_Clone() As IAutoKey
     Set IAutoKey_Clone = Clone
@@ -120,10 +121,6 @@ End Function
 
 Private Function IAutoKey_NextKey() As Variant
     IAutoKey_NextKey = NextKey
-End Function
-
-Private Function IAutoKey_Name() As String
-    IAutoKey_Name = Name
 End Function
 
 Public Property Get IAutoKey_FirstUseKeyType() As String
@@ -134,6 +131,9 @@ Private Function IAutoKey_NextKeys(ByVal ipCount As Long) As Lyst
     Set IAutoKey_NextKeys = NextKeys(ipCount)
 End Function
 
+Private Property Get IAutoKey_Name() As String
+    IAutoKey_Name = Name
+End Property
 '========1=========2=========3=========4=========5=========6=========7=========8=========9=========A=========B=========C
 '
 ' class public members
@@ -159,13 +159,13 @@ Friend Function SetFirstUseKey(ByVal ipValue As Variant) As AutoKeyByString
     
 End Function
 
-Public Property Get CurrentKey() As Variant
-    CurrentKey = p.CurrentKey
-End Property
+Public Function GetCurrentKey() As Variant
+    GetCurrentKey = p.CurrentKey
+End Function
 
-Friend Property Let CurrentKey(ByVal ipValue As Variant)
+Friend Function SetCurrentKey(ByVal ipValue As Variant)
     p.CurrentKey = ipValue
-End Property
+End Function
 
 Public Function GetKeyAllowedChars() As ROL
     Set GetKeyAllowedChars = p.KeyAllowedChars
@@ -196,7 +196,7 @@ Public Function Clone() As AutoKeyByString
     Dim myAutoKey As AutoKeyByString
     Set myAutoKey = Me.Deb(p.FirstUseKey)
     myAutoKey.SetKeyAllowedChars p.KeyAllowedChars
-    myAutoKey.CurrentKey = p.CurrentKey
+    myAutoKey.SetCurrentKey p.CurrentKey
 
     Set Clone = myAutoKey
         
@@ -219,9 +219,9 @@ Public Property Get NextKey() As Variant
         
 End Property
 
-Public Function Name() As String
+Public Property Get Name() As String
     Name = AutoKeyByStringName
-End Function
+End Property
 
 Public Function NextKeys(ByVal ipCount As Long) As Lyst
         
@@ -239,5 +239,4 @@ Public Function NextKeys(ByVal ipCount As Long) As Lyst
     Next
         
 End Function
-
 

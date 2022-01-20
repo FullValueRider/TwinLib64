@@ -29,4 +29,22 @@ Public Sub dodays()
     Day04.Execute
 End Sub
 
+Public Sub TestmpExecDeb()
+
+    Dim myLyst As Lyst
+    Set myLyst = _
+        Lyst.Deb.Add _
+            ( _
+                Lyst.Deb.Add(10, 20, 30, 40, 50), _
+                Lyst.Deb.Add(11, 21, 31, 41, 51), _
+                Lyst.Deb.Add(12, 22, 32, 42, 52), _
+                Lyst.Deb.Add(13, 23, 33, 43, 53), _
+                Lyst.Deb.Add(14, 24, 34, 44, 54) _
+            )
+    
+    Dim myBoard As Board
+    Set myBoard = mpExecDeb.Deb(Board).ExecMapper(myLyst)
+    
+End Sub
+
 End Module

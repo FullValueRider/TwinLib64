@@ -4,7 +4,7 @@ BEGIN
 END
 Attribute VB_Name = "Parser"
 Attribute VB_GlobalNameSpace = False
-Attribute VB_Creatable = True
+Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = True
 Attribute VB_Description = "Parses a ParamArray (or a variant containing an array). Typically used for inputs to the Lyst and Kvp objects"

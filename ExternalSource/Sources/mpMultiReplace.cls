@@ -4,7 +4,7 @@ BEGIN
 END
 Attribute VB_Name = "mpMultiReplace"
 Attribute VB_GlobalNameSpace = False
-Attribute VB_Creatable = True
+Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = True
 Option Explicit
@@ -47,7 +47,7 @@ Attribute Deb.VB_Description = "Takes a jagged array of find/replacepairs"
             
 End Function
 
-Friend Function ReadyToUseInstance(ByRef ipFindReplaceItems As Variant) As mpMultiReplace
+Friend Function ReadyToUseInstance(ByVal ipFindReplaceItems As Variant) As mpMultiReplace
         
     s.FindReplaceItems = ipFindReplaceItems
     Set ReadyToUseInstance = Me

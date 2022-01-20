@@ -4,7 +4,7 @@ BEGIN
 END
 Attribute VB_Name = "mpExecDeb"
 Attribute VB_GlobalNameSpace = False
-Attribute VB_Creatable = True
+Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = True
 Option Explicit
@@ -51,12 +51,6 @@ End Function
 
 Public Function ExecMapper(ByVal ipHostItem As Variant) As Variant
      
-    Dim myVar As Variant
-    Debug.Print TypeName(ipHostItem)
-    
-    Dim myObj As Object
-    Set myObj = s.PredeclaredId
-    'myVar = Array(s.PredeclaredId.Deb(ipHostItem))
-    Set ExecMapper = myObj.Deb(ipHostItem)
+    Set ExecMapper = s.PredeclaredId.Deb(ipHostItem)
        
 End Function

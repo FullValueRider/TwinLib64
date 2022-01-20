@@ -4,7 +4,7 @@ BEGIN
 END
 Attribute VB_Name = "KVPair"
 Attribute VB_GlobalNameSpace = False
-Attribute VB_Creatable = True
+Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = True
 Attribute VB_Description = "A simple single item dictionary"
@@ -75,13 +75,13 @@ Public Property Let Key(ByVal ipKey As Variant)
 End Property
 
 Public Property Get Item() As Variant
-    If VBA.IsObject(p.Item.item(0)) Then
+    If VBA.IsObject(p.Item.Item(0)) Then
         
         Set Item = p.Item.Item(0)
    
     Else
         
-        Item = p.Item.item(0)
+        Item = p.Item.Item(0)
         
     End If
 End Property

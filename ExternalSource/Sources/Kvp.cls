@@ -4,7 +4,7 @@ BEGIN
 END
 Attribute VB_Name = "Kvp"
 Attribute VB_GlobalNameSpace = False
-Attribute VB_Creatable = True
+Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = True
 Attribute VB_Description = "Kvp is a flexible Key/Value pair dictionary targeted at VB/VBA. It facilitates data input, direct content manipulation of items and keys, and indirect manipulation of data via Map and Comparer objects"
@@ -50,7 +50,7 @@ Public Enum KvpInput
 End Enum
 
 
-Const DefaultSeparator                  As string = "," ' can't use asciicode.twcomma
+Const DefaultSeparator                  As String = "," ' can't use asciicode.twcomma
 Const Defaultadjustamount               As Long = 1
 Const DefaultFirstNumberKey             As Long = 1
 Const DefaultFirstStringKey             As String = "0000"
@@ -192,7 +192,7 @@ End Property
 '
 '========1=========2=========3=========4=========5=========6=========7=========8=========9=========A=========B=========C
 ' Add and Insert methods have a lot of commonality in the preprocessing of the input param array.
-' To simplify coding such preprocessing is consolidated into the InputItems method 
+' To simplify coding such preprocessing is consolidated into the InputItems method
 
 '@Description("Adds items in the ParamArray, returns the updated kvp. If ParamArray is 1 or 2 items the items are parsed as potential key/value pairs.")
 Public Function Add(ParamArray ipArgArray() As Variant) As Kvp
@@ -362,6 +362,7 @@ Attribute Pop.VB_Description = "Items are popped from Last index of the host.  R
 '
 '    End If
 '
+    '@Ignore EmptyIfBlock
     If ipCount > p.Keys.Count Then
 ''
 ''        Reverse
@@ -478,15 +479,14 @@ Attribute Dequeue.VB_Description = "Returns a Kvp removed items.  Items are remo
     
     Dim myIndex As Long
     For myIndex = 1 To ipCount
-        
-        Dim myKey As Variant
-        Set myKey = p.Keys.Dequeue
-        Dim myItem As Variant
-        Set myItem = p.Items.Dequeue
+
         myKvp.Add p.Keys.Dequeue.First, p.Items.Dequeue.First
         
+        
     Next
+    
     Set Dequeue = myKvp
+    
 End Function
 
 
@@ -669,7 +669,7 @@ End Function
 Public Function Clear() As Kvp
     p.Keys.Clear
     p.Items.Clear
-    p.AutoKey.CurrentKey = Empty
+    p.AutoKey.SetCurrentKey Empty
     Set Clear = Me
     
 End Function
@@ -689,7 +689,7 @@ End Function
 
 
     
-'@Description("Returns the number of Items in the Lyst for which the comparer is true)")
+'@Description "Returns the number of Items in the Lyst instance equal to ipValue)"
 Public Function CountIt(ByRef ipComparer As IComparer) As Long
 Attribute CountIt.VB_Description = "Returns the number of Items in the Lyst instance equal to ipValue)"
   
@@ -884,18 +884,7 @@ Attribute GetLast.VB_Description = "Returns a KVPair of the Key and Item at Last
 End Function
 
 
-
-' <summary> NextPair/PrevPair get the indicated KVPair from the Host
-' Dictionary. These methods are not intended to be used as iterators
-' but as ad hoc requests for the next/prev KVPair in the Kvp. If the
-' supplied key is the last/first key in the Dictionary then ipLoop
-' will determine if the KVPair returned will be null:null (ipLoop =
-' false) or the first/last KVPair in the Dictionary (ipLoop=True)
-' </summary> <paramname="ipKey">The Key for which the next/prev
-' KVPair should be returned. <paramname="ipLoop">Wraps around the
-' Dictionary if True </param> <returns>The Indicated KVPair</returns></param>
 Public Function NextPair(ByVal ipKey As Variant, Optional ByVal ipTreatKeysArrayAsLoop As Boolean = True) As KVPair
-Attribute NextPair.VB_Description = "Returns a Lyst of the specified Items. An empty Paramarray will return all Iems. If the item is an object the Clone methos will be used if available. "
 
     Dim myIndex As Long
     myIndex = p.Keys.IndexOf(ipKey) + 1
@@ -1374,7 +1363,6 @@ End Function
 
 '@Enumerator
 Friend Function NewEnum() As IUnknown
-    Attribute NewEnum.VB_UserMemId = -4
     Dim enumerator As IUnknown
     '@Ignore DefaultMemberRequired
     Set enumerator = p.Keys.Host.GetEnumerator(0, p.Keys.Count)
@@ -1484,7 +1472,6 @@ End Function
 
 
 Public Function Reverse() As Kvp
-Attribute Reverse.VB_Description = "Sugar for InsertFirst"
 
     p.Keys.Reverse
     p.Items.Reverse
@@ -1747,7 +1734,6 @@ End Sub
 
 
 Friend Sub AdjustAllItems(ByVal ipAdjustAmount As Variant)
-Attribute AdjustAllItems.VB_Description = "Adds or Inserts the items and keys Lysts contained in Globals.Res"
     
     With p.Items
     
@@ -1857,6 +1843,7 @@ Attribute AdjustbyKey.VB_Description = "Common code for IncByKey and DecByKey"
 End Sub
 
 
+'@Ignore EmptyMethod
 Private Sub DoNothing()
 
 End Sub

@@ -4,7 +4,7 @@ BEGIN
 END
 Attribute VB_Name = "IAutoKey"
 Attribute VB_GlobalNameSpace = False
-Attribute VB_Creatable = True
+Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
 
@@ -16,11 +16,11 @@ Option Explicit
 Friend Function Clone() As IAutoKey
 End Function
 
-Public Property Get CurrentKey() As Variant
-End Property
+Public Function GetCurrentKey() As Variant
+End Function
 
-Friend Property Let CurrentKey(ByVal Value As Variant)
-End Property
+Friend Function SetCurrentKey(ByVal Value As Variant) As IAutoKey
+End Function
 
 Public Function GetFirstUseKey() As Variant
 End Function
@@ -37,11 +37,9 @@ End Function
 Public Function NextKey() As Variant
 End Function
 
-Public Function Name() As String
-End Function
+Public Property Get Name() As String
+End Property
 
-' Public Function Res() As Result
-' End Function
 
 
 

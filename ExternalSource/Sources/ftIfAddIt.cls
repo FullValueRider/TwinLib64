@@ -4,9 +4,10 @@ BEGIN
 END
 Attribute VB_Name = "ftIfAddIt"
 Attribute VB_GlobalNameSpace = False
-Attribute VB_Creatable = True
+Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = True
+'@IgnoreModule EmptyModule
  Option Explicit
  '@PredeclaredId
  '@Exposed

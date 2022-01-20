@@ -4,7 +4,7 @@ BEGIN
 END
 Attribute VB_Name = "mpDec"
 Attribute VB_GlobalNameSpace = False
-Attribute VB_Creatable = True
+Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = True
 Option Explicit
@@ -47,6 +47,7 @@ End Function
 
 Public Function ExecMapper(ByVal ipHostItem As Variant) As Variant
         
+    '@Ignore VariableNotAssigned
     If Types.Group.IsNotNumber(ipHostItem) Then
             
         ExecMapper = ipHostItem

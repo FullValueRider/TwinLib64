@@ -4,7 +4,7 @@ BEGIN
 END
 Attribute VB_Name = "enums"
 Attribute VB_GlobalNameSpace = False
-Attribute VB_Creatable = True
+Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = True
 Attribute VB_Description = "Provides a central location for providing complex enumerations"
@@ -13,6 +13,7 @@ Option Explicit
 '@Folder("Enums")
 '@PredeclaredId
 '@exposed
+'@Ignore EmptyMethod
 Private Sub Class_Initialize()
 End Sub
 

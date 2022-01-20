@@ -4,7 +4,7 @@ BEGIN
 END
 Attribute VB_Name = "eChar"
 Attribute VB_GlobalNameSpace = False
-Attribute VB_Creatable = True
+Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = True
 Option Explicit
@@ -17,7 +17,7 @@ Option Explicit
 Public Enum AscIICode
     'This enumeration defines character descriptions in terms of thier AscII value
     'twNoString
-    twNUL = &H00
+    twNUL = &H0
     twSOH
     twSTX
     twETX
@@ -53,7 +53,7 @@ Public Enum AscIICode
     
     twExcl = &H21             ' !
     twQuot                  ' "
-    twHash                  ' #    
+    twHash                  ' #
     twDollar                ' $
     twPercent               ' %
     twAmp                   ' &
@@ -80,7 +80,7 @@ Public Enum AscIICode
     twHyphen
     
     twLBracket = &H5B        ' [
-    twBackslash             ' \    
+    twBackslash             ' \
     twRBracket              ' ]
     twCircumflex            ' ^
     twLowLine
@@ -329,5 +329,5 @@ End Property
 Public Property Get Count() As Long
     If s.Strings Is Nothing Then SetupDictionaries
     Count = s.Strings.Count
-End Property' add your member fields and procedures here
+End Property ' add your member fields and procedures here
 

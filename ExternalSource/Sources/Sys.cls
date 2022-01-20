@@ -4,7 +4,7 @@ BEGIN
 END
 Attribute VB_Name = "Sys"
 Attribute VB_GlobalNameSpace = False
-Attribute VB_Creatable = True
+Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = True
 Attribute VB_Description = "A place for useful VBA things not explicitly provided by VBA"
@@ -28,8 +28,8 @@ Public Function AsOneItem(ByVal ipIterable As Variant) As Variant
     AsOneItem = Array(ipIterable)
 End Function
 
-Public Function IsTrue(ByVal ipExpression As Boolean) As Boolean
-    IsTrue = ipExpression
+Public Function IsTrue(ByVal ipexpression As Boolean) As Boolean
+    IsTrue = ipexpression
 End Function
 
 Public Function IsNotTrue(ByVal ipexpression As Boolean) As Boolean

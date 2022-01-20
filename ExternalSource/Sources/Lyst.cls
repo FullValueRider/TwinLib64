@@ -4,7 +4,7 @@ BEGIN
 END
 Attribute VB_Name = "Lyst"
 Attribute VB_GlobalNameSpace = False
-Attribute VB_Creatable = True
+Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = True
 Attribute VB_Description = "A Wrapper for the ArrayList object which provides intellisense and extends functionality"
@@ -84,7 +84,6 @@ End Property
 '========1=========2=========3=========4=========5=========6=========7=========8=========9=========A=========B=========C
 '@Description("Adds a comma separated list of items to the Lyst.)"
 Public Function Add(ParamArray ipArgArray() As Variant) As Lyst
-Attribute Add.VB_Description = "Adds a comma separated list of items to the Lyst.  )"
 
     Set Add = Me
     Globals.Res.Init (Msg.Okay)
@@ -182,7 +181,7 @@ Attribute AddKnownIterableAsItems.VB_Description = "Implements add for a single 
 
     If Types.Group.IsNotIterable(ipIterable) Then
         
-        s.Host.add ipIterable
+        s.Host.Add ipIterable
         
     Else
         
@@ -912,18 +911,15 @@ Public Function SetRange(ByVal ipStartIndex As Long, ByVal ipIterable As Variant
     Set myIterable = Types.Iterable.ToArrayList(ipIterable)
     If BailOut.When(myIterable Is Nothing, Msg.HasNoInstance) Then Exit Function
         
-    Dim myStartindex As Long
-    myStartindex = Globals.Res.Item(ResultItemsEnums.StartRun(srStartindex)) - 1 ' adjust for use with arraylist
-    
-    Dim myArrayList As ArrayList
-    Set myArrayList = New ArrayList
+    Dim myStartIndex As Long
+    myStartIndex = Globals.Res.Item(ResultItemsEnums.StartRun(srStartindex)) - 1 ' adjust for use with arraylist
     
     Dim myitem As Variant
     For Each myitem In myIterable
             
-        s.Host.Item(myStartindex) = myitem
-        myStartindex = myStartindex + 1
-        If myStartindex = s.Host.Count Then Exit For
+        s.Host.Item(myStartIndex) = myitem
+        myStartIndex = myStartIndex + 1
+        If myStartIndex = s.Host.Count Then Exit For
             
     Next
         
@@ -978,12 +974,12 @@ Public Function Transpose() As Lyst
 Attribute Transpose.VB_Description = "Transposes a lyst of lysts"
         
     Set Transpose = Nothing
-    If BailOut.When(TypeName(s.Host.item(0)) <> "Lyst", Msg.InvalidType) Then Exit Function
+    If BailOut.When(TypeName(s.Host.Item(0)) <> "Lyst", Msg.InvalidType) Then Exit Function
         
     Dim myTransposed As Lyst
     Set myTransposed = Lyst.Deb
     Dim myIndex As Long
-    For myIndex = s.Host.item(0).firstindex To s.Host.item(0).lastindex ' working with arraylist
+    For myIndex = s.Host.Item(0).FirstIndex To s.Host.Item(0).LastIndex ' working with arraylist
         
         myTransposed.Add Lyst.Deb
             
@@ -992,7 +988,7 @@ Attribute Transpose.VB_Description = "Transposes a lyst of lysts"
     Dim myitem As Variant
     For Each myitem In s.Host
             
-        For myIndex = myitem.firstindex To myitem.LastIndex
+        For myIndex = myitem.FirstIndex To myitem.LastIndex
                 
             myTransposed.Item(myIndex).Add myitem(myIndex)
                 
@@ -1039,7 +1035,7 @@ End Function
 'End Function
 '@Description("Returns a new Lyst comprising of items where the comparer was true.  If Index has a value then the item(index) is compared")
 Public Function FilterIt(ipComparer As IComparer, Optional ByVal ipIndex As Variant = 0) As Lyst
-Attribute Filter.VB_Description = "Returns a new Lyst comprising of items where the comparer was true.  If Index has a value then the item(index) is compared"
+Attribute FilterIt.VB_Description = "Returns a new Lyst comprising of items where the comparer was true.  If Index has a value then the item(index) is compared"
         
     Dim myLyst As Lyst
     Set myLyst = Lyst.Deb

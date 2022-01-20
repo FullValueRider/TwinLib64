@@ -4,7 +4,7 @@ BEGIN
 END
 Attribute VB_Name = "IReduce"
 Attribute VB_GlobalNameSpace = False
-Attribute VB_Creatable = True
+Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = True
 
@@ -13,5 +13,5 @@ Option Explicit
 '@PredeclaredId
 '@Interface
 '@Exposed
-Public Function ExecRed(ByRef ipHostItems As Lyst) As Variant
+Public Function ExecRed(ByVal ipHostItems As Lyst) As Variant
 End Function

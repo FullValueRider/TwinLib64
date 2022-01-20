@@ -4,7 +4,7 @@ BEGIN
 END
 Attribute VB_Name = "Types"
 Attribute VB_GlobalNameSpace = False
-Attribute VB_Creatable = True
+Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = True
 
@@ -27,6 +27,7 @@ Option Explicit
 '
 'Private i                                       As InternalConstants
 
+'@Ignore EmptyMethod
 Public Sub Class_Initialize()
         
     ' If VBA.Len(i.Location) = 0 Then
@@ -63,6 +64,7 @@ End Property
 '========1=========2=========3=========4=========5=========6=========7=========8=========9=========A=========B=========C
 '@Description("Global.Res.Items is populated with the first index,lastindex and count if ipItem is an iterable")
 Public Function TryExtent(ByVal ipItem As Variant, Optional ipRank As Long = 1&) As Result
+Attribute TryExtent.VB_Description = "Global.Res.Items is populated with the first index,lastindex and count if ipItem is an iterable"
     
     Set TryExtent = Globals.Res.SetNotOkay
         

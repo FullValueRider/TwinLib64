@@ -4,7 +4,7 @@ BEGIN
 END
 Attribute VB_Name = "TypesIterables"
 Attribute VB_GlobalNameSpace = False
-Attribute VB_Creatable = True
+Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = True
 Option Explicit
@@ -12,9 +12,6 @@ Option Explicit
 '@eXPOSED
 '@Folder("VBALib.Types")
 
-
-Private Sub Class_Initialize()
-End Sub
 
 '@Description("Returns the firstindex,lastindex and count in Items.  If the iterable has no items status is false.")
 Public Function TryExtent _
@@ -36,7 +33,7 @@ Attribute TryExtent.VB_Description = "Returns the firstindex,lastindex and count
                 
 
         Case VBA.IsArray(ipIterable)
-            ' Does not yet deal with dimensions of more than one.  
+            ' Does not yet deal with dimensions of more than one.
             Arrays.TryExtent ipIterable, ipRank
             
 
@@ -279,12 +276,9 @@ Attribute HasItems.VB_Description = "Returns true if arg is an array and has ubo
 
     If VBA.IsArray(ipArg) Then
         
-        If Arrays.HasNoItems(ipArg) Then Exit Function
+        If Arrays.HasNoItems(ipArg) Then Exit Function  '  Need to something about ipRank here
             
     Else
-        
-            
-        'Guard IsNotArray, ipRank <> 1, mcLocation & "HasItems", Array(TypeName(ipArg))
             
         If ipArg.Count <= 0 Then Exit Function
 
@@ -460,7 +454,7 @@ Public Function ToArrayList(ParamArray ipArgArray() As Variant) As ArrayList
     If Arrays.IsNotValid(ipArgArray) Then Exit Function
         
     'Dim myResult As Result
-    Dim myItem As Variant
+    Dim myitem As Variant
     If Arrays.HasOneItem(ipArgArray) Then
             
         If Types.Name.OfArrayList = TypeName(ipArgArray(0)) Then
@@ -481,31 +475,31 @@ Public Function ToArrayList(ParamArray ipArgArray() As Variant) As ArrayList
                 
             End If
             
-            For Each myItem In myVar
+            For Each myitem In myVar
                 
-                myAL.add myItem
+                myAL.Add myitem
                 
             Next
             
         ElseIf Types.Group.IsIterableKeysByEnum(ipArgArray(0)) Then
             
-            For Each myItem In ipArgArray(0).items
+            For Each myitem In ipArgArray(0).Items
                 
-                myAL.add myItem
+                myAL.Add myitem
                 
             Next
             
         Else
             
-            myAL.add ipArgArray(0)
+            myAL.Add ipArgArray(0)
             
         End If
         
     Else
 
-        For Each myItem In ipArgArray
+        For Each myitem In ipArgArray
                 
-            myAL.Add myItem
+            myAL.Add myitem
                 
         Next
         

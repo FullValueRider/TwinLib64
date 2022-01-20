@@ -4,7 +4,7 @@ BEGIN
 END
 Attribute VB_Name = "AutoKeyByNumber"
 Attribute VB_GlobalNameSpace = False
-Attribute VB_Creatable = True
+Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = True
 '========1=========2=========3=========4=========5=========6=========7=========8=========9=========A=========B=========C
@@ -43,10 +43,11 @@ Private p                                     As Properties
 ' class admin
 '
 '========1=========2=========3=========4=========5=========6=========7=========8=========9=========A=========B=========C
+'@Ignore EmptyMethod
 Private Sub Class_Initialize()
 End Sub
 
-Public Function Deb(Optional ByVal ipFirstUseKey As Variant = Defaultfirstkey) As AutoKeyByNumber
+Public Function Deb(Optional ByVal ipFirstUseKey As Variant = DefaultFirstKey) As AutoKeyByNumber
     ' Variant is used to allow any number type to be used as a Key
     With New AutoKeyByNumber
             
@@ -74,21 +75,21 @@ End Function
 ' Interface
 '
 '========1=========2=========3=========4=========5=========6=========7=========8=========9=========A=========B=========C
-Private Property Get IAutoKey_GetFirstUseKey() As Variant
+Private Function IAutoKey_GetFirstUseKey() As Variant
     IAutoKey_GetFirstUseKey = GetFirstUseKey
-End Property
-
-Friend Function IAutoKey_SetFirstUseKey(ByVal ipValue As Variant) As IAutoKey
-    SetFirstUseKey ipValue
 End Function
 
-Private Property Get IAutoKey_CurrentKey() As Variant
-    IAutoKey_CurrentKey = CurrentKey
-End Property
+Friend Function IAutoKey_SetFirstUseKey(ByVal ipValue As Variant) As IAutoKey
+    Set IAutoKey_SetFirstUseKey = SetFirstUseKey(ipValue)
+End Function
 
-Friend Property Let IAutoKey_CurrentKey(ByVal ipValue As Variant)
-    CurrentKey = ipValue
-End Property
+Private Function IAutoKey_GetCurrentKey() As Variant
+    IAutoKey_GetCurrentKey = GetCurrentKey
+End Function
+
+Friend Function IAutoKey_SetCurrentKey(ByVal ipValue As Variant) As IAutoKey
+    IAutoKey_SetCurrentKey = SetCurrentKey(ipValue)
+End Function
 
 
 Private Function IAutoKey_Clone() As IAutoKey
@@ -99,10 +100,6 @@ Private Function IAutoKey_NextKey() As Variant
     IAutoKey_NextKey = NextKey
 End Function
 
-Private Function IAutoKey_Name() As String
-    IAutoKey_Name = Name
-End Function
-
 Public Property Get IAutoKey_FirstUseKeyType() As String
     IAutoKey_FirstUseKeyType = p.FirstUseKeyType
 End Property
@@ -110,6 +107,10 @@ End Property
 Private Function IAutoKey_NextKeys(ByVal ipCount As Long) As Lyst
     Set IAutoKey_NextKeys = NextKeys(ipCount)
 End Function
+
+Private Property Get IAutoKey_Name() As String
+    IAutoKey_Name = Name
+End Property
 
 '========1=========2=========3=========4=========5=========6=========7=========8=========9=========A=========B=========C
 '
@@ -134,13 +135,13 @@ Friend Function SetFirstUseKey(ByVal ipValue As Variant) As IAutoKey
     
 End Function
 
-Public Property Get CurrentKey() As Variant
-    CurrentKey = p.CurrentKey
-End Property
+Public Function GetCurrentKey() As Variant
+    GetCurrentKey = p.CurrentKey
+End Function
 
-Friend Property Let CurrentKey(ByVal ipValue As Variant)
+Friend Function SetCurrentKey(ByVal ipValue As Variant) As IAutoKey
     p.CurrentKey = ipValue
-End Property
+End Function
 
 
 Public Function Clone() As IAutoKey
@@ -148,7 +149,7 @@ Public Function Clone() As IAutoKey
     Dim myAutoKey As AutoKeyByNumber
     Set myAutoKey = Me.Deb(p.FirstUseKey)
         
-    myAutoKey.CurrentKey = p.CurrentKey
+    myAutoKey.SetCurrentKey p.CurrentKey
         
     Set Clone = myAutoKey
         
@@ -171,9 +172,9 @@ Public Property Get NextKey() As Variant
         
 End Property
 
-Public Function Name() As String
+Public Property Get Name() As String
     Name = AutokeyByNumberName
-End Function
+End Property
 
 Public Property Get FirstUseKeyType() As String
     FirstUseKeyType = p.FirstUseKeyType

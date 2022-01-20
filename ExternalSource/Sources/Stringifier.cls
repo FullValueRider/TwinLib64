@@ -4,11 +4,11 @@ BEGIN
 END
 Attribute VB_Name = "Stringifier"
 Attribute VB_GlobalNameSpace = False
-Attribute VB_Creatable = True
+Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = True
 Attribute VB_Description = "Static class: Repository for non standard conversions methods"
-'@IgnoreModule FunctionReturnValueAlwaysDiscarded
+'@IgnoreModule StopKeyword, FunctionReturnValueAlwaysDiscarded
 Option Explicit
 '@Exposed
 '@PredeclaredId
@@ -64,7 +64,7 @@ End Sub
 ' Implementation
 '
 '========1=========2=========3=========4=========5=========6=========7=========8=========9=========A=========B=========C
-Friend Sub ResetMarkup()
+Public Sub ResetMarkup()
         
     ResetArrayMarkup
     ResetObjectMarkup
@@ -182,14 +182,14 @@ Public Function ToStringByIterable(ByVal ipIterable As Variant) As String
         
 End Function
 
-Friend Function StringifyPrimitive(ByVal ipPrimitive As Variant) As String
+Public Function StringifyPrimitive(ByVal ipPrimitive As Variant) As String
         
     StringifyPrimitive = CStr(ipPrimitive)
         
 End Function
 
 
-Friend Function StringifyAdmin(ByVal ipAdmin As Variant) As String
+Public Function StringifyAdmin(ByVal ipAdmin As Variant) As String
 
     Select Case True
                 
@@ -234,7 +234,7 @@ Friend Function StringifyAdmin(ByVal ipAdmin As Variant) As String
         
 End Function
 
-Friend Function StringifyIterable(ByRef ipIterable As Variant) As String
+Public Function StringifyIterable(ByRef ipIterable As Variant) As String
 
     'ResetArrayMarkup
     StringifyIterable = vbNullString
@@ -281,7 +281,7 @@ Friend Function StringifyIterable(ByRef ipIterable As Variant) As String
         
 End Function
 
-Friend Function GetIterableItemsByEnumAsLystOfStrings(ByVal ipIterable As Variant) As Lyst
+Public Function GetIterableItemsByEnumAsLystOfStrings(ByVal ipIterable As Variant) As Lyst
 
     Dim myLyst As Lyst
     Set myLyst = Lyst.Deb
@@ -297,7 +297,7 @@ Friend Function GetIterableItemsByEnumAsLystOfStrings(ByVal ipIterable As Varian
             
 End Function
 
-Friend Function GetIterableKeysByEnumAsLystOfStrings(ByVal ipIterable As Variant) As Lyst
+Public Function GetIterableKeysByEnumAsLystOfStrings(ByVal ipIterable As Variant) As Lyst
 
     Dim myLyst As Lyst
     Set myLyst = Lyst.Deb
@@ -319,7 +319,7 @@ Friend Function GetIterableKeysByEnumAsLystOfStrings(ByVal ipIterable As Variant
 
 End Function
 
-' Friend Function GetLystOfIterableItemsByIndexStrings(ByVal ipIterable As Variant) As Lyst
+' Public Function GetLystOfIterableItemsByIndexStrings(ByVal ipIterable As Variant) As Lyst
 
 '     Dim myLyst As Lyst
 '     Set myLyst = Lyst.Deb
@@ -341,7 +341,7 @@ End Function
 
 
 '@Description("Trys to get string description of a non iterable object. Defaullt result is '{Object "Name"}'"
-Friend Function StringifyNonIterableObject(ByVal ipObject As Object) As String
+Public Function StringifyNonIterableObject(ByVal ipObject As Object) As String
 
     Dim myMethods As Variant
     myMethods = VBA.Split(mcMethods, Char.twComma)

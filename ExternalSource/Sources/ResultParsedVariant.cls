@@ -4,7 +4,7 @@ BEGIN
 END
 Attribute VB_Name = "ResultParsedVariant"
 Attribute VB_GlobalNameSpace = False
-Attribute VB_Creatable = True
+Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = True
 Option Explicit
@@ -53,6 +53,7 @@ End Function
 
 Public Function GetItems() As Lyst
     
+    '@Ignore DefaultMemberRequired
     Set GetItems = Lyst.Deb.AddKnownIterableAsItems(p.Items(0))
    
 End Function

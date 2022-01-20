@@ -4,7 +4,7 @@ BEGIN
 END
 Attribute VB_Name = "IValueProvider"
 Attribute VB_GlobalNameSpace = False
-Attribute VB_Creatable = True
+Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 
@@ -12,12 +12,14 @@ Attribute VB_Exposed = False
 
 ' IValueProvider: Provide values.
 Option Explicit
-Option Base 0
+
 
 ' Return True if there are more values
+'@Ignore EmptyMethod
 Public Function HasMore() As Boolean
 End Function
 
 ' Return the next value
+'@Ignore EmptyMethod
 Public Function GetNext() As Variant
 End Function

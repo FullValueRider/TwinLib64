@@ -4,7 +4,7 @@ BEGIN
 END
 Attribute VB_Name = "ROL"
 Attribute VB_GlobalNameSpace = False
-Attribute VB_Creatable = True
+Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = True
 Option Explicit
@@ -50,7 +50,7 @@ Friend Function ReadyToUseInstance(ByVal ipIterable As Variant) As ROL
     Set s.Items = ipIterable
     
 If Types.IsTypeByName(Array(Types.Name.OfLyst, Types.Name.OfROL), ipIterable) Then
-    Set s.Items = ipIterable.toarraylist
+    Set s.Items = ipIterable.ToArrayList
 End If
     
   ElseIf Types.IsString(ipIterable) Then
