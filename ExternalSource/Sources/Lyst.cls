@@ -4,7 +4,7 @@ BEGIN
 END
 Attribute VB_Name = "Lyst"
 Attribute VB_GlobalNameSpace = False
-Attribute VB_Creatable = False
+Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = True
 Attribute VB_Description = "A Wrapper for the ArrayList object which provides intellisense and extends functionality"
@@ -105,10 +105,10 @@ Public Function Add(ParamArray ipArgArray() As Variant) As Lyst
     
     Dim myArgArray As Variant
     myArgArray = CVar(ipArgArray)
-    Dim myitem As Variant
-    For Each myitem In myArgArray
+    Dim myItem As Variant
+    For Each myItem In myArgArray
             
-        s.Host.Add myitem
+        s.Host.Add myItem
             
     Next
     
@@ -148,10 +148,10 @@ Attribute AddRange.VB_Description = "Adds the Items of a single iterable to the 
 '    Dim myLyst As Lyst
 '    Set myLyst = Lyst.Deb.AddKnownIterableAsItems(ipIterable)
     'Debug.Print TypeName(ipIterable.Host)
-    Dim myitem As Variant
-    For Each myitem In ipIterable  '.Host
+    Dim myItem As Variant
+    For Each myItem In ipIterable  '.Host
       
-        s.Host.Add myitem
+        s.Host.Add myItem
         
     Next
         
@@ -162,10 +162,10 @@ End Function
 
 Friend Function AddKnownItemsAsItems(ParamArray ipitems() As Variant) As Lyst
         
-    Dim myitem As Variant
-    For Each myitem In ipitems
+    Dim myItem As Variant
+    For Each myItem In ipitems
         
-        s.Host.Add myitem
+        s.Host.Add myItem
             
                 
     Next
@@ -186,10 +186,10 @@ Attribute AddKnownIterableAsItems.VB_Description = "Implements add for a single 
     Else
         
     
-        Dim myitem As Variant
-        For Each myitem In ipIterable
+        Dim myItem As Variant
+        For Each myItem In ipIterable
                 
-            s.Host.Add myitem
+            s.Host.Add myItem
                 
                 
         Next
@@ -218,10 +218,10 @@ Attribute CountIt.VB_Description = "Returns the number of Items in the Lyst inst
   
     Dim myCounter As Long
     myCounter = 0
-    Dim myitem As Variant
-    For Each myitem In s.Host
+    Dim myItem As Variant
+    For Each myItem In s.Host
 
-        If ipComparer.ExecCmp(myitem) Then myCounter = myCounter + 1
+        If ipComparer.ExecCmp(myItem) Then myCounter = myCounter + 1
         
             
     Next
@@ -238,10 +238,10 @@ Attribute Deduplicate.VB_Description = "Returns a new Lyst containing only uniqu
     Dim myUnique As Lyst
     Set myUnique = New Lyst
     
-    Dim myitem As Variant
-    For Each myitem In s.Host
+    Dim myItem As Variant
+    For Each myItem In s.Host
         
-        If myUnique.LacksItem(myitem) Then myUnique.AddKnownItemsAsItems myitem
+        If myUnique.LacksItem(myItem) Then myUnique.AddKnownItemsAsItems myItem
             
 
     Next
@@ -347,17 +347,17 @@ Public Property Let Item(ByVal ipIndex As Long, ByVal ipValue As Variant)
     
     If Ranges.TryStartRunFromAnyStartRunEnd(s.Host, ipIndex).IsNotOkay Then Exit Property
     
-    Dim mystartrun As ResultStartRun
-    Set mystartrun = Globals.Res.GetResultStartRun
+    Dim myStartRun As ResultStartRun
+    Set myStartRun = Globals.Res.GetResultStartRun
     
     If VBA.IsObject(ipValue) Then
         
-        Set s.Host.Item(mystartrun.StartIndex) = ipValue
+        Set s.Host.Item(myStartRun.StartIndex) = ipValue
             
         
     Else
         
-        s.Host.Item(mystartrun.StartIndex) = ipValue
+        s.Host.Item(myStartRun.StartIndex) = ipValue
             
         
     End If
@@ -369,10 +369,10 @@ Public Property Set Item(ByVal ipIndex As Long, ByVal ipValue As Variant)
         
     If Ranges.TryStartRunFromAnyStartRunEnd(s.Host, ipIndex).IsNotOkay Then Exit Property
    
-    Dim mystartrun As ResultStartRun
-    Set mystartrun = Globals.Res.GetResultStartRun
+    Dim myStartRun As ResultStartRun
+    Set myStartRun = Globals.Res.GetResultStartRun
     
-    Set s.Host.Item(mystartrun.StartIndex) = ipValue
+    Set s.Host.Item(myStartRun.StartIndex) = ipValue
         
 End Property
 
@@ -476,14 +476,14 @@ Attribute CopyTo.VB_Description = "Copies the specified range to the byref array
     ' for Lyst, the host will always be a 0 based ArrayList
     ' This we convert by adding 1 to startindex and endindex if they are provided
      
-    Dim mystartrun As ResultStartRun
+    Dim myStartRun As ResultStartRun
     If Ranges.TryStartRunFromAnyStartRunEnd(Me, ipStartIndex, ipRun, ipEndIndex).IsNotOkay Then Exit Sub
-    Set mystartrun = Globals.Res.GetResultStartRun
+    Set myStartRun = Globals.Res.GetResultStartRun
 
-    If BailOut.When(myArrayExtent.Count <> mystartrun.Run, Msg.IndexWillOverrun) Then Exit Sub
+    If BailOut.When(myArrayExtent.Count <> myStartRun.Run, Msg.IndexWillOverrun) Then Exit Sub
         
     Dim myRange As Variant
-    myRange = s.Host.GetRange(mystartrun.StartIndex - 1, mystartrun.Run).ToArray
+    myRange = s.Host.GetRange(myStartRun.StartIndex - 1, myStartRun.Run).ToArray
     
     Dim myIndex As Long
     For myIndex = LBound(myRange) To UBound(myRange)
@@ -506,11 +506,11 @@ Attribute GetRange.VB_Description = "Returns a new Lyst instance containing a sh
         
     If Ranges.TryStartRunFromAnyStartRunEnd(Me, ipStartIndex, ipRun, ipEndIndex).IsNotOkay Then Exit Function
        
-    Dim mystartrun As ResultStartRun
-    Set mystartrun = Globals.Res.GetResultStartRun
+    Dim myStartRun As ResultStartRun
+    Set myStartRun = Globals.Res.GetResultStartRun
     
     Dim myAL As ArrayList
-    Set myAL = s.Host.GetRange(mystartrun.StartIndex - 1, mystartrun.Run)
+    Set myAL = s.Host.GetRange(myStartRun.StartIndex - 1, myStartRun.Run)
         
     myList.InjectHostArrayList myAL
     Set GetRange = myList
@@ -536,16 +536,16 @@ Attribute IndexOf.VB_Description = "Returns the Index of the first Item found in
     Globals.Res.SetNotOkay
     If Ranges.TryStartRunFromAnyStartRunEnd(Me, ipStartIndex, ipRun, ipEndIndex).IsNotOkay Then Exit Function
     
-    Dim mystartrun As ResultStartRun
-    Set mystartrun = Globals.Res.GetResultStartRun
+    Dim myStartRun As ResultStartRun
+    Set myStartRun = Globals.Res.GetResultStartRun
     
     Dim myAL As ArrayList
-    Set myAL = s.Host.GetRange(mystartrun.StartIndex - 1, mystartrun.Run)
+    Set myAL = s.Host.GetRange(myStartRun.StartIndex - 1, myStartRun.Run)
     
     Dim myIndex As Long
     myIndex = myAL.IndexOf(ipItem, 0)
         
-    IndexOf = myIndex + mystartrun.StartIndex
+    IndexOf = myIndex + myStartRun.StartIndex
     
 End Function
 
@@ -605,8 +605,8 @@ Attribute InsertAt.VB_Description = "Inserts values at Index"
     If Ranges.TryStartRunFromAnyStartRunEnd(s.Host, ipIndex).IsNotOkay Then Exit Function
         
         
-    Dim mystartrun As ResultStartRun
-    Set mystartrun = Globals.Res.GetResultStartRun
+    Dim myStartRun As ResultStartRun
+    Set myStartRun = Globals.Res.GetResultStartRun
     
     If Arrays.HasOneItem(ipArgArray) Then
       
@@ -616,12 +616,12 @@ Attribute InsertAt.VB_Description = "Inserts values at Index"
       Dim myParsed As ResultParsedVariant
       Set myParsed = Globals.Res.GetResultParsedVariant
      
-      s.Host.InsertRange mystartrun.StartIndex, myParsed.ResultItems.ToArrayList
+      s.Host.InsertRange myStartRun.StartIndex, myParsed.ResultItems.ToArrayList
         
                 
     Else
         
-        s.Host.InsertRange mystartrun.StartIndex, Types.Iterable.ToArrayList(ipArgArray)
+        s.Host.InsertRange myStartRun.StartIndex, Types.Iterable.ToArrayList(ipArgArray)
             
     End If
         
@@ -791,10 +791,10 @@ Attribute MergeByValue.VB_Description = "Merges new values from the input Lystc"
         
     End If
     
-    Dim myitem As Variant
-    For Each myitem In ipLyst
+    Dim myItem As Variant
+    For Each myItem In ipLyst
         
-        If Not s.Host.Contains(myitem) Then s.Host.Add myitem
+        If Not s.Host.Contains(myItem) Then s.Host.Add myItem
             
     Next
     
@@ -906,18 +906,20 @@ Public Function SetRange(ByVal ipStartIndex As Long, ByVal ipIterable As Variant
         
     Set SetRange = Me
     If Ranges.TryStartRunFromAnyStartRunEnd(Me, ipStartIndex).IsNotOkay Then Exit Function
+    Dim myStartRun As ResultStartRun
+    Set myStartRun = Globals.Res.GetResultStartRun
     
     Dim myIterable As ArrayList
     Set myIterable = Types.Iterable.ToArrayList(ipIterable)
     If BailOut.When(myIterable Is Nothing, Msg.HasNoInstance) Then Exit Function
         
     Dim myStartIndex As Long
-    myStartIndex = Globals.Res.Item(ResultItemsEnums.StartRun(srStartindex)) - 1 ' adjust for use with arraylist
+    myStartIndex = myStartRun.StartIndex  ' adjust for use with arraylist
     
-    Dim myitem As Variant
-    For Each myitem In myIterable
+    Dim myItem As Variant
+    For Each myItem In myIterable
             
-        s.Host.Item(myStartIndex) = myitem
+        s.Host.Item(myStartIndex - 1) = myItem
         myStartIndex = myStartIndex + 1
         If myStartIndex = s.Host.Count Then Exit For
             
@@ -974,7 +976,7 @@ Public Function Transpose() As Lyst
 Attribute Transpose.VB_Description = "Transposes a lyst of lysts"
         
     Set Transpose = Nothing
-    If BailOut.When(TypeName(s.Host.Item(0)) <> "Lyst", Msg.InvalidType) Then Exit Function
+    If BailOut.When(TypeName(First) <> "Lyst", Msg.InvalidType) Then Exit Function
         
     Dim myTransposed As Lyst
     Set myTransposed = Lyst.Deb
@@ -985,12 +987,12 @@ Attribute Transpose.VB_Description = "Transposes a lyst of lysts"
             
     Next
         
-    Dim myitem As Variant
-    For Each myitem In s.Host
+    Dim myItem As Variant
+    For Each myItem In s.Host
             
-        For myIndex = myitem.FirstIndex To myitem.LastIndex
+        For myIndex = myItem.FirstIndex To myItem.LastIndex
                 
-            myTransposed.Item(myIndex).Add myitem(myIndex)
+            myTransposed.Item(myIndex).Add myItem(myIndex)
                 
         Next
             
@@ -1041,13 +1043,13 @@ Attribute FilterIt.VB_Description = "Returns a new Lyst comprising of items wher
     Set myLyst = Lyst.Deb
     Set FilterIt = myLyst
     
-    Dim myitem As Variant
+    Dim myItem As Variant
     
     If ipIndex = 0 Then
     
-        For Each myitem In s.Host
+        For Each myItem In s.Host
             
-            If ipComparer.ExecCmp(myitem) Then myLyst.Add myitem
+            If ipComparer.ExecCmp(myItem) Then myLyst.Add myItem
                    
         Next
         
@@ -1056,12 +1058,12 @@ Attribute FilterIt.VB_Description = "Returns a new Lyst comprising of items wher
         
     End If
     
-    For Each myitem In s.Host
+    For Each myItem In s.Host
         
-        If Ranges.TryStartRunFromAnyStartRunEnd(myitem, ipIndex).IsNotOkay Then Exit Function
+        If Ranges.TryStartRunFromAnyStartRunEnd(myItem, ipIndex).IsNotOkay Then Exit Function
             
         '@Ignore DefaultMemberRequired
-        If ipComparer(myitem.Item(Globals.Res.Item(ResultItemsEnums.StartRun(srStartindex)))) Then myLyst.Add myitem
+        If ipComparer(myItem.Item(Globals.Res.Item(ResultItemsEnums.StartRun(srStartindex)))) Then myLyst.Add myItem
                 
     Next
     

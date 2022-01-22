@@ -4,7 +4,7 @@ BEGIN
 END
 Attribute VB_Name = "Types"
 Attribute VB_GlobalNameSpace = False
-Attribute VB_Creatable = False
+Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = True
 
@@ -86,7 +86,7 @@ Attribute TryExtent.VB_Description = "Global.Res.Items is populated with the fir
             Arrays.TryExtent ipItem, ipRank
                         
                         
-        Case Types.Group.IsIterableObject(ipItem)
+        Case Types.Group.IsIterable(ipItem)
                 
             Types.Iterable.TryExtent ipItem, ipRank
                         
@@ -128,11 +128,11 @@ Friend Function HasItemsByFPA(ByVal ipArgArray As Variant) As Result
         
     End If
     
-    Dim myitem As Variant
-    For Each myitem In myargs
+    Dim myItem As Variant
+    For Each myItem In myargs
         
-        If BailOut.When(Types.Group.IsNotIterable(myitem), Msg.IsNotIterable) Then Exit Function
-        If BailOut.When(Types.Iterable.HasNoItems(myitem), Msg.HasNoItems) Then Exit Function
+        If BailOut.When(Types.Group.IsNotIterable(myItem), Msg.IsNotIterable) Then Exit Function
+        If BailOut.When(Types.Iterable.HasNoItems(myItem), Msg.HasNoItems) Then Exit Function
         
     Next
     
@@ -243,9 +243,9 @@ Attribute HasItemMethod.VB_Description = "Returns True if an object has an Item 
     ' Using Array is the simplest way of recieving an object without an isobject test.
     ' The assignment below is to get the error number only and tests if the item method exists
     '@Ignore VariableNotUsed
-    Dim myitem As Variant
+    Dim myItem As Variant
     '@Ignore AssignmentNotUsed
-    myitem = Array(ipItem.Item(ipItem.Count - 1))
+    myItem = Array(ipItem.Item(ipItem.Count - 1))
     Dim myErrNo As Long
     myErrNo = Err.Number
         
@@ -345,11 +345,11 @@ Public Function pvIsSameTypeByFPA(ByVal ipRequiredType As Variant, ByVal ipArgAr
                 
     Dim myRequiredType As String
     myRequiredType = TypeName(ipRequiredType)
-    Dim myitem As Variant
-    For Each myitem In ipArgArray
+    Dim myItem As Variant
+    For Each myItem In ipArgArray
         ' cannot use vartype as this cannot distinguish object types
             
-        If InStr(myRequiredType, TypeName(myitem)) = 0 Then Exit Function
+        If InStr(myRequiredType, TypeName(myItem)) = 0 Then Exit Function
             
     Next
         
@@ -451,18 +451,18 @@ Public Function pvIsTypeByNameByFPA(ByVal ipTypesasStringOrIterable As Variant, 
     Dim myIterable As Variant
     If VBA.VarType(ipTypesasStringOrIterable) = vbString Then
         
-        Set myIterable = Types.Iterable.ToArrayList(VBA.Split(ipTypesasStringOrIterable, Char.twComma))
+        Set myIterable = Lyst.Deb.AddKnownIterableAsItems(VBA.Split(ipTypesasStringOrIterable, Char.twComma))
             
     Else
 
-        Set myIterable = Types.Iterable.ToArrayList(ipTypesasStringOrIterable)
+        Set myIterable = Lyst.Deb.AddKnownIterableAsItems(ipTypesasStringOrIterable)
     
     End If
     
-    Dim myitem As Variant
-    For Each myitem In ipArgArray
-        'Debug.Print TypeName(myitem)
-        If Not myIterable.Contains(TypeName(myitem)) Then Exit Function
+    Dim myItem As Variant
+    For Each myItem In ipArgArray
+        
+        If myIterable.LacksItem(TypeName(myItem)) Then Exit Function
         
     Next
         
@@ -488,10 +488,10 @@ Public Function pvIsVarTypeByFPA(ByVal ipVarType As VbVarType, ByVal ipArgArray 
     '@Ignore IsMissingOnInappropriateArgument
     If VBA.IsMissing(ipArgArray) Then Exit Function
                 
-    Dim myitem As Variant
-    For Each myitem In ipArgArray
+    Dim myItem As Variant
+    For Each myItem In ipArgArray
         
-        If Not VBA.VarType(myitem) = ipVarType Then Exit Function
+        If Not VBA.VarType(myItem) = ipVarType Then Exit Function
             
     Next
         

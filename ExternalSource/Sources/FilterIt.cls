@@ -4,7 +4,7 @@ BEGIN
 END
 Attribute VB_Name = "FilterIt"
 Attribute VB_GlobalNameSpace = False
-Attribute VB_Creatable = False
+Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = True
 Option Explicit
@@ -51,10 +51,10 @@ Public Function ExecRed(ByVal ipHostItems As Lyst) As Lyst
     Dim myLyst As Lyst
     Set myLyst = Lyst.Deb
         
-   Dim myitem As Variant
-   For Each myitem In ipHostItems
+   Dim myItem As Variant
+   For Each myItem In ipHostItems
    
-        If s.Comparer.ExecCmp(myitem) Then myLyst.Add myitem
+        If s.Comparer.ExecCmp(myItem) Then myLyst.Add myItem
    
    Next
    

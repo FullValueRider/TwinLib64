@@ -4,7 +4,7 @@ BEGIN
 END
 Attribute VB_Name = "Strs"
 Attribute VB_GlobalNameSpace = False
-Attribute VB_Creatable = False
+Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = True
 Option Explicit
@@ -288,12 +288,12 @@ Attribute ToSubStrLyst.VB_Description = "Converts a string to an Lyst of trimmed
             
     End If
         
-    Dim myitem As Variant
+    Dim myItem As Variant
     Dim myLyst As Lyst
     Set myLyst = Lyst.Deb
-    For Each myitem In myArray
+    For Each myItem In myArray
         
-        myLyst.Add myitem
+        myLyst.Add myItem
             
     Next
 

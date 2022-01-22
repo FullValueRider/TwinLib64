@@ -4,7 +4,7 @@ BEGIN
 END
 Attribute VB_Name = "TableArrayToColLystsCopyFirst"
 Attribute VB_GlobalNameSpace = False
-Attribute VB_Creatable = False
+Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = True
 Option Explicit
@@ -34,11 +34,11 @@ Public Function ExecAction(ByVal ipTablearray As Variant) As Lyst
     Dim myRankLysts As Lyst
     Set myRankLysts = Lyst.Deb
         
-    Dim myitem As Variant
-    For Each myitem In myLystOfRankLysts
+    Dim myItem As Variant
+    For Each myItem In myLystOfRankLysts
             
         Dim myInnerLyst As Lyst
-        Set myInnerLyst = myitem
+        Set myInnerLyst = myItem
         myRankFirstItemsLyst.AddKnownItemsAsItems myInnerLyst.First
         myRankLysts.AddKnownItemsAsItems myInnerLyst
             

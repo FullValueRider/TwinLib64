@@ -54,8 +54,8 @@
 	"project.autoPrettify": true,
 	"project.versionMajor": 0,
 	"project.versionMinor": 1,
-	"project.versionBuild": 7,
+	"project.versionBuild": 0,
 	"project.licence": "MIT",
-	"project.versionRevision": 2,
+	"project.versionRevision": 3,
 	"project.packageVisibility": "PUBLIC"
 }

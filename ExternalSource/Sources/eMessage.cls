@@ -4,7 +4,7 @@ BEGIN
 END
 Attribute VB_Name = "eMessage"
 Attribute VB_GlobalNameSpace = False
-Attribute VB_Creatable = False
+Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = True
 Option Explicit
@@ -868,12 +868,12 @@ End Function
 
 Public Function Ord(ByVal ipEnum As Msg) As Long
         
-    Dim myitem As Variant
+    Dim myItem As Variant
     Dim myOrd As Long
     myOrd = 1
-    For Each myitem In s.Strings.Keys
+    For Each myItem In s.Strings.Keys
             
-        If myitem = ipEnum Then
+        If myItem = ipEnum Then
                 
             Ord = myOrd
             Exit Function

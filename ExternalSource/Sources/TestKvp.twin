@@ -615,7 +615,7 @@ TestFail:
             .Add myAutoKey.NextKey
             .Add myAutoKey.NextKey
             .Add myAutoKey.NextKey
-            myAutoKey.CurrentKey = 100&
+            myAutoKey.SetCurrentKey 100&
             .Add myAutoKey.NextKey
             .Add myAutoKey.NextKey
             .Add myAutoKey.NextKey
@@ -810,7 +810,7 @@ TestFail:
             .Add myAutoKey.NextKey
             .Add myAutoKey.NextKey
             .Add myAutoKey.NextKey
-            myAutoKey.CurrentKey = "bbbd"
+            myAutoKey.SetCurrentKey "bbbd"
             .Add myAutoKey.NextKey
             .Add myAutoKey.NextKey
             .Add myAutoKey.NextKey

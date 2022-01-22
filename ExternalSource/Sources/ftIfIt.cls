@@ -2,7 +2,7 @@ VERSION 1.0 CLASS
 BEGIN
   MultiUse = -1  'True
 END
-Attribute VB_Name = "FilterIt"
+Attribute VB_Name = "ftIfIt"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = True
@@ -22,9 +22,9 @@ End Type
 
 Private s                           As State
 
-Public Function Deb(ByRef ipComparer As IComparer) As FilterIt
+Public Function Deb(ByRef ipComparer As IComparer) As ftIfIt
         
-    With New FilterIt
+    With New ftIfIt
         
         Set Deb = .ReadyToUseInstance(ipComparer)
             
@@ -32,7 +32,7 @@ Public Function Deb(ByRef ipComparer As IComparer) As FilterIt
         
 End Function
 
-Friend Function ReadyToUseInstance(ByRef ipComparer As IComparer) As FilterIt
+Friend Function ReadyToUseInstance(ByRef ipComparer As IComparer) As ftIfIt
         
     Set s.Comparer = ipComparer
     Set ReadyToUseInstance = Me
@@ -51,10 +51,10 @@ Public Function ExecRed(ByVal ipHostItems As Lyst) As Lyst
     Dim myLyst As Lyst
     Set myLyst = Lyst.Deb
         
-   Dim myitem As Variant
-   For Each myitem In ipHostItems
+   Dim myItem As Variant
+   For Each myItem In ipHostItems
    
-        If s.Comparer.ExecCmp(myitem) Then myLyst.Add myitem
+        If s.Comparer.ExecCmp(myItem) Then myLyst.Add myItem
    
    Next
    

@@ -4,7 +4,7 @@ BEGIN
 END
 Attribute VB_Name = "mpExecDeb"
 Attribute VB_GlobalNameSpace = False
-Attribute VB_Creatable = False
+Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = True
 Option Explicit
@@ -23,7 +23,7 @@ End Type
 Private s                               As State
 
 
-Public Function Deb(ByRef ipPredeclaredId As Object) As mpExecDeb
+Public Function Deb(ByVal ipPredeclaredId As Object) As mpExecDeb
         
     With New mpExecDeb
         
@@ -34,7 +34,7 @@ Public Function Deb(ByRef ipPredeclaredId As Object) As mpExecDeb
 End Function
 
 
-Friend Function ReadyToUseInstance(ByRef ipPredeclaredId As Object) As mpExecDeb
+Friend Function ReadyToUseInstance(ByVal ipPredeclaredId As Object) As mpExecDeb
         
     Set s.PredeclaredId = ipPredeclaredId
     Set ReadyToUseInstance = Me

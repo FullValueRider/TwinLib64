@@ -4,7 +4,7 @@ BEGIN
 END
 Attribute VB_Name = "Result"
 Attribute VB_GlobalNameSpace = False
-Attribute VB_Creatable = False
+Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = True
 Option Explicit
@@ -255,8 +255,8 @@ Attribute SetItems.VB_Description = "Sets the values of p.ResultItems "
  
     ' Else
         
-    Dim myitem As Variant
-    For Each myitem In ipResultItems
+    Dim myItem As Variant
+    For Each myItem In ipResultItems
         
       '  If Types.Group.IsNotIterable(myItem) Then
             
@@ -265,7 +265,7 @@ Attribute SetItems.VB_Description = "Sets the values of p.ResultItems "
             
       '  Else
     
-            p.ResultItems.Add myitem
+            p.ResultItems.Add myItem
             
         
        ' End If

@@ -4,7 +4,7 @@ BEGIN
 END
 Attribute VB_Name = "rdCountIt"
 Attribute VB_GlobalNameSpace = False
-Attribute VB_Creatable = False
+Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = True
 Option Explicit
@@ -50,10 +50,10 @@ Public Function ExecRed(ByVal ipHostItems As Lyst) As Variant
     Dim myCounter As Long
     myCounter = 0
         
-   Dim myitem As Variant
-   For Each myitem In ipHostItems
+   Dim myItem As Variant
+   For Each myItem In ipHostItems
    
-        If s.Comparer.ExecCmp(myitem) Then myCounter = myCounter + 1
+        If s.Comparer.ExecCmp(myItem) Then myCounter = myCounter + 1
    
    Next
    

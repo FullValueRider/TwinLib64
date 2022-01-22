@@ -4,7 +4,7 @@ BEGIN
 END
 Attribute VB_Name = "Arrays"
 Attribute VB_GlobalNameSpace = False
-Attribute VB_Creatable = False
+Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = True
 Option Explicit
@@ -19,21 +19,6 @@ Option Explicit
 ' Comment line limit should be 80 characters
 '========1=========2=========3=========4=========5=========6=========7=========8=========9=========A=========B=========C
     
-' Public Enum ArrayAdmin
-    
-'     FirstRank = 1
-        
-' End Enum
-
-' Private Type ReadOnly
-        
-'     Location As String
-
-' End Type
-
-' Private r                                     As ReadOnly
-
-
 Public Enum ArrayDirections
 
     FourWay
@@ -48,26 +33,10 @@ Public Enum RankOrientation
         
 End Enum
 
-'@Ignore EmptyMethod
-Private Sub Class_Initialize()
-        
-    ' If VBA.Len(r.Location) = 0 Then
-            
-    '     r.Location = "VBALib.Arrays."
-            
-            
-    ' End If
-        
-   ' if BailOut.When( enums.Message.AsEnum(Msg.InvalidNew), Not (Me Is Arrays), r.Location & "Class_Initialise"
-        
-End Sub
 
-
-
-
-    'ToDo: Move perimiter and associated functions to its own Area class
-    ' ToDO use Lbound and Ubound to get min and max values
-    '@Description("Returns an array of valid coordinates based on the provided x,y coordinate and the available area.")
+' ToDo: Move perimiter and associated functions to its own Area class
+' ToDo: use Lbound and Ubound to get min and max values
+'@Description("Returns an array of valid coordinates based on the provided x,y coordinate and the available area.")
 Public Function GetPerimeterCoordinates _
        ( _
        ByVal ipCurRow As Long, _
@@ -340,11 +309,9 @@ Public Function HasOneItem(ByVal ipArray As Variant) As Boolean
     HasOneItem = (UBound(ipArray) - LBound(ipArray) + 1) = 1
 End Function
 
-'Public Function HasOneItem(ByVal ipArray As Variant, Optional ByVal ipRank As Long = preset.ArrayFirstRank) As Boolean
-        
-    '      HasOneItem = Count(ipArray, ipRank) = 1
-        
-    '  End Function
+Public Function HasMoreThanOneItem(ByVal ipArray As Variant) As Boolean
+    HasMoreThanOneItem = (UBound(ipArray) - LBound(ipArray) + 1) > 1
+End Function
 
 Public Function IsNotSingleItem(ByVal ipArray As Variant) As Boolean
     IsNotSingleItem = Not HasOneItem(ipArray)
@@ -364,11 +331,11 @@ Public Function IsListArrayByIterable(ByVal ipFPA As Variant) As Boolean
     IsListArrayByIterable = Globals.Res.SetNotOkay.Status
     
     If Arrays.IsNotValid(ipFPA) Then Exit Function
-    Dim myitem As Variant
-    For Each myitem In ipFPA
+    Dim myItem As Variant
+    For Each myItem In ipFPA
         
-        If BailOut.When(Types.IsNotArray(myitem), Msg.IsNotArray) Then Exit Function
-        If BailOut.When(Arrays.Ranks(myitem) <> 1, Msg.IsNotListArray) Then Exit Function
+        If BailOut.When(Types.IsNotArray(myItem), Msg.IsNotArray) Then Exit Function
+        If BailOut.When(Arrays.Ranks(myItem) <> 1, Msg.IsNotListArray) Then Exit Function
         
     Next
     
@@ -390,11 +357,11 @@ Public Function IsTableArrayByIterable(ByVal ipFPA As Variant) As Boolean
     IsTableArrayByIterable = Globals.Res.SetNotOkay.Status
     
     If Arrays.IsNotValid(ipFPA) Then Exit Function
-    Dim myitem As Variant
-    For Each myitem In ipFPA
+    Dim myItem As Variant
+    For Each myItem In ipFPA
         
-        If BailOut.When(Types.IsNotArray(myitem), Msg.IsNotArray) Then Exit Function
-        If BailOut.When(Arrays.Ranks(myitem) <> 2, Msg.IsNotTableArray) Then Exit Function
+        If BailOut.When(Types.IsNotArray(myItem), Msg.IsNotArray) Then Exit Function
+        If BailOut.When(Arrays.Ranks(myItem) <> 2, Msg.IsNotTableArray) Then Exit Function
         
     Next
     
@@ -416,11 +383,11 @@ Public Function IsMDArrayByIterable(ByVal ipFPA As Variant) As Boolean
     IsMDArrayByIterable = Globals.Res.SetNotOkay.Status
     
     If Arrays.IsNotValid(ipFPA) Then Exit Function
-    Dim myitem As Variant
-    For Each myitem In ipFPA
+    Dim myItem As Variant
+    For Each myItem In ipFPA
         
-        If BailOut.When(Types.IsNotArray(myitem), Msg.IsNotArray) Then Exit Function
-        If BailOut.When(Arrays.Ranks(myitem) < 3, Msg.IsNotTableArray) Then Exit Function
+        If BailOut.When(Types.IsNotArray(myItem), Msg.IsNotArray) Then Exit Function
+        If BailOut.When(Arrays.Ranks(myItem) < 3, Msg.IsNotTableArray) Then Exit Function
         
     Next
     
@@ -431,28 +398,24 @@ End Function
 '@Description("Returns true if dimension 1 of an array has Ubound>=Lbound. Allows syntax parity with IterableObjects")
 Public Function HasItems(ParamArray ipArgArray() As Variant) As Boolean
 Attribute HasItems.VB_Description = "Returns true if dimension 1 of an array has Ubound>=Lbound. Allows syntax parity with IterableObjects"
-   HasItems = HasItemsByIterable(ipArgArray)
+   HasItems = HasItemsByFPA(ipArgArray)
 End Function
 
 Public Function HasNoItems(ParamArray ipArgsArray() As Variant) As Boolean
-    HasNoItems = Not HasItemsByIterable(ipArgsArray)
+    HasNoItems = Not HasItemsByFPA(ipArgsArray)
 End Function
 
-' ' this function exists to get out of an awkiwardness for Lyst.Add method
-' Public Function HasNoItemsByIterable(ByVal ipArgsArray As Variant) As Boolean
-'     HasNoItemsByIterable = Not HasItemsByIterable(ipArgsArray)
-' End Function
 
-Friend Function HasItemsByIterable(ByVal ipArgsArray As Variant) As Boolean
+Friend Function HasItemsByFPA(ByVal ipArgsArray As Variant) As Boolean
     
-    HasItemsByIterable = Globals.Res.SetNotOkay.Status
+    HasItemsByFPA = Globals.Res.SetNotOkay.Status
     
-    Dim myitem As Variant
-    For Each myitem In ipArgsArray
+    Dim myItem As Variant
+    For Each myItem In ipArgsArray
         
         On Error Resume Next
         Dim myUBound As Long
-        myUBound = UBound(myitem)
+        myUBound = UBound(myItem)
         If Err.Number <> 0 Then
             
             On Error GoTo 0
@@ -460,13 +423,13 @@ Friend Function HasItemsByIterable(ByVal ipArgsArray As Variant) As Boolean
             
         End If
         
-        If myUBound < LBound(myitem) Then Exit Function
+        If myUBound < LBound(myItem) Then Exit Function
         
     Next
     
     On Error GoTo 0
     
-    HasItemsByIterable = Globals.Res.SetOkay.SetItems(True).Status
+    HasItemsByFPA = Globals.Res.SetOkay.SetItems(True).Status
 
 End Function
     
@@ -501,7 +464,6 @@ Public Function TryExtent(ByRef ipArray As Variant, Optional ByVal ipRank As Lon
     If BailOut.When(Arrays.IsNotValid(ipArray), Msg.HasNoItems) Then Exit Function
     If BailOut.When(Ranks(ipArray) < Preset.ArrayFirstRank, Msg.RankLessThanArrayFirstRank) Then Exit Function
     If BailOut.When(Arrays.LacksRank(ipArray, ipRank), Msg.ArrayLacksRank) Then Exit Function
-    'If BailOut.When(Arrays.HasNoItems(ipArray), Msg.ArrayHasNoItems) Then Exit Function ' also detects empty variant
    
     'An uninitialised variant array has Ubound of -1 and Lbound of 0
     Dim myUBound As Long
@@ -542,14 +504,7 @@ End Function
 '@Description("transposes rows and colums of a 2d array")
 Public Function Transpose(ByVal ipTablearray As Variant) As Variant
 Attribute Transpose.VB_Description = "transposes rows and colums of a 2d array"
-    'ToDo: update to be able to cope with a jagged array.
-    ' 'Check for a jaggedarray
-    ' If Ranks(ipTablearray) = 1 And Ranks(ipTablearray(LBound(ipTablearray))) = 1 Then
-            
-    '     Return TransposeJagged(ipTablearray)
-            
-            
-    ' End If
+    ' ToDo: update to be able to cope with a jagged array.
 
     If IsNotTableArray(ipTablearray) Then
     

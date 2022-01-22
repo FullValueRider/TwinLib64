@@ -4,7 +4,7 @@ BEGIN
 END
 Attribute VB_Name = "rdSum"
 Attribute VB_GlobalNameSpace = False
-Attribute VB_Creatable = False
+Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = True
  Option Explicit
@@ -59,21 +59,21 @@ Public Function ExecRed(ByVal ipHostItems As Lyst) As Variant
 
     Dim mySum As LongLong
     mySum = 0
-    Dim myitem As Variant
+    Dim myItem As Variant
     
     If VBA.IsEmpty(s.Comparer) Then
     
-        For Each myitem In ipHostItems
+        For Each myItem In ipHostItems
     
-            mySum = mySum + myitem
+            mySum = mySum + myItem
          
         Next
            
     Else
         
-        For Each myitem In ipHostItems
+        For Each myItem In ipHostItems
            
-           If s.Comparer.ExecCmp(myitem) Then mySum = mySum + myitem
+           If s.Comparer.ExecCmp(myItem) Then mySum = mySum + myItem
            
         Next
              

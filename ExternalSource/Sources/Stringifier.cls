@@ -4,7 +4,7 @@ BEGIN
 END
 Attribute VB_Name = "Stringifier"
 Attribute VB_GlobalNameSpace = False
-Attribute VB_Creatable = False
+Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = True
 Attribute VB_Description = "Static class: Repository for non standard conversions methods"
@@ -138,32 +138,32 @@ Public Function ToStringByIterable(ByVal ipIterable As Variant) As String
     If myItems.HasNoItems Then Exit Function
   
     ' Convert each item in ipParamArray to a string representation
-    Dim myitem As Variant
+    Dim myItem As Variant
     Dim myIterableAsString As Lyst
     Set myIterableAsString = Lyst.Deb
         
-    For Each myitem In ipIterable
+    For Each myItem In ipIterable
                 
         Select Case True
           
-          Case Types.Group.IsIterable(myitem)
+          Case Types.Group.IsIterable(myItem)
                   
-            myIterableAsString.AddKnownItemsAsItems StringifyIterable(myitem)
+            myIterableAsString.AddKnownItemsAsItems StringifyIterable(myItem)
               
           
-          Case VBA.IsObject(myitem)
+          Case VBA.IsObject(myItem)
                 
-            myIterableAsString.AddKnownItemsAsItems StringifyNonIterableObject(myitem)
+            myIterableAsString.AddKnownItemsAsItems StringifyNonIterableObject(myItem)
               
             
-          Case Types.Group.IsAdmin(myitem)
+          Case Types.Group.IsAdmin(myItem)
                   
-            myIterableAsString.AddKnownItemsAsItems StringifyAdmin(myitem)
+            myIterableAsString.AddKnownItemsAsItems StringifyAdmin(myItem)
             
             
-          Case Types.Group.IsPrimitive(myitem)
+          Case Types.Group.IsPrimitive(myItem)
               
-              myIterableAsString.AddKnownItemsAsItems StringifyPrimitive(myitem)
+              myIterableAsString.AddKnownItemsAsItems StringifyPrimitive(myItem)
               
  
           Case Else
@@ -286,10 +286,10 @@ Public Function GetIterableItemsByEnumAsLystOfStrings(ByVal ipIterable As Varian
     Dim myLyst As Lyst
     Set myLyst = Lyst.Deb
         
-    Dim myitem As Variant
-    For Each myitem In ipIterable
+    Dim myItem As Variant
+    For Each myItem In ipIterable
         
-        myLyst.AddKnownItemsAsItems ToString(myitem)
+        myLyst.AddKnownItemsAsItems ToString(myItem)
             
     Next
         

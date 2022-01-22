@@ -4,7 +4,7 @@ BEGIN
 END
 Attribute VB_Name = "Kvp"
 Attribute VB_GlobalNameSpace = False
-Attribute VB_Creatable = False
+Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = True
 Attribute VB_Description = "Kvp is a flexible Key/Value pair dictionary targeted at VB/VBA. It facilitates data input, direct content manipulation of items and keys, and indirect manipulation of data via Map and Comparer objects"
@@ -695,10 +695,10 @@ Attribute CountIt.VB_Description = "Returns the number of Items in the Lyst inst
   
     Dim myCounter As Long
     myCounter = 0
-    Dim myitem As Variant
-    For Each myitem In p.Items
+    Dim myItem As Variant
+    For Each myItem In p.Items
 
-        If ipComparer.ExecCmp(myitem) Then myCounter = myCounter + 1
+        If ipComparer.ExecCmp(myItem) Then myCounter = myCounter + 1
         
             
     Next
@@ -1659,14 +1659,14 @@ Friend Sub InputWhenFPAHasOneItem(ByVal ipInputAction As Long, ByVal ipItem As V
         
     Else
         
-        Dim mystartrun As ResultStartRun
+        Dim myStartRun As ResultStartRun
         ' remember that ipindex may be negative
        If Ranges.TryStartRunFromAnyStartRunEnd(p.Keys, ipIndex).IsNotOkay Then Exit Sub
         
         '@Ignore DefaultMemberRequired
-        Set mystartrun = Globals.Res.GetResultStartRun
-        p.Keys.InsertRange mystartrun.StartIndex, myKeys
-        p.Items.InsertRange mystartrun.StartIndex, myParsed.GetItems
+        Set myStartRun = Globals.Res.GetResultStartRun
+        p.Keys.InsertRange myStartRun.StartIndex, myKeys
+        p.Items.InsertRange myStartRun.StartIndex, myParsed.GetItems
         
     End If
         
@@ -1688,14 +1688,14 @@ Friend Sub InputWhenFPAHasTwoItems(ByVal ipInputAction As KvpAdmin, ByVal ipfirs
         
     Else
         
-        Dim mystartrun As ResultStartRun
+        Dim myStartRun As ResultStartRun
         ' remember that ipindex may be negative
         If Ranges.TryStartRunFromAnyStartRunEnd(p.Keys, ipIndex).IsNotOkay Then Exit Sub
         
         '@Ignore DefaultMemberRequired
-        Set mystartrun = Globals.Res.GetResultStartRun
-        p.Keys.InsertRange mystartrun.StartIndex, myParsed.GetKeys
-        p.Items.InsertRange mystartrun.StartIndex, myParsed.GetItems
+        Set myStartRun = Globals.Res.GetResultStartRun
+        p.Keys.InsertRange myStartRun.StartIndex, myParsed.GetKeys
+        p.Items.InsertRange myStartRun.StartIndex, myParsed.GetItems
         
     End If
     
@@ -1818,14 +1818,14 @@ Attribute AdjustbyKey.VB_Description = "Common code for IncByKey and DecByKey"
         
     End If
 
-    Dim myitem As Variant
-    For Each myitem In myKeys
+    Dim myItem As Variant
+    For Each myItem In myKeys
 
         ' We choose to ignore any key that is not in p.keys
-        If p.Keys.HoldsItem(myitem) Then
+        If p.Keys.HoldsItem(myItem) Then
             
             Dim myIndex As Long
-            myIndex = p.Keys.IndexOf(myitem)
+            myIndex = p.Keys.IndexOf(myItem)
             
             ' The code below preserves the Type of the variable stored at ipIndex
             ' e.g. a Decimal Type is classed as a number But decimal +1 yeilds Double Type (or long Type)

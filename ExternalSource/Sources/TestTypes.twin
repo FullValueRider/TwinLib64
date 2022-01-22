@@ -1691,10 +1691,10 @@ Module TestTypes
             
             
             Dim myIterable(10 To 13) As Integer
-            myIterable(10) = 10
-            myIterable(11) = 20
-            myIterable(12) = 30
-            myIterable(13) = 40
+            myIterable(10) = 40
+            myIterable(11) = 30
+            myIterable(12) = 20
+            myIterable(13) = 10
             
             Dim myResult As Stack
             
@@ -1725,10 +1725,10 @@ Module TestTypes
             
             Dim myIterable As ArrayList
             Set myIterable = New ArrayList
-            myIterable.Add 10
-            myIterable.Add 20
-            myIterable.Add 30
             myIterable.Add 40
+            myIterable.Add 30
+            myIterable.Add 20
+            myIterable.Add 10
             
             Dim myResult As Stack
             
@@ -1760,10 +1760,10 @@ Module TestTypes
             
             Dim myIterable As Collection
             Set myIterable = New Collection
-            myIterable.Add 10
-            myIterable.Add 20
-            myIterable.Add 30
             myIterable.Add 40
+            myIterable.Add 30
+            myIterable.Add 20
+            myIterable.Add 10
             
             Dim myResult As Stack
             
@@ -1796,10 +1796,10 @@ Module TestTypes
             
             Dim myIterable As Queue
             Set myIterable = New Queue
-            myIterable.EnQueue 10
-            myIterable.EnQueue 20
-            myIterable.EnQueue 30
             myIterable.EnQueue 40
+            myIterable.EnQueue 30
+            myIterable.EnQueue 20
+            myIterable.EnQueue 10
             
             Dim myResult As Stack
             

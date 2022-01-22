@@ -4,7 +4,7 @@ BEGIN
 END
 Attribute VB_Name = "Ranges"
 Attribute VB_GlobalNameSpace = False
-Attribute VB_Creatable = False
+Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = True
 Option Explicit
@@ -21,8 +21,8 @@ Public Function GetSeries(ByVal ipStart As Variant, ByVal ipCount As Long, Optio
         
     If Types.Group.IsNotNumber(ipStart, ipCount, ipStep) Then Exit Function
         
-    Dim myitem As Variant
-    For myitem = 1 To ipCount
+    Dim myItem As Variant
+    For myItem = 1 To ipCount
         
         myLyst.Host.Add ipStart
         ipStart = ipStart + ipStep
@@ -39,8 +39,8 @@ Public Function GetConstSeries(ByVal ipCount As Long, ByVal ipValue As Variant) 
     Set myLyst = Lyst.Deb
     Set GetConstSeries = myLyst
         
-    Dim myitem As Long
-    For myitem = 1 To ipCount
+    Dim myItem As Long
+    For myItem = 1 To ipCount
         
         myLyst.Host.Add ipValue
             
