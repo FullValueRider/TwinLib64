@@ -1,4 +1,3 @@
-*git*
 *.zip
 Packages/
 Archive/
@@ -14,6 +13,8 @@ obj/
 *.json
 Debug/
 *.code-workspace
-Export*.bat
-Import*.bat
+Export*.*
+Import*.*
+.gitignore
+.gitattributes
 
