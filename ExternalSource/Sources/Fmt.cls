@@ -107,15 +107,15 @@ Public Sub Class_Initialize()
         
     With s.FormatFields
         
-        .Add NEWLINES, vbCrLf                    ' {nl
-        .Add TABS, vbTab                         ' {tb
-        .Add NEWLINES_TAB, vbCrLf                ' {nt
-        .Add DQUOTE, Char.twPlainDQuote                ' {dq
-        .Add SQUOTE, Char.twPlainSQuote                ' {sq
-        .Add SMART_SQUOTE_OPEN, Char.twLSmartSQuote ' {so
-        .Add SMART_SQUOTE_CLOSE, Char.twRSmartSQuote ' {sc
-        .Add SMART_DQUOTE_OPEN, Char.twLSMartDQuote ' {do
-        .Add SMART_DQUOTE_CLOSE, Char.twRSmartDQuote ' {dc
+        .Add NEWLINES, vbCrLf                           ' {nl
+        .Add TABS, vbTab                                ' {tb
+        .Add NEWLINES_TAB, vbCrLf                       ' {nt
+        .Add DQUOTE, Char.twPlainDQuote                 ' {dq
+        .Add SQUOTE, Char.twPlainSQuote                 ' {sq
+        .Add SMART_SQUOTE_OPEN, Char.twLSmartSQuote     ' {so
+        .Add SMART_SQUOTE_CLOSE, Char.twRSmartSQuote    ' {sc
+        .Add SMART_DQUOTE_OPEN, Char.twLSMartDQuote     ' {do
+        .Add SMART_DQUOTE_CLOSE, Char.twRSmartDQuote    ' {dc
             
     End With
         

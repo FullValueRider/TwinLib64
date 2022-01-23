@@ -1,4 +1,10 @@
 Attribute VB_Name = "Preset"
+' Constants defined in this module will not be available
+' to projects using a TwinLib64 activex compilation
+' Therefore
+' ToDo reimplement constants as Functions.  This will require
+' 
+
 ' We are using Preset to mean constant
 ' this is because the Name Constant is already used by VBA
 Option Explicit

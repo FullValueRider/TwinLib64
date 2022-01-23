@@ -10,7 +10,6 @@ Module Testing
 
     Public Sub Tester()
         
-        
         Debug.Print "Testing started"
         TestStringifier.StringifierTests
         TestFmt.FmtTests
