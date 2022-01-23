@@ -1,3 +1,4 @@
+.git*
 *.zip
 Packages/
 Archive/
@@ -12,4 +13,7 @@ Settings.*
 obj/
 *.json
 Debug/
+*.code-workspace
+Export*.bat
+Import*.bat
 
