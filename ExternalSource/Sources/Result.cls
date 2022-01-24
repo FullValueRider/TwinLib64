@@ -48,7 +48,7 @@ Private p                               As Properties
 
 Private Sub Class_Initialize()
         
-    p.Status = enums.Con.Value(Preset.ResultStatusOkay)
+    p.Status = enums.Preset.Value(PresetId.ResultStatusOkay)
     p.MsgId = Msg.okay
     Set p.ResultItems = New ArrayList
         
@@ -251,7 +251,7 @@ Attribute SetOkay.VB_Description = "Sets Status and Messageenum"
         
     If p.MsgId = Msg.NotOkay Or p.MsgId = Msg.okay Then p.MsgId = ipMessageEnum
     
-    p.Status = enums.Con.Value(Preset.ResultStatusOkay)
+    p.Status = enums.Preset.Value(PresetId.ResultStatusOkay)
     Set SetOkay = Me
     
 End Function
@@ -262,7 +262,7 @@ Attribute SetNotOkay.VB_Description = "Sets Status and Messageenum"
         
 If p.MsgId = Msg.NotOkay Or p.MsgId = Msg.okay Then p.MsgId = ipMessageEnum
     
-    p.Status = enums.Con.Value(Preset.ResultStatusNotOkay)
+    p.Status = enums.Preset.Value(PresetId.ResultStatusNotOkay)
     Set SetNotOkay = Me
     
 End Function
@@ -276,12 +276,12 @@ Attribute Init.VB_Description = "Sets the Result to the 'NotOkay' or 'Failed' Re
         Case Msg.okay
         
             p.MsgId = Msg.okay
-            p.Status = enums.Con.Value(Preset.ResultStatusOkay)
+            p.Status = enums.Preset.Value(PresetId.ResultStatusOkay)
         
         Case Msg.NotOkay
         
             p.MsgId = Msg.NotOkay
-            p.Status = enums.Con.Value(Preset.ResultStatusNotOkay)
+            p.Status = enums.Preset.Value(PresetId.ResultStatusNotOkay)
         
     End Select
    

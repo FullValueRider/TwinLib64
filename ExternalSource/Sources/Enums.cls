@@ -26,8 +26,8 @@ Public Property Get TableToLystActions() As eTableToLystActions
     Set TableToLystActions = eTableToLystActions
 End Property
 
-Public Property Get Con() As eConstants
-    Set Con = eConstants
+Public Property Get Preset() As ePresets
+    Set Preset = ePresets
 End Property
 ' Public Property Get LookupConst() As eLookupConst
 '     Set LookupConst = eLookupConst

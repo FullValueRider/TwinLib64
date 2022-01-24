@@ -83,7 +83,7 @@ Attribute TryStartRunFromAnyStartRunEnd.VB_Description = "Takes an iterable or s
  
     Set TryStartRunFromAnyStartRunEnd = Globals.Res.SetOkay
     Dim myRank As Long
-    If VBA.IsMissing(ipRank) Then myRank = enums.Con.Value(Preset.ArrayFirstRank) Else myRank = ipRank
+    If VBA.IsMissing(ipRank) Then myRank = enums.Preset.Value(PresetId.ArrayFirstRank) Else myRank = ipRank
         
     If Types.TryExtent(ipItem, myRank).IsNotOkay Then Exit Function
         
@@ -398,7 +398,7 @@ Attribute TryRange.VB_Description = "Returns the specified subrange in Item(0) o
     Globals.Res.SetOkay
     Set TryRange = Globals.Res
     Dim myRank As Long
-    If VBA.IsMissing(ipRank) Then myRank = enums.Con.Value(Preset.ArrayFirstRank) Else myRank = ipRank
+    If VBA.IsMissing(ipRank) Then myRank = enums.Preset.Value(PresetId.ArrayFirstRank) Else myRank = ipRank
         
     If Ranges.TryStartRunFromAnyStartRunEnd(ipIterable, ipStartIndex, ipRun, ipEndIndex, myRank).IsNotOkay Then Exit Function
  

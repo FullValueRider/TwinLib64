@@ -68,7 +68,7 @@ Attribute TryExtent.VB_Description = "Global.Res.Items is populated with the fir
     
     Set TryExtent = Globals.Res.SetNotOkay
     Dim myRank As Long
-    If VBA.IsMissing(ipRank) Then myRank = enums.Con.Value(Preset.ArrayFirstRank): Else myRank = ipRank
+    If VBA.IsMissing(ipRank) Then myRank = enums.Preset.Value(PresetId.ArrayFirstRank): Else myRank = ipRank
         
     Select Case True
         

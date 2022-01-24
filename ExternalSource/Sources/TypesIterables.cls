@@ -24,7 +24,7 @@ Attribute TryExtent.VB_Description = "Returns the firstindex,lastindex and count
     'Items should be accessed using Item(ResultItemsEnums.ItemExtent(enum))
     Set TryExtent = Globals.Res.SetNotOkay
     Dim myRank As Long
-    If VBA.IsMissing(ipRank) Then myRank = enums.Con.Value(Preset.ArrayFirstRank): Else myRank = ipRank
+    If VBA.IsMissing(ipRank) Then myRank = enums.Preset.Value(PresetId.ArrayFirstRank): Else myRank = ipRank
     If BailOut.When(Types.Group.IsNotIterable(ipIterable), Msg.IsNotIterable) Then Exit Function
         
     Select Case True
@@ -77,7 +77,7 @@ Public Function Count(ByVal ipIterable As Variant, Optional ByVal ipRank As Vari
 
     Count = -1
     Dim myRank As Long
-    If VBA.IsMissing(ipRank) Then myRank = enums.Con.Value(Preset.ArrayFirstRank): Else myRank = ipRank
+    If VBA.IsMissing(ipRank) Then myRank = enums.Preset.Value(PresetId.ArrayFirstRank): Else myRank = ipRank
     
     If TryExtent(ipIterable, myRank).IsNotOkay Then Exit Function
         
@@ -262,7 +262,7 @@ End Function
 
 Public Function HasNoItems(ByVal ipArg As Variant, Optional ByVal ipRank As Variant) As Boolean
     Dim myRank As Long
-    If VBA.IsMissing(ipRank) Then myRank = enums.Con.Value(Preset.ArrayFirstRank): Else myRank = ipRank
+    If VBA.IsMissing(ipRank) Then myRank = enums.Preset.Value(PresetId.ArrayFirstRank): Else myRank = ipRank
     HasNoItems = Not HasItems(ipArg, myRank)
 End Function
 
@@ -278,7 +278,7 @@ Attribute HasItems.VB_Description = "Returns true if arg is an array and has ubo
         
     HasItems = False
     Dim myRank As Long
-    If VBA.IsMissing(ipRank) Then myRank = enums.Con.Value(Preset.ArrayFirstRank): Else myRank = ipRank
+    If VBA.IsMissing(ipRank) Then myRank = enums.Preset.Value(PresetId.ArrayFirstRank): Else myRank = ipRank
         
     If Types.Group.IsNotIterable(ipArg) Then Exit Function
 

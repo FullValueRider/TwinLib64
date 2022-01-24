@@ -2,17 +2,18 @@ VERSION 1.0 CLASS
 BEGIN
   MultiUse = -1  'True
 END
-Attribute VB_Name = "eConstants"
+Attribute VB_Name = "ePresets"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = True
 Option Explicit
 
-Const eConstName As String = "eConstants"
+Const ePresetName As String = "eConstants"
 
-Public Enum Preset
+Public Enum PresetId
     
+    NoValue = -1
     'Number related
     NaN
     MaxLong
@@ -133,11 +134,11 @@ Public Function Ord(ByVal ipEnum As TableToLystAction) As Long
         
 End Function
 
-Public Property Get AsEnum(ByVal ipEnum As Preset) As Preset
+Public Property Get AsEnum(ByVal ipEnum As PresetId) As PresetId
     AsEnum = ipEnum
 End Property
 
-Public Property Get Value(ByVal ipEnum As Preset) As Variant
+Public Property Get Value(ByVal ipEnum As PresetId) As Variant
     Value = s.Values.Item(ipEnum)
 End Property
 
@@ -155,7 +156,7 @@ Public Property Get LacksMember(ByVal ipValue As Long) As Boolean
 End Property
 
 Public Property Get Name() As String
-    Name = eConstName
+    Name = ePresetName
 End Property
 
 Public Property Get Count() As Long

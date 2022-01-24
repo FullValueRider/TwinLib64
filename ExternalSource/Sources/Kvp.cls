@@ -723,7 +723,7 @@ Attribute Dec.VB_Description = "Decrements the Items  at the given Keys by the s
 
     Globals.Res.Init Msg.okay
     Dim myDecrement As Long
-    If VBA.IsMissing(ipDecrement) Then myDecrement = enums.Con.Value(Preset.DefaultDec) Else myDecrement = ipDecrement
+    If VBA.IsMissing(ipDecrement) Then myDecrement = enums.Preset.Value(PresetId.DefaultDec) Else myDecrement = ipDecrement
     
     If BailOut.When(Types.Group.IsNotNumber(myDecrement), Msg.IsNotNumber, ipAltMessage:="The increment variable is not a number") Then Exit Function
     If BailOut.When(myDecrement = 0, Msg.ZeroIsInvalidParameter) Then Exit Function
@@ -740,7 +740,7 @@ Attribute DecAt.VB_Description = "Decrements the Items at the given indexes by t
     
     Globals.Res.Init Msg.okay
     Dim myDecrement As Long
-    If VBA.IsMissing(ipDecrement) Then myDecrement = enums.Con.Value(Preset.DefaultDec) Else myDecrement = ipDecrement
+    If VBA.IsMissing(ipDecrement) Then myDecrement = enums.Preset.Value(PresetId.DefaultDec) Else myDecrement = ipDecrement
     
     If BailOut.When(Types.Group.IsNotNumber(ipDecrement), Msg.IsNotNumber, ipAltMessage:="The increment variable is not a number") Then Exit Function
     If BailOut.When(ipDecrement = 0, Msg.ZeroIsInvalidParameter) Then Exit Function
@@ -966,7 +966,7 @@ Attribute Inc.VB_Description = "Increments the Items  at the given Keys by the s
 
     Globals.Res.Init Msg.okay
     Dim myIncrement As Long
-    If VBA.IsMissing(ipIncrement) Then myIncrement = enums.Con.Value(Preset.DefaultInc) Else myIncrement = ipIncrement
+    If VBA.IsMissing(ipIncrement) Then myIncrement = enums.Preset.Value(PresetId.DefaultInc) Else myIncrement = ipIncrement
     
     If BailOut.When(Types.Group.IsNotNumber(myIncrement), Msg.IsNotNumber, ipAltMessage:="The increment variable is not a number") Then Exit Function
     If BailOut.When(myIncrement = 0, Msg.ZeroIsInvalidParameter) Then Exit Function
@@ -981,7 +981,7 @@ Public Function IncAt(Optional ByVal ipIndexes As Variant, Optional ByVal ipIncr
     
     Globals.Res.Init Msg.okay
     Dim myIncrement As Long
-    If VBA.IsMissing(ipIncrement) Then myIncrement = enums.Con.Value(Preset.DefaultInc) Else myIncrement = ipIncrement
+    If VBA.IsMissing(ipIncrement) Then myIncrement = enums.Preset.Value(PresetId.DefaultInc) Else myIncrement = ipIncrement
     
     ' If BailOut.When(Types.Group.IsNotNumber(myIncrement), Msg.IsNotNumber, ipAltMessage:="The increment variable is not a number") Then Exit Function
     ' If BailOut.When(myIncrement = 0, Msg.ZeroIsInvalidParameter) Then Exit Function

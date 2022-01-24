@@ -648,7 +648,7 @@ Attribute InsertRange.VB_Description = "Returns a modified Lyst with values from
     Set InsertRange = Me
     
     Dim myRank As Long
-    If VBA.IsMissing(ipRank) Then myRank = enums.Con.Value(Preset.ArrayFirstRank) Else myRank = ipRank
+    If VBA.IsMissing(ipRank) Then myRank = enums.Preset.Value(PresetId.ArrayFirstRank) Else myRank = ipRank
     
    
     If Ranges.TryStartRunFromAnyStartRunEnd(Me, ipInsertIndex).IsNotOkay Then Exit Function

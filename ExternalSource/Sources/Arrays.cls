@@ -107,7 +107,7 @@ Public Function HasNoBounds(ByRef ipArray As Variant, Optional ByVal ipRank As V
     
     HasNoBounds = True
     Dim myRank As Long
-    If VBA.IsMissing(ipRank) Then myRank = enums.Con.Value(Preset.ArrayFirstRank) Else myRank = ipRank
+    If VBA.IsMissing(ipRank) Then myRank = enums.Preset.Value(PresetId.ArrayFirstRank) Else myRank = ipRank
     If VBA.IsMissing(ipRank) < 0 Then Exit Function
      
     On Error Resume Next
@@ -128,13 +128,13 @@ End Function
 
 Public Function RankHasNoItems(ByVal ipArray As Variant, Optional ByVal ipRank As Variant) As Boolean
     Dim myRank As Long
-    If VBA.IsMissing(ipRank) Then myRank = enums.Con.Value(Preset.ArrayFirstRank) Else myRank = ipRank
+    If VBA.IsMissing(ipRank) Then myRank = enums.Preset.Value(PresetId.ArrayFirstRank) Else myRank = ipRank
     RankHasNoItems = Count(ipArray, myRank) < 1
 End Function
 
 Public Function RankHasItems(ByVal ipArray As Variant, Optional ByVal ipRank As Variant) As Boolean
     Dim myRank As Long
-    If VBA.IsMissing(ipRank) Then myRank = enums.Con.Value(Preset.ArrayFirstRank) Else myRank = ipRank
+    If VBA.IsMissing(ipRank) Then myRank = enums.Preset.Value(PresetId.ArrayFirstRank) Else myRank = ipRank
     RankHasItems = Not RankHasNoItems(ipArray, myRank)
 End Function
 
@@ -229,7 +229,7 @@ Public Function HasRank(ByRef ipArray As Variant, Optional ByVal ipRank As Varia
 
     HasRank = Globals.Res.SetNotOkay.Status
     Dim myRank As Long
-    If VBA.IsMissing(ipRank) Then myRank = enums.Con.Value(ipRank) Else myRank = ipRank
+    If VBA.IsMissing(ipRank) Then myRank = enums.Preset.Value(ipRank) Else myRank = ipRank
     If BailOut.When(Arrays.IsNotValid(ipArray), Msg.ArrayLacksRank) Then Exit Function
     If BailOut.When(myRank < 1, Msg.RankLessThanArrayFirstRank) Then Exit Function
     If BailOut.When(myRank > Ranks(ipArray), Msg.ArrayLacksRank) Then Exit Function
@@ -242,7 +242,7 @@ End Function
 
 Public Function LacksRank(ByRef ipArray As Variant, Optional ByVal ipRank As Variant) As Boolean
     Dim myRank As Long
-    If VBA.IsMissing(ipRank) Then myRank = enums.Con.Value(ipRank) Else myRank = ipRank
+    If VBA.IsMissing(ipRank) Then myRank = enums.Preset.Value(ipRank) Else myRank = ipRank
     LacksRank = Not HasRank(ipArray, myRank)
 End Function
 
@@ -275,7 +275,7 @@ Public Function Count(ByRef ipArray As Variant, Optional ByVal ipRank As Variant
         
     Count = -1
     Dim myRank As Long
-    If VBA.IsMissing(ipRank) Then myRank = enums.Con.Value(Preset.ArrayFirstRank) Else myRank = ipRank
+    If VBA.IsMissing(ipRank) Then myRank = enums.Preset.Value(PresetId.ArrayFirstRank) Else myRank = ipRank
         
     If BailOut.When(Types.IsNotArray(ipArray), Msg.IsNotArray) Then Exit Function
     If BailOut.When(Arrays.IsNotValid(ipArray), Msg.ArrayHasNoItems) Then Exit Function
@@ -476,9 +476,9 @@ Public Function TryExtent(ByRef ipArray As Variant, Optional ByVal ipRank As Var
         
     Set TryExtent = Globals.Res.SetNotOkay
     Dim myRank As Long
-    If VBA.IsMissing(ipRank) Then myRank = enums.Con.Value(Preset.ArrayFirstRank) Else myRank = ipRank
+    If VBA.IsMissing(ipRank) Then myRank = enums.Preset.Value(PresetId.ArrayFirstRank) Else myRank = ipRank
     If BailOut.When(Arrays.IsNotValid(ipArray), Msg.HasNoItems) Then Exit Function
-    If BailOut.When(Ranks(ipArray) < enums.Con.Value(Preset.ArrayFirstRank), Msg.RankLessThanArrayFirstRank) Then Exit Function
+    If BailOut.When(Ranks(ipArray) < enums.Preset.Value(PresetId.ArrayFirstRank), Msg.RankLessThanArrayFirstRank) Then Exit Function
     If BailOut.When(Arrays.LacksRank(ipArray, myRank), Msg.ArrayLacksRank) Then Exit Function
    
     'An uninitialised variant array has Ubound of -1 and Lbound of 0
