@@ -15,6 +15,5 @@ Debug/
 *.code-workspace
 Export*.*
 Import*.*
-.gitignore
-.gitattributes
+
 

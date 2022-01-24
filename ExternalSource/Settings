@@ -39,7 +39,7 @@
 	"project.description": "TwinLib64",
 	"project.id": "{B768C096-6072-450A-84A8-01D07F690907}",
 	"configuration.inherits": "Defaults",
-	"project.buildType": "Package TWINPACK",
+	"project.buildType": "ActiveX DLL",
 	"project.buildPath": "${SourcePath}\\Build\\${ProjectName}_${Architecture}.${FileExtension}",
 	"project.optionExplicit": true,
 	"project.warnings": {

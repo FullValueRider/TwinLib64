@@ -61,7 +61,7 @@ Public Function ExecAction(ByVal ipTablearray As Variant) As Lyst
             
     Next
     
-    Globals.Res.Init (Msg.Okay)
+    Globals.Res.Init (Msg.okay)
     Set ExecAction = myLystOfLyst
         
 End Function

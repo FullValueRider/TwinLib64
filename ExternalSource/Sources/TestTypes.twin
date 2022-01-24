@@ -40,7 +40,6 @@ Module TestTypes
     Public Sub TypesTests()
         
         Debug.Print "Testing ", CurrentProcedureName vbTab, vbTab,
-        myPlace = CurrentSourceFile & ":" & CurrentProcedureName & "."
         
         Test01_HasItemsEmptyArrayOfIntegerIsFalse
         Test02_HasItemsArrayOfIntegerIsTrue

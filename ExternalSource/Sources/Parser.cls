@@ -250,7 +250,7 @@ Friend Sub SetGlobalsResWhenFirstParamIsIterableKeysByENum(ByVal ipfirst As Vari
                 
         Case Types.Group.IsIterableItemsByEnum(ipsecond)
             'dictionary to iterable Is  dictionary keys to iterabl
-            Globals.Res.Init(Msg.Okay).SetItems ipsecond, ipfirst.Keys
+            Globals.Res.Init(Msg.okay).SetItems ipsecond, ipfirst.Keys
                     
         Case Else
                 
