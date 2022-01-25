@@ -13,8 +13,8 @@
 			"window.title": "${dirty}TwinLib64${separator}twinBASIC",
 				"files.associations" : {
                     "/___BUILDS/*": "twinbasicBuildConfig",
-                    "/___BUILDS/win64": "twinbasicBuildConfigACTIVE",
-                    "/*/Settings": "twinbasicProjectConfig"
+                    "/*/Settings": "twinbasicProjectConfig",
+                    "/___BUILDS/win64": "twinbasicBuildConfigACTIVE"
                 }, 
 				"files.defaultLanguage" : "twinbasic",
 					"editor.trimAutoWhitespace" : false,
@@ -57,7 +57,7 @@
                             "debug.saveBeforeStart": "none",
                             "twinbasic.hasCheckedSaveBeforeStart": true,
                             "editor.semanticTokenColorCustomizations": {
-                                "[Default Dark+]": {
+                                "[Visual Studio Dark]": {
                                     "enabled": true,
                                     "rules": {
                                         "basicClass": {

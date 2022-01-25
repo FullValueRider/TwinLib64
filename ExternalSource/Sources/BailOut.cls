@@ -24,26 +24,49 @@ Option Explicit
 Private Sub Class_Initialize()
 End Sub
 
-Public Function When(ByVal ipBailOut As Boolean, Optional ByVal ipMsg As Msg = Msg.Unspecified, Optional ByRef ipMsgArgsLyst As Lyst, Optional ByVal ipAltMessage As String) As Boolean
+'@Description("Sets message and global.res.status to not okay. Returns ipBailout ")
+Public Function When _
+( _
+    ByVal ipBailOut As Boolean, _
+    Optional ByVal ipMsg As Msg = Msg.Unspecified, _
+    Optional ByRef ipMsgArgsLyst As Lyst, _
+    Optional ByVal ipAltMessage As String _
+) As Boolean
     
-    ' because we wish 'When' to be true to facilitate bailing out,
-    ' globals.res.status MUST be reversed.
     If ipBailOut Then
         
-        SetGlobalResNotOkay ipMsg, ipMsgArgsLyst, ipAltMessage
-        When = True
-        
-    Else
-        
-        'Globals.Res.SetOkay
-        When = False
+        SetGlobalResMsg ipMsg, ipMsgArgsLyst, ipAltMessage
+       
+        Globals.Res.SetNotOkay
         
     End If
+ 
+    When = ipBailOut
+    
+End Function
+
+'@Description("Sets message and global.res.status to okay. Returns ipNotify.")
+Public Function Notify _
+( _
+    ByVal ipNotify As Boolean, _
+    Optional ByVal ipMsg As Msg = Msg.Unspecified, _
+    Optional ByRef ipMsgArgsLyst As Lyst, _
+    Optional ByVal ipAltMessage As String _
+) As Boolean
+        
+    If ipNotify Then
+        
+        SetGlobalResMsg ipMsg, ipMsgArgsLyst, ipAltMessage
+        Globals.Res.SetOkay
+        
+    End If
+    
+    Notify = ipNotify
     
 End Function
 
 
-Friend Sub SetGlobalResNotOkay _
+Friend Sub SetGlobalResMsg _
 ( _
     ByVal ipMessageEnum As Msg, _
     Optional ByVal ipArgLyst As Lyst, _
@@ -73,13 +96,10 @@ Friend Sub SetGlobalResNotOkay _
         myargs = ipArgLyst.ToArray
         
     End If
-        
-    
     
     Dim myErrorText As String
     myErrorText = Fmt.TxtArr(myMessage, myargs)
     Globals.Res.SetText myErrorText
-    Globals.Res.SetNotOkay
     
 End Sub
 
